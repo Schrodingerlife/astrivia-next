@@ -18,6 +18,6 @@ const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
 // Email autorizado para acessar o admin
-export const ADMIN_EMAILS = ["nicollas@astrivia.ai", "nicollas.braga@usp.br"];
+export const ADMIN_EMAILS = ["nicollas@astrivia.ai", "nicollas.braga@usp.br", "nicollas.braga@gmail.com"];
 
 export { app, auth, db, googleProvider };
