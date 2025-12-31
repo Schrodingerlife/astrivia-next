@@ -2,9 +2,24 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Linkedin } from "lucide-react";
+import { Linkedin, Loader2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { collection, getDocs } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
-const team = [
+interface TeamMember {
+    id?: string;
+    name: string;
+    role: string;
+    image: string;
+    bio: string;
+    experience: string[];
+    quote: string;
+    linkedin: string;
+}
+
+// Dados padrão caso Firestore esteja vazio ou offline
+const defaultTeam: TeamMember[] = [
     {
         name: "Nícollas Braga",
         role: "CEO & Founder",
@@ -54,6 +69,29 @@ const values = [
 ];
 
 export default function TeamPage() {
+    const [team, setTeam] = useState<TeamMember[]>(defaultTeam);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const loadTeam = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, "team"));
+                if (!querySnapshot.empty) {
+                    const teamData: TeamMember[] = [];
+                    querySnapshot.forEach((doc) => {
+                        teamData.push({ id: doc.id, ...doc.data() } as TeamMember);
+                    });
+                    setTeam(teamData);
+                }
+            } catch (error) {
+                console.error("Error loading team from Firestore:", error);
+                // Usa dados padrão em caso de erro
+            }
+            setLoading(false);
+        };
+        loadTeam();
+    }, []);
+
     return (
         <div className="min-h-screen pt-24">
             {/* Hero */}
@@ -78,56 +116,62 @@ export default function TeamPage() {
             {/* Team Members */}
             <section className="py-16 px-6">
                 <div className="max-w-6xl mx-auto">
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {team.map((member, index) => (
-                            <motion.div
-                                key={member.name}
-                                initial={{ opacity: 0, y: 40 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
-                                className="glass-card rounded-3xl p-8 text-center group"
-                            >
-                                <div className="relative w-[160px] h-[160px] mx-auto mb-6 rounded-full overflow-hidden border-4 border-[#00D9FF]/20 group-hover:border-[#00D9FF]/50 transition-colors">
-                                    <Image
-                                        src={member.image}
-                                        alt={member.name}
-                                        fill
-                                        className="object-cover"
-                                    />
-                                </div>
-
-                                <h3 className="text-xl font-bold mb-1">{member.name}</h3>
-                                <p className="text-[#00D9FF] text-sm font-medium mb-4">{member.role}</p>
-
-                                <p className="text-white/60 text-sm leading-relaxed mb-4">{member.bio}</p>
-
-                                <div className="flex flex-wrap justify-center gap-2 mb-4">
-                                    {member.experience.map((exp) => (
-                                        <span
-                                            key={exp}
-                                            className="text-xs px-2 py-1 rounded-full bg-white/5 text-white/50"
-                                        >
-                                            {exp}
-                                        </span>
-                                    ))}
-                                </div>
-
-                                <blockquote className="text-white/40 text-sm italic mb-4">
-                                    {`"${member.quote}"`}
-                                </blockquote>
-
-                                <a
-                                    href={member.linkedin}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 text-white/40 hover:text-[#00D9FF] transition-colors text-sm"
+                    {loading ? (
+                        <div className="flex justify-center py-20">
+                            <Loader2 className="w-8 h-8 animate-spin text-[#00D9FF]" />
+                        </div>
+                    ) : (
+                        <div className="grid md:grid-cols-3 gap-8">
+                            {team.map((member, index) => (
+                                <motion.div
+                                    key={member.name}
+                                    initial={{ opacity: 0, y: 40 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ delay: index * 0.1 }}
+                                    className="glass-card rounded-3xl p-8 text-center group"
                                 >
-                                    <Linkedin size={16} /> LinkedIn
-                                </a>
-                            </motion.div>
-                        ))}
-                    </div>
+                                    <div className="relative w-[160px] h-[160px] mx-auto mb-6 rounded-full overflow-hidden border-4 border-[#00D9FF]/20 group-hover:border-[#00D9FF]/50 transition-colors">
+                                        <Image
+                                            src={member.image}
+                                            alt={member.name}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                    </div>
+
+                                    <h3 className="text-xl font-bold mb-1">{member.name}</h3>
+                                    <p className="text-[#00D9FF] text-sm font-medium mb-4">{member.role}</p>
+
+                                    <p className="text-white/60 text-sm leading-relaxed mb-4">{member.bio}</p>
+
+                                    <div className="flex flex-wrap justify-center gap-2 mb-4">
+                                        {member.experience.map((exp) => (
+                                            <span
+                                                key={exp}
+                                                className="text-xs px-2 py-1 rounded-full bg-white/5 text-white/50"
+                                            >
+                                                {exp}
+                                            </span>
+                                        ))}
+                                    </div>
+
+                                    <blockquote className="text-white/40 text-sm italic mb-4">
+                                        {`"${member.quote}"`}
+                                    </blockquote>
+
+                                    <a
+                                        href={member.linkedin}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-2 text-white/40 hover:text-[#00D9FF] transition-colors text-sm"
+                                    >
+                                        <Linkedin size={16} /> LinkedIn
+                                    </a>
+                                </motion.div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </section>
 
