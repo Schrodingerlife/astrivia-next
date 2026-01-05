@@ -11,6 +11,7 @@ import {
     FileText,
     CheckCircle,
     ArrowRight,
+    ExternalLink,
 } from "lucide-react";
 
 const products = [
@@ -85,6 +86,7 @@ const products = [
             "Auditoria completa para inspetores",
         ],
         tech: ["Vertex AI Search", "Grounded Generation", "RAG", "100% compliance"],
+        demoUrl: "https://medsafe-backend-759156439718.us-central1.run.app/",
     },
     {
         id: "letterfix",
@@ -273,13 +275,26 @@ export default function ProductsPage() {
                                 </div>
 
                                 {/* Tech */}
-                                <div className="flex flex-wrap gap-2">
+                                <div className="flex flex-wrap gap-2 mb-6">
                                     {product.tech.map((t) => (
                                         <span key={t} className="tech-badge text-xs">
                                             {t}
                                         </span>
                                     ))}
                                 </div>
+
+                                {/* Demo Button */}
+                                {product.demoUrl && (
+                                    <a
+                                        href={product.demoUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="btn-primary px-6 py-3 rounded-xl inline-flex items-center gap-2"
+                                    >
+                                        <ExternalLink size={18} />
+                                        Acessar Demo
+                                    </a>
+                                )}
                             </motion.div>
                         </div>
                     </div>
