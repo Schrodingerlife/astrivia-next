@@ -152,17 +152,40 @@ export default function SocialVigilanteApp() {
                     if (response.ok) {
                         const data = await response.json();
                         addPosts(data.posts);
+                    } else {
+                        throw new Error("API Failed");
                     }
                 } catch (error) {
-                    console.error("Simulation error", error);
+                    console.warn("API Error, falling back to local simulation:", error);
+                    // Fallback: Generate local mock post if API fails (e.g. missing API Key on Vercel)
+                    simulateLocalPost();
                 }
+            };
+
+            const simulateLocalPost = () => {
+                const randomPost = MOCK_POSTS_POOL[Math.floor(Math.random() * MOCK_POSTS_POOL.length)];
+                const newPost = {
+                    ...randomPost,
+                    id: `local-${Date.now()}`,
+                    timestamp: new Date().toISOString(),
+                    status: "new" as const,
+                    // Simple text replacement to make the mock feel responsive to the search term
+                    content: randomPost.content
+                        .replace(/#\w+/g, `#${activeTerm.replace(/\s/g, "")}`)
+                        .replace(/CardioFix|NeuroCalm|DermGlow|FlexiJoint|ImunoBoost/g, activeTerm),
+                    aiAnalysis: randomPost.aiAnalysis ? {
+                        ...randomPost.aiAnalysis,
+                        drugMentioned: activeTerm
+                    } : undefined
+                };
+                addPosts([newPost]);
             };
 
             // First fetch immediately
             fetchSimulation();
 
-            // Then every 8 seconds
-            interval = setInterval(fetchSimulation, 8000);
+            // Then every 5 seconds (slightly faster for better demo feel)
+            interval = setInterval(fetchSimulation, 5000);
         }
 
         return () => clearInterval(interval);
@@ -292,8 +315,8 @@ export default function SocialVigilanteApp() {
                         onClick={isSimulating ? handleStopSimulation : handleStartSimulation}
                         disabled={loading}
                         className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${isSimulating
-                                ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20"
-                                : "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/20"
+                            ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20"
+                            : "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/20"
                             }`}
                     >
                         {loading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
