@@ -28,17 +28,17 @@ export function Navbar() {
         <>
             <nav className={`navbar fixed top-0 w-full z-50 ${isScrolled ? "scrolled" : ""}`}>
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-3 group">
-                        <span className="relative w-10 h-10 block">
+                    <Link href="/" className="flex items-center group">
+                        <span className="relative h-12 w-auto block mr-1">
                             <img
-                                src="/images/astrivia-logo-v3.png"
-                                alt="Astrivia Logo"
-                                className="w-full h-full object-contain drop-shadow-[0_0_15px_rgba(0,217,255,0.5)]"
+                                src="/images/logo-symbol.png"
+                                alt="A"
+                                className="h-full w-auto object-contain drop-shadow-[0_0_15px_rgba(0,217,255,0.5)]"
                             />
                         </span>
-                        <span className="flex items-center text-2xl font-bold">
-                            <span className="text-gradient-cyan">Astrivia</span>
-                            <span className="text-white/80 ml-1"> AI</span>
+                        <span className="flex items-center text-3xl font-bold tracking-tight">
+                            <span className="text-gradient-cyan">strivia</span>
+                            <span className="text-white/80 ml-2"> AI</span>
                         </span>
                     </Link>
 

@@ -25,17 +25,17 @@ export function Footer() {
                 <div className="grid md:grid-cols-4 gap-12">
                     {/* Logo & Description */}
                     <div className="md:col-span-1">
-                        <Link href="/" className="flex items-center gap-2 mb-4 group">
-                            <span className="relative w-8 h-8 block">
+                        <Link href="/" className="flex items-center mb-4 group">
+                            <span className="relative h-10 w-auto block mr-1">
                                 <img
-                                    src="/images/astrivia-logo-v3.png"
-                                    alt="Astrivia Logo"
-                                    className="w-full h-full object-contain opacity-90"
+                                    src="/images/logo-symbol.png"
+                                    alt="A"
+                                    className="h-full w-auto object-contain opacity-90"
                                 />
                             </span>
-                            <span className="text-xl font-bold block">
-                                <span className="text-gradient-cyan">Astrivia</span>
-                                <span className="text-white/80 ml-1"> AI</span>
+                            <span className="text-2xl font-bold block tracking-tight">
+                                <span className="text-gradient-cyan">strivia</span>
+                                <span className="text-white/80 ml-2"> AI</span>
                             </span>
                         </Link>
                         <p className="text-white/40 text-sm leading-relaxed">

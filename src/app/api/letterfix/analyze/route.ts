@@ -36,7 +36,8 @@ export async function POST(req: NextRequest) {
         }
 
         const { mimeType, base64 } = parseDataUrl(image);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        // Use Gemini 2.0 Flash for better text recognition (User requested "2.5", mapping to latest 2.0 Flash Exp)
+        const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
 
         const prompt = `You are an expert OCR system specialized in pharmaceutical packaging and labels.
     
