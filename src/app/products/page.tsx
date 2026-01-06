@@ -38,6 +38,7 @@ const products = [
             "Padronização de mensagem em todo o time",
         ],
         tech: ["Gemini 1.5 Pro", "Google Cloud TPU", "WebSockets", "<200ms latência"],
+        demoUrl: "https://pharmaroleplay-frontend-gzsqkmnyna-uc.a.run.app",
     },
     {
         id: "vigilante",
