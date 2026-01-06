@@ -190,7 +190,7 @@ export default function SocialVigilanteApp() {
         return () => clearInterval(interval);
     }, [isSimulating, activeTerm]);
 
-    const addPosts = (newPosts: any[]) => {
+    const addPosts = (newPosts: SocialPost[]) => {
         setPosts(prev => {
             const combined = [...newPosts, ...prev].slice(0, 50);
             return combined;

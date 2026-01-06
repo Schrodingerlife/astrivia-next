@@ -82,7 +82,7 @@ export function Footer() {
                         <h4 className="text-white font-semibold mb-4">Connect</h4>
                         <div className="flex gap-4 mb-6">
                             <a
-                                href="https://linkedin.com/company/astrivia"
+                                href="https://www.linkedin.com/in/astrivia-ai-96933b3a3/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="w-10 h-10 rounded-full glass flex items-center justify-center text-white/50 hover:text-[#00D9FF] transition-colors"
