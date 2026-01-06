@@ -26,15 +26,15 @@ export function Footer() {
                     {/* Logo & Description */}
                     <div className="md:col-span-1">
                         <Link href="/" className="flex items-center mb-4 group">
-                            <span className="relative h-10 w-auto block mr-1">
+                            <span className="relative h-8 w-auto block mr-2">
                                 <img
                                     src="/images/logo-symbol.png"
-                                    alt="A"
-                                    className="h-full w-auto object-contain opacity-90"
+                                    alt="Astrivia Logo"
+                                    className="h-full w-auto object-contain mix-blend-screen opacity-90"
                                 />
                             </span>
-                            <span className="text-2xl font-bold block tracking-tight">
-                                <span className="text-gradient-cyan">strivia</span>
+                            <span className="text-xl font-bold block tracking-tight">
+                                <span className="text-gradient-cyan">Astrivia</span>
                                 <span className="text-white/80 ml-2"> AI</span>
                             </span>
                         </Link>
@@ -93,7 +93,7 @@ export function Footer() {
                                 <Linkedin size={18} />
                             </a>
                             <a
-                                href="mailto:contato@astrivia.ai"
+                                href="mailto:astriviaai@gmail.com"
                                 className="w-10 h-10 rounded-full glass flex items-center justify-center text-white/50 hover:text-[#00D9FF] transition-colors"
                             >
                                 <Mail size={18} />

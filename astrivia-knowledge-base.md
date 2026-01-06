@@ -430,7 +430,7 @@ A Astrivia é construída 100% sobre Google Cloud, utilizando:
 ## Contato
 
 **Website:** <https://astrivia-next.vercel.app>  
-**Email:** <contato@astrivia.ai>
+**Email:** <astriviaai@gmail.com>
 
 ---
 

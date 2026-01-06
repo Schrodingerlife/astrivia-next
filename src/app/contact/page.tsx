@@ -216,10 +216,10 @@ export default function ContactPage() {
                             <Mail size={24} className="text-[#00D9FF] mb-3" />
                             <h3 className="font-bold mb-1">Email</h3>
                             <a
-                                href="mailto:contato@astrivia.ai"
+                                href="mailto:astriviaai@gmail.com"
                                 className="text-white/60 hover:text-[#00D9FF] transition-colors"
                             >
-                                contato@astrivia.ai
+                                astriviaai@gmail.com
                             </a>
                         </motion.div>
 
