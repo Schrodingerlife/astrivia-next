@@ -111,6 +111,7 @@ const products = [
             "Economia de custos de retrabalho",
         ],
         tech: ["Imagen 3", "Inpainting", "Vertex AI", "Zero texture loss"],
+        demoUrl: "https://letterfix-1.vercel.app/",
     },
     {
         id: "internmatch",
