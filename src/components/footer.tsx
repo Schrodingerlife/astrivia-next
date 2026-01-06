@@ -26,16 +26,12 @@ export function Footer() {
                     {/* Logo & Description */}
                     <div className="md:col-span-1">
                         <Link href="/" className="flex items-center mb-4 group">
-                            <span className="relative h-8 w-auto block mr-2">
+                            <span className="relative h-10 w-auto block">
                                 <img
-                                    src="/images/logo-symbol.png?v=fluid"
-                                    alt="Astrivia Logo"
-                                    className="h-full w-auto object-contain mix-blend-screen opacity-90"
+                                    src="/images/astrivia-logo-fixed.png"
+                                    alt="Astrivia AI"
+                                    className="h-full w-auto object-contain opacity-90"
                                 />
-                            </span>
-                            <span className="text-xl font-bold block tracking-tight">
-                                <span className="text-gradient-cyan">Astrivia</span>
-                                <span className="text-white/80 ml-2"> AI</span>
                             </span>
                         </Link>
                         <p className="text-white/40 text-sm leading-relaxed">

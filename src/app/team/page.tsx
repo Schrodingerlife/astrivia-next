@@ -31,7 +31,7 @@ const defaultTeam: TeamMember[] = [
     },
     {
         name: "André Guilherme",
-        role: "CSO",
+        role: "CSO & Co-Founder",
         image: "/images/team-andre.jpg",
         bio: "Ex-Marketing Sanofi. Estratégia B2B e Finanças. Farmácia-USP. Experiência em construção de modelos de negócio e precificação para mercado farmacêutico.",
         experience: ["Sanofi", "B2B Strategy", "Finanças", "Farmácia-USP"],
@@ -40,7 +40,7 @@ const defaultTeam: TeamMember[] = [
     },
     {
         name: "Gabriel Katakura",
-        role: "CCO",
+        role: "CCO & Co-Founder",
         image: "/images/team/gabriel.jpg?v=2",
         bio: "Qualidade na Boston Scientific. Validação Regulatória. Farmácia-USP. Background em garantia de qualidade e compliance para dispositivos médicos.",
         experience: ["Boston Scientific", "Qualidade", "Regulatório", "Farmácia-USP"],
