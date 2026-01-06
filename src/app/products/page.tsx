@@ -136,6 +136,7 @@ const products = [
             "Matching inteligente sem bias",
         ],
         tech: ["Vertex AI Embeddings", "Vector Search", "Semantic Matching"],
+        demoUrl: "https://intermatch-5051b.web.app/",
     },
     {
         id: "scigen",
