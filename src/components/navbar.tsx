@@ -30,6 +30,7 @@ export function Navbar() {
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                     <Link href="/" className="flex items-center group">
                         <span className="relative h-12 w-auto block">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img
                                 src="/images/astrivia-logo-fixed.png"
                                 alt="Astrivia AI"

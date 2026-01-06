@@ -27,6 +27,7 @@ export function Footer() {
                     <div className="md:col-span-1">
                         <Link href="/" className="flex items-center mb-4 group">
                             <span className="relative h-10 w-auto block">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
                                 <img
                                     src="/images/astrivia-logo-fixed.png"
                                     alt="Astrivia AI"

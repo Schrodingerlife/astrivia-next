@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
     Activity,
     AlertTriangle,
-    CheckCircle,
     Search,
     Filter,
     BarChart3,
@@ -356,6 +355,7 @@ export default function SocialVigilanteApp() {
                                 ) : null}
 
                                 <div className="flex gap-4">
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
                                     <img
                                         src={post.avatar}
                                         alt={post.author}
