@@ -3,8 +3,6 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut } from "lucide-react";
-import { useAuth } from "@/components/auth-provider";
 
 const navLinks = [
     { name: "Home", href: "/" },
@@ -19,7 +17,6 @@ const navLinks = [
 export function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const { user, logout } = useAuth();
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -50,28 +47,12 @@ export function Navbar() {
                         ))}
                     </div>
 
-                    <div className="hidden lg:flex items-center gap-4">
-                        {user && (
-                            <span className="text-white/40 text-sm truncate max-w-[150px]">
-                                {user.email}
-                            </span>
-                        )}
-                        <Link
-                            href="/contact"
-                            className="btn-primary px-6 py-2.5 rounded-lg text-sm"
-                        >
-                            Get Started
-                        </Link>
-                        {user && (
-                            <button
-                                onClick={logout}
-                                className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors text-white/60 hover:text-white"
-                                title="Sair"
-                            >
-                                <LogOut size={18} />
-                            </button>
-                        )}
-                    </div>
+                    <Link
+                        href="/contact"
+                        className="hidden lg:flex btn-primary px-6 py-2.5 rounded-lg text-sm"
+                    >
+                        Get Started
+                    </Link>
 
                     {/* Mobile Hamburger */}
                     <div
@@ -119,17 +100,6 @@ export function Navbar() {
                             >
                                 Get Started
                             </Link>
-                            {user && (
-                                <button
-                                    onClick={() => {
-                                        logout();
-                                        setMobileMenuOpen(false);
-                                    }}
-                                    className="flex items-center gap-2 text-white/60 hover:text-red-400 transition-colors"
-                                >
-                                    <LogOut size={18} /> Sair
-                                </button>
-                            )}
                         </div>
                     </motion.div>
                 )}

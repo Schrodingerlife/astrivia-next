@@ -120,19 +120,19 @@ const products = [
         category: "Talent Matching",
         badge: "Vector Search",
         description:
-            "Recrutamento inteligente para talentos farmacêuticos. Matching semântico entre perfis de candidatos e vagas usando embeddings do Vertex AI.",
+            "Plataforma de recrutamento inteligente para universitários de todos os cursos. Conectamos estudantes às melhores oportunidades de estágio e emprego usando IA semântica.",
         problem:
-            "Currículos são filtrados por keywords, perdendo candidatos qualificados. RH gasta horas em triagem manual.",
+            "Currículos são filtrados por keywords, perdendo candidatos qualificados. Estudantes de qualquer área têm dificuldade em encontrar vagas compatíveis com seu perfil.",
         howItWorks: [
             "Embeddings de vagas e currículos em espaço semântico",
-            "Matching por similaridade considerando experiências equivalentes",
-            "Score de compatibilidade com explicação",
-            "Shortlist automática para entrevistas",
+            "Matching por similaridade considerando experiências e habilidades",
+            "Score de compatibilidade com explicação personalizada",
+            "Conexão direta entre estudantes e empresas",
         ],
         benefits: [
             "80% menos tempo em triagem",
-            "Candidatos mais qualificados no shortlist",
-            "Redução de bias no processo seletivo",
+            "Oportunidades para todos os cursos",
+            "Matching inteligente sem bias",
         ],
         tech: ["Vertex AI Embeddings", "Vector Search", "Semantic Matching"],
     },

@@ -64,7 +64,7 @@ const products = [
     icon: <Users size={24} />,
     title: "InternMatch",
     description:
-      "Recrutamento inteligente para talentos farmacêuticos. Matching semântico entre perfis de candidatos e vagas usando embeddings do Vertex AI.",
+      "Plataforma de recrutamento inteligente para universitários de todos os cursos. Conectamos estudantes às melhores oportunidades de estágio e emprego.",
     badge: "Vector Search",
     category: "Talent Matching",
   },
