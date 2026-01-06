@@ -63,6 +63,7 @@ const products = [
             "Relatórios prontos para ANVISA",
         ],
         tech: ["BigQuery ML", "Vertex AI NLP", "Pub/Sub", "Terabytes/dia"],
+        demoUrl: "/tools/social-vigilante",
     },
     {
         id: "medsafe",
