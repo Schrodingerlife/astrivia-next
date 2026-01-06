@@ -372,7 +372,7 @@ A Astrivia é construída 100% sobre Google Cloud, utilizando:
 
 ### André Guilherme
 
-**Cargo:** CSO (Chief Strategy Officer)
+**Cargo:** CSO & Co-Founder
 
 **Background:**
 
@@ -389,7 +389,7 @@ A Astrivia é construída 100% sobre Google Cloud, utilizando:
 
 ### Gabriel Katakura
 
-**Cargo:** CCO (Chief Compliance Officer)
+**Cargo:** CCO & Co-Founder
 
 **Background:**
 
@@ -431,6 +431,7 @@ A Astrivia é construída 100% sobre Google Cloud, utilizando:
 
 **Website:** <https://astrivia-next.vercel.app>  
 **Email:** <astriviaai@gmail.com>
+**LinkedIn:** <https://www.linkedin.com/in/astrivia-ai-96933b3a3/>
 
 ---
 
@@ -446,3 +447,4 @@ A Astrivia é construída 100% sobre Google Cloud, utilizando:
 ---
 
 *Documento gerado para uso como fonte de conhecimento em NotebookLM e outras ferramentas de IA.*
+*Atualizado em Janeiro de 2025.*

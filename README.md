@@ -103,11 +103,11 @@ NEXT_PUBLIC_FIREBASE_API_KEY=...
 
 ## 📦 Produtos Astrivia
 
-1. **PharmaRoleplay** - Treinamento de vendas por voz com IA
-2. **Social Vigilante** - Farmacovigilância em redes sociais
+1. **PharmaRoleplay** - Treinamento de vendas por voz com IA ([Demo](https://pharmaroleplay-frontend-gzsqkmnyna-uc.a.run.app))
+2. **Social Vigilante** - Farmacovigilância em redes sociais ([Demo Funcional IA](/tools/social-vigilante))
 3. **MedSafe AI** - Auditoria regulatória automática ([Demo](https://medsafe-backend-759156439718.us-central1.run.app/))
-4. **LetterFix** - Edição generativa de materiais
-5. **InternMatch** - Plataforma de recrutamento para universitários
+4. **LetterFix** - Edição generativa de materiais ([Demo Funcional IA](/tools/letterfix))
+5. **InternMatch** - Plataforma de recrutamento para universitários ([Demo](https://intermatch-5051b.web.app/))
 6. **SciGen** - Geração de conteúdo científico
 
 ---
@@ -116,58 +116,33 @@ NEXT_PUBLIC_FIREBASE_API_KEY=...
 
 ### Vercel (Produção)
 
-```bash
-# Deploy manual
-npx vercel --prod
-
-# Ou automático via GitHub (já configurado)
-git push origin master
-```
-
-### Deploy Automático
-
-O repositório está conectado ao Vercel. Qualquer push para `master` dispara deploy automático.
+O repositório está conectado ao Vercel. Qualquer push para `master` dispara o deploy automático.
+**Status:** Build configurado para ignorar linting e garantir disponibilidade contínua.
 
 ---
 
 ## 👤 Painel Admin
 
-Acesse `/admin` para editar conteúdo do site.
-
-**Funcionalidades:**
-
-- Login com Google
-- Editar membros do time
-- Editar conteúdo da Home
-- Editar descrições de produtos
-
-**Emails autorizados:** Configurados em `src/lib/firebase.ts`
-
----
-
-## 📚 Documentação Adicional
-
-- [DEPLOY.md](./DEPLOY.md) - Instruções detalhadas de deploy
-- [astrivia-knowledge-base.md](./astrivia-knowledge-base.md) - Knowledge base para IA/NotebookLM
+Acesse `/admin` para editar membros do time e conteúdos dinâmicos via Firebase.
 
 ---
 
 ## 🤝 Time
 
 - **Nícollas Braga** - CEO & Founder
-- **André Guilherme** - CSO
-- **Gabriel Katakura** - CCO
+- **André Guilherme** - CSO & Co-Founder
+- **Gabriel Katakura** - CCO & Co-Founder
 
 ---
 
 ## 📄 Licença
 
-Proprietary - Astrivia AI © 2024
+Proprietary - Astrivia AI © 2025
 
 ---
 
 ## 🔗 Links
 
 - **Site:** <https://astrivia-next.vercel.app>
+- **LinkedIn:** [Astrivia AI](https://www.linkedin.com/in/astrivia-ai-96933b3a3/)
 - **GitHub:** <https://github.com/Schrodingerlife/astrivia-next>
-- **MedSafe Demo:** <https://medsafe-backend-759156439718.us-central1.run.app/>
