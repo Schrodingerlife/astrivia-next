@@ -41,7 +41,7 @@ const defaultTeam: TeamMember[] = [
     {
         name: "Gabriel Katakura",
         role: "CCO",
-        image: "/images/team/gabriel.jpg",
+        image: "/images/team/gabriel.jpg?v=2",
         bio: "Qualidade na Boston Scientific. Validação Regulatória. Farmácia-USP. Background em garantia de qualidade e compliance para dispositivos médicos.",
         experience: ["Boston Scientific", "Qualidade", "Regulatório", "Farmácia-USP"],
         quote: "Compliance não é obstáculo, é vantagem competitiva.",

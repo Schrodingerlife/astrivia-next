@@ -28,7 +28,7 @@ export function Footer() {
                         <Link href="/" className="flex items-center mb-4 group">
                             <span className="relative h-8 w-auto block mr-2">
                                 <img
-                                    src="/images/logo-symbol.png"
+                                    src="/images/logo-symbol.png?v=fluid"
                                     alt="Astrivia Logo"
                                     className="h-full w-auto object-contain mix-blend-screen opacity-90"
                                 />

@@ -31,7 +31,7 @@ export function Navbar() {
                     <Link href="/" className="flex items-center group">
                         <span className="relative h-10 w-auto block mr-3">
                             <img
-                                src="/images/logo-symbol.png"
+                                src="/images/logo-symbol.png?v=fluid"
                                 alt="Astrivia Logo"
                                 className="h-full w-auto object-contain mix-blend-screen drop-shadow-[0_0_15px_rgba(0,217,255,0.5)]"
                             />
