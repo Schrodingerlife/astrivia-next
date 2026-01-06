@@ -232,12 +232,12 @@ export default function ContactPage() {
                             <Linkedin size={24} className="text-[#00D9FF] mb-3" />
                             <h3 className="font-bold mb-1">LinkedIn</h3>
                             <a
-                                href="https://linkedin.com/company/astrivia"
+                                href="https://www.linkedin.com/in/astrivia-ai-96933b3a3/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-white/60 hover:text-[#00D9FF] transition-colors"
                             >
-                                /company/astrivia
+                                /in/astrivia-ai-96933b3a3
                             </a>
                         </motion.div>
 
