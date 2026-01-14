@@ -106,9 +106,8 @@ NEXT_PUBLIC_FIREBASE_API_KEY=...
 1. **PharmaRoleplay** - Treinamento de vendas por voz com IA ([Demo](https://pharmaroleplay-frontend-gzsqkmnyna-uc.a.run.app))
 2. **Social Vigilante** - Farmacovigilância em redes sociais ([Demo Funcional IA](/tools/social-vigilante))
 3. **MedSafe AI** - Auditoria regulatória automática ([Demo](https://medsafe-backend-759156439718.us-central1.run.app/))
-4. **LetterFix** - Edição generativa de materiais ([Demo Funcional IA](/tools/letterfix))
-5. **InternMatch** - Plataforma de recrutamento para universitários ([Demo](https://intermatch-5051b.web.app/))
-6. **SciGen** - Geração de conteúdo científico
+4. **InternMatch** - Plataforma de recrutamento para universitários ([Demo](https://intermatch-5051b.web.app/))
+5. **SciGen** - Geração de conteúdo científico
 
 ---
 

@@ -10,7 +10,6 @@ const services: { name: string; status: ServiceStatus; latency: string }[] = [
     { name: "PharmaRoleplay API", status: "operational", latency: "180ms" },
     { name: "Social Vigilante Processing", status: "operational", latency: "2.3s" },
     { name: "MedSafe AI Analysis", status: "operational", latency: "450ms" },
-    { name: "LetterFix Generation", status: "operational", latency: "3.1s" },
     { name: "InternMatch Matching", status: "operational", latency: "120ms" },
     { name: "SciGen Content", status: "operational", latency: "1.8s" },
 ];

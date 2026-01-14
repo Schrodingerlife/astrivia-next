@@ -91,31 +91,6 @@ const products = [
         demoUrl: "https://medsafe-backend-759156439718.us-central1.run.app/",
     },
     {
-        id: "letterfix",
-        image: "/images/product-letterfix.jpeg",
-        icon: <Wand2 size={32} />,
-        title: "LetterFix",
-        category: "Generative AI",
-        badge: "Imagen 3 on Vertex AI",
-        description:
-            "Edição generativa pixel-perfect em materiais finalizados. Modifique textos em embalagens e bulas preservando 100% do layout, texturas e iluminação originais.",
-        problem:
-            "Correções de última hora em artes finalizadas exigem retrabalho do designer. Pequenas mudanças levam dias.",
-        howItWorks: [
-            "Upload da arte final em alta resolução",
-            "Seleção do texto a ser modificado",
-            "IA preserva fonte, sombras, texturas e perspectiva",
-            "Resultado pronto para impressão em minutos",
-        ],
-        benefits: [
-            "Correções em minutos, não dias",
-            "Zero perda de qualidade visual",
-            "Economia de custos de retrabalho",
-        ],
-        tech: ["Imagen 3", "Inpainting", "Vertex AI", "Zero texture loss"],
-        demoUrl: "/tools/letterfix",
-    },
-    {
         id: "internmatch",
         image: "/images/product-internmatch.jpeg",
         icon: <Users size={32} />,

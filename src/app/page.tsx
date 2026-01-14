@@ -49,16 +49,6 @@ const products = [
     category: "Regulatory Compliance",
   },
   {
-    id: "letterfix",
-    image: "/images/product-letterfix.jpeg",
-    icon: <Wand2 size={24} />,
-    title: "LetterFix",
-    description:
-      "Edição pixel-perfect em materiais finalizados. IA generativa que modifica textos em embalagens preservando 100% do layout e texturas originais.",
-    badge: "Imagen 3",
-    category: "Generative AI",
-  },
-  {
     id: "internmatch",
     image: "/images/product-internmatch.jpeg",
     icon: <Users size={24} />,

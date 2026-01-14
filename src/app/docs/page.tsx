@@ -14,7 +14,7 @@ const sidebarItems = [
     {
         title: "Products",
         icon: <Cpu size={18} />,
-        items: ["PharmaRoleplay", "Social Vigilante", "MedSafe AI", "LetterFix", "InternMatch", "SciGen"],
+        items: ["PharmaRoleplay", "Social Vigilante", "MedSafe AI", "InternMatch", "SciGen"],
     },
     {
         title: "Tech Stack",
@@ -91,8 +91,8 @@ export default function DocsPage() {
                                                     <button
                                                         onClick={() => setActiveSection(item)}
                                                         className={`text-sm transition-colors ${activeSection === item
-                                                                ? "text-[#00D9FF]"
-                                                                : "text-white/40 hover:text-white/70"
+                                                            ? "text-[#00D9FF]"
+                                                            : "text-white/40 hover:text-white/70"
                                                             }`}
                                                     >
                                                         {item}

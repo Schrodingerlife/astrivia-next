@@ -73,7 +73,6 @@ const defaultContent: SiteContent = {
         { id: "pharmaroleplay", title: "PharmaRoleplay", category: "High-Compute Training", badge: "Google Cloud TPU", description: "Treinamento de vendas com IA por voz em tempo real.", benefits: ["Avaliação objetiva e consistente", "Feedback instantâneo pós-simulação"] },
         { id: "vigilante", title: "Social Vigilante", category: "Pharmacovigilance", badge: "BigQuery ML", description: "Farmacovigilância em escala de terabytes.", benefits: ["Detecção antes dos canais oficiais", "Cobertura 100% das menções públicas"] },
         { id: "medsafe", title: "MedSafe AI", category: "Regulatory Compliance", badge: "Vertex AI Search", description: "Conformidade com zero alucinação.", benefits: ["Redução de 95% no tempo de revisão", "Zero falsos positivos"] },
-        { id: "letterfix", title: "LetterFix", category: "Generative AI", badge: "Imagen 3", description: "Edição pixel-perfect em materiais finalizados.", benefits: ["Correções em minutos", "Zero perda de qualidade"] },
         { id: "internmatch", title: "InternMatch", category: "Talent Matching", badge: "Vector Search", description: "Recrutamento inteligente para talentos farmacêuticos.", benefits: ["80% menos tempo em triagem", "Candidatos mais qualificados"] },
         { id: "scigen", title: "SciGen", category: "Content Generation", badge: "Gemini Pro", description: "Transformação de estudos clínicos em conteúdo acessível.", benefits: ["Conteúdo em horas", "100% baseado em evidências"] },
     ],

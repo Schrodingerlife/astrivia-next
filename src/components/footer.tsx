@@ -5,7 +5,6 @@ const productLinks = [
     { name: "PharmaRoleplay", href: "/products#pharmaroleplay" },
     { name: "Social Vigilante", href: "/products#vigilante" },
     { name: "MedSafe AI", href: "/products#medsafe" },
-    { name: "LetterFix", href: "/products#letterfix" },
     { name: "InternMatch", href: "/products#internmatch" },
     { name: "SciGen", href: "/products#scigen" },
 ];
