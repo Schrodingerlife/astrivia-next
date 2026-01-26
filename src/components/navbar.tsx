@@ -55,7 +55,7 @@ export function Navbar() {
 
                     <div className="hidden lg:flex items-center gap-3">
                         <Link
-                            href="/tools/social-vigilante"
+                            href="/platform"
                             className="btn-outline px-5 py-2.5 rounded-lg text-sm"
                         >
                             Login

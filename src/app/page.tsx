@@ -150,13 +150,13 @@ export default function HomePage() {
               className="flex flex-wrap gap-4"
             >
               <Link
-                href="/products"
+                href="/platform"
                 className="btn-primary px-8 py-4 rounded-xl text-base flex items-center gap-2"
               >
                 Acessar Plataforma <ChevronRight size={20} />
               </Link>
               <Link
-                href="/tools/social-vigilante"
+                href="/platform"
                 className="btn-outline px-8 py-4 rounded-xl flex items-center gap-2 text-base"
               >
                 <Play size={20} /> Testar Demo Grátis
