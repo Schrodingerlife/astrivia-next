@@ -216,10 +216,10 @@ export default function ContactPage() {
                             <Mail size={24} className="text-[#00D9FF] mb-3" />
                             <h3 className="font-bold mb-1">Email</h3>
                             <a
-                                href="mailto:astriviaai@gmail.com"
+                                href="mailto:nicollas.braga@astriviaai.tech"
                                 className="text-white/60 hover:text-[#00D9FF] transition-colors"
                             >
-                                astriviaai@gmail.com
+                                nicollas.braga@astriviaai.tech
                             </a>
                         </motion.div>
 
@@ -232,12 +232,12 @@ export default function ContactPage() {
                             <Linkedin size={24} className="text-[#00D9FF] mb-3" />
                             <h3 className="font-bold mb-1">LinkedIn</h3>
                             <a
-                                href="https://www.linkedin.com/in/astrivia-ai-96933b3a3/"
+                                href="https://www.linkedin.com/company/astriviaai/"
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-white/60 hover:text-[#00D9FF] transition-colors"
                             >
-                                /in/astrivia-ai-96933b3a3
+                                /company/astriviaai
                             </a>
                         </motion.div>
 
