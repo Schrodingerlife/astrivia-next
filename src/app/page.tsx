@@ -195,38 +195,50 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ============== PROBLEM SECTION ============== */}
+      {/* ============== IMPACT SECTION ============== */}
       <section className="py-32 px-6 bg-[#0D1B2A]">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
-            title="O Diagnóstico: O Atrito Que Custa Bilhões"
-            subtitle="Marketing precisa da velocidade de uma F1. Regulatório impõe a cautela de um Fusca. No meio, receita é perdida."
+            title="Impacto Mensurável"
+            subtitle="Nossa plataforma entrega resultados concretos para operações de Life Sciences"
           />
 
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-12 relative"
-          >
-            <Image
-              src="/assets/diagnostic-comparison.jpg"
-              alt="Diagnóstico: F1 vs Fusca - Velocidade vs Cautela"
-              width={1200}
-              height={600}
-              className="w-full max-w-4xl mx-auto rounded-3xl shadow-2xl"
-            />
-          </motion.div>
+          <div className="grid md:grid-cols-3 gap-8 mt-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="glass-card rounded-2xl p-8 text-center"
+            >
+              <p className="text-4xl font-bold neon-number">60%</p>
+              <p className="text-white/60 mt-2">Redução no Time-to-Market</p>
+              <p className="text-white/40 text-sm mt-4">Aprovações regulatórias mais rápidas com IA</p>
+            </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass-card rounded-2xl p-8 max-w-xl mx-auto mt-12 text-center"
-          >
-            <p className="text-3xl font-bold text-[#EF4444]">US$ 1 milhão/dia</p>
-            <p className="text-white/60 mt-2">em receita perdida por atrasos regulatórios</p>
-          </motion.div>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="glass-card rounded-2xl p-8 text-center"
+            >
+              <p className="text-4xl font-bold neon-number">85%</p>
+              <p className="text-white/60 mt-2">Automação de Compliance</p>
+              <p className="text-white/40 text-sm mt-4">Revisões regulatórias automatizadas</p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="glass-card rounded-2xl p-8 text-center"
+            >
+              <p className="text-4xl font-bold neon-number">40%</p>
+              <p className="text-white/60 mt-2">Redução de Custos</p>
+              <p className="text-white/40 text-sm mt-4">Economia operacional com agentes IA</p>
+            </motion.div>
+          </div>
         </div>
       </section>
 
