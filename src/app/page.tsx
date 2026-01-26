@@ -139,8 +139,8 @@ export default function HomePage() {
               transition={{ duration: 0.8, delay: 0.3 }}
               className="text-lg md:text-xl text-white/70 max-w-xl leading-relaxed"
             >
-              Transformamos atrito regulatório em autonomia inteligente com IA agêntica.
-              Agentes que raciocinam, agem e aprendem continuamente.
+              Plataforma SaaS que transforma atrito regulatório em autonomia inteligente.
+              Agentes de IA que raciocinam, agem e aprendem continuamente.
             </motion.p>
 
             <motion.div
@@ -246,8 +246,8 @@ export default function HomePage() {
       <section id="products" className="py-32 px-6">
         <div className="max-w-7xl mx-auto">
           <SectionHeader
-            title="Ecossistema de 6 Agentes Autônomos"
-            subtitle="Cada produto resolve um gargalo específico da operação farmacêutica"
+            title="Nossos Produtos SaaS"
+            subtitle="6 ferramentas de IA disponíveis por assinatura para operações farmacêuticas"
           />
 
           <div className="grid md:grid-cols-2 gap-8 mt-16">
@@ -435,30 +435,37 @@ function ImpactCard({ stat }: { stat: typeof stats[0] }) {
   useEffect(() => {
     if (isInView) {
       const end = parseFloat(stat.value);
-      const duration = 2000;
-      const increment = end / (duration / 16);
-      let current = 0;
+      const duration = 1500; // Slightly faster
+      const startTime = performance.now();
 
-      const timer = setInterval(() => {
-        current += increment;
-        if (current >= end) {
-          setCount(end);
-          clearInterval(timer);
+      const animate = (currentTime: number) => {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+
+        // Ease-out cubic for smooth deceleration
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const current = end * easeOut;
+
+        setCount(current);
+
+        if (progress < 1) {
+          requestAnimationFrame(animate);
         } else {
-          setCount(current);
+          setCount(end);
         }
-      }, 16);
+      };
 
-      return () => clearInterval(timer);
+      requestAnimationFrame(animate);
     }
   }, [isInView, stat.value]);
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
       className="glass-card rounded-3xl p-10 text-center"
     >
       <div className="text-5xl md:text-6xl font-bold neon-number mb-4">
