@@ -61,7 +61,7 @@ export default function ContactPage() {
                     animate={{ opacity: 1, y: 0 }}
                     className="text-4xl md:text-5xl font-bold mb-4"
                 >
-                    Entre em <span className="text-gradient-cyan">Contato</span>
+                    Solicitar <span className="text-gradient-cyan">Acesso</span>
                 </motion.h1>
                 <motion.p
                     initial={{ opacity: 0 }}
@@ -69,7 +69,7 @@ export default function ContactPage() {
                     transition={{ delay: 0.2 }}
                     className="text-white/60 text-lg max-w-2xl mx-auto"
                 >
-                    Vamos transformar sua operação farmacêutica com IA agêntica
+                    Contrate nossa plataforma SaaS ou solicite uma demonstração dos produtos
                 </motion.p>
             </section>
 
@@ -142,12 +142,12 @@ export default function ContactPage() {
 
                                     <div>
                                         <select {...register("category")} className="form-input">
-                                            <option value="">Como podemos ajudar? *</option>
-                                            <option value="demo">Demonstração de Produto</option>
-                                            <option value="partnership">Parceria</option>
-                                            <option value="investment">Investimento</option>
-                                            <option value="career">Carreira</option>
-                                            <option value="other">Outro</option>
+                                            <option value="">Qual plano deseja contratar? *</option>
+                                            <option value="demo">Solicitar Demo Gratuito</option>
+                                            <option value="pilot">Iniciar Projeto Piloto</option>
+                                            <option value="subscription">Contratar Assinatura</option>
+                                            <option value="enterprise">Plano Enterprise</option>
+                                            <option value="other">Outra Solicitação</option>
                                         </select>
                                         {errors.category && (
                                             <p className="text-[#EF4444] text-sm mt-1">{errors.category.message}</p>
@@ -157,7 +157,7 @@ export default function ContactPage() {
                                     <div>
                                         <textarea
                                             {...register("message")}
-                                            placeholder="Conte sobre seu desafio *"
+                                            placeholder="Quais produtos deseja contratar? *"
                                             rows={5}
                                             className="form-input resize-none"
                                         />
