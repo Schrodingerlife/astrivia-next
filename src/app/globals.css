@@ -194,6 +194,13 @@ body {
   color: rgba(255, 255, 255, 0.4);
 }
 
+/* Select dropdown options - ensure visibility */
+select.form-input option {
+  background-color: #1a2b42;
+  color: #ffffff;
+  padding: 12px;
+}
+
 /* ============== NAVBAR ============== */
 .navbar {
   background: rgba(10, 22, 40, 0.8);
