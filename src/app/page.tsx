@@ -110,10 +110,16 @@ export default function HomePage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
-              className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm"
+              className="flex flex-wrap gap-3"
             >
-              <div className="w-2 h-2 bg-[#00D9FF] rounded-full animate-pulse" />
-              <span className="text-white/80">Powered by Vertex AI Agent Engine</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm">
+                <div className="w-2 h-2 bg-[#00D9FF] rounded-full animate-pulse" />
+                <span className="text-white/80">SaaS Platform</span>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2 glass rounded-full text-sm">
+                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                <span className="text-white/80">Powered by Vertex AI</span>
+              </div>
             </motion.div>
 
             <motion.h1
@@ -147,11 +153,14 @@ export default function HomePage() {
                 href="/products"
                 className="btn-primary px-8 py-4 rounded-xl text-base flex items-center gap-2"
               >
-                Explore Solutions <ChevronRight size={20} />
+                Acessar Plataforma <ChevronRight size={20} />
               </Link>
-              <button className="btn-outline px-8 py-4 rounded-xl flex items-center gap-2 text-base">
-                <Play size={20} /> Watch Demo
-              </button>
+              <Link
+                href="/tools/social-vigilante"
+                className="btn-outline px-8 py-4 rounded-xl flex items-center gap-2 text-base"
+              >
+                <Play size={20} /> Testar Demo Grátis
+              </Link>
             </motion.div>
           </div>
 
