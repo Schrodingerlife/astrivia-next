@@ -53,12 +53,20 @@ export function Navbar() {
                         ))}
                     </div>
 
-                    <Link
-                        href="/contact"
-                        className="hidden lg:flex btn-primary px-6 py-2.5 rounded-lg text-sm"
-                    >
-                        Get Started
-                    </Link>
+                    <div className="hidden lg:flex items-center gap-3">
+                        <Link
+                            href="/tools/social-vigilante"
+                            className="btn-outline px-5 py-2.5 rounded-lg text-sm"
+                        >
+                            Login
+                        </Link>
+                        <Link
+                            href="/contact"
+                            className="btn-primary px-6 py-2.5 rounded-lg text-sm"
+                        >
+                            Get Started
+                        </Link>
+                    </div>
 
                     {/* Mobile Hamburger */}
                     <div
