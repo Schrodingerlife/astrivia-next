@@ -146,6 +146,7 @@ const LetterFixApp: React.FC = () => {
 
                 <div className="flex-1 bg-black/50 rounded-2xl overflow-hidden flex justify-center items-center min-h-[300px] border border-white/5 relative group">
                     {imagePreview ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- Dynamic blob URL from user upload
                         <img
                             src={imagePreview}
                             alt="Uploaded Preview"
@@ -280,6 +281,7 @@ const LetterFixApp: React.FC = () => {
                         <div className="space-y-8">
                             <div className="bg-black/50 rounded-2xl overflow-hidden flex justify-center items-center relative border border-white/10 group">
                                 <div className="absolute inset-0 bg-[url('/images/transparent-bg.png')] opacity-10"></div>
+                                {/* eslint-disable-next-line @next/next/no-img-element -- Dynamic base64 data URL from AI generation */}
                                 <img
                                     src={generatedImage}
                                     alt="Generated result"

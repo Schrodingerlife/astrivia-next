@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Linkedin, Mail } from "lucide-react";
 
 const productLinks = [
@@ -25,14 +26,13 @@ export function Footer() {
                     {/* Logo & Description */}
                     <div className="md:col-span-1">
                         <Link href="/" className="flex items-center mb-4 group">
-                            <span className="relative h-10 w-auto block">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                    src="/images/astrivia-logo-fixed.png"
-                                    alt="Astrivia AI"
-                                    className="h-full w-auto object-contain opacity-90"
-                                />
-                            </span>
+                            <Image
+                                src="/images/astrivia-logo-fixed.png"
+                                alt="Astrivia AI"
+                                width={150}
+                                height={40}
+                                className="h-10 w-auto object-contain opacity-90"
+                            />
                         </Link>
                         <p className="text-white/40 text-sm leading-relaxed">
                             Intelligence that Cures Inefficiency
