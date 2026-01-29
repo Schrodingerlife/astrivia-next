@@ -10,7 +10,6 @@ import {
   Mic,
   Globe,
   Shield,
-  Wand2,
   Users,
   FileText,
   ExternalLink,

@@ -3,12 +3,12 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-    apiKey: "AIzaSyD-vixTXjX6_mXgH6PpP7mJQbP4QqBtyIs",
-    authDomain: "astrivia-website.firebaseapp.com",
-    projectId: "astrivia-website",
-    storageBucket: "astrivia-website.firebasestorage.app",
-    messagingSenderId: "1024609903368",
-    appId: "1:1024609903368:web:d85e48e11d16eccf5e02bd"
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
 // Initialize Firebase
@@ -17,7 +17,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-// Email autorizado para acessar o admin
-export const ADMIN_EMAILS = ["nicollas@astrivia.ai", "nicollas.braga@usp.br", "nicollas.braga@gmail.com"];
+// Emails autorizados para acessar o admin (carregados de variável de ambiente)
+const adminEmailsEnv = process.env.NEXT_PUBLIC_ADMIN_EMAILS || "";
+export const ADMIN_EMAILS = adminEmailsEnv.split(",").map(email => email.trim()).filter(Boolean);
 
 export { app, auth, db, googleProvider };
