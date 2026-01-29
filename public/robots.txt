@@ -3,7 +3,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://astrivia.ai/sitemap.xml
+Sitemap: https://astriviaai.tech/sitemap.xml
 
 # Disallow admin and API routes
 Disallow: /admin
