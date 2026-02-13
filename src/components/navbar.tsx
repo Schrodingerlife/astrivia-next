@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 const navLinks = [
@@ -29,14 +30,14 @@ export function Navbar() {
             <nav className={`navbar fixed top-0 w-full z-50 ${isScrolled ? "scrolled" : ""}`}>
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
                     <Link href="/" className="flex items-center group">
-                        <span className="relative h-12 w-auto block">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                src="/images/astrivia-logo-fixed.png"
-                                alt="Astrivia AI"
-                                className="h-full w-auto object-contain"
-                            />
-                        </span>
+                        <Image
+                            src="/images/astrivia-logo-fixed.png"
+                            alt="Astrivia AI"
+                            width={180}
+                            height={48}
+                            className="h-12 w-auto object-contain"
+                            priority
+                        />
                     </Link>
 
                     {/* Desktop Navigation */}

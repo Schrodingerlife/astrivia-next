@@ -6,12 +6,6 @@ import {
     Activity,
     AlertTriangle,
     Search,
-    Filter,
-    BarChart3,
-    Share2,
-    MessageSquare,
-    ThumbsUp,
-    MoreHorizontal,
     Globe,
     Zap,
     Loader2
