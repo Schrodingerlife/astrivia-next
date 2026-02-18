@@ -3,48 +3,47 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown } from "lucide-react";
 import {
-    Mic,
-    Globe,
-    Shield,
-    Users,
-    FileText,
-    ChevronDown,
-} from "lucide-react";
+    PharmaRoleplayLogo,
+    SocialVigilanteLogo,
+    MedSafeLogo,
+    InternMatchLogo,
+    SciGenLogo,
+} from "@/components/product-logos";
 
 const products = [
     {
         href: "/tools/pharmaroleplay",
-        icon: <Mic size={20} />,
+        icon: <PharmaRoleplayLogo size={28} />,
         title: "PharmaRoleplay",
         desc: "Treinamento por voz com IA",
         color: "#00D9FF",
     },
     {
         href: "/tools/social-vigilante",
-        icon: <Globe size={20} />,
+        icon: <SocialVigilanteLogo size={28} />,
         title: "Social Vigilante",
         desc: "Vigilância pós-mercado",
         color: "#A855F7",
     },
     {
         href: "/tools/medsafe",
-        icon: <Shield size={20} />,
+        icon: <MedSafeLogo size={28} />,
         title: "MedSafe AI",
         desc: "Compliance regulatório",
         color: "#10B981",
     },
     {
-        href: "/contact",
-        icon: <Users size={20} />,
+        href: "/tools/internmatch",
+        icon: <InternMatchLogo size={28} />,
         title: "InternMatch",
         desc: "Talent matching com IA",
         color: "#F59E0B",
-        soon: true,
     },
     {
         href: "/contact",
-        icon: <FileText size={20} />,
+        icon: <SciGenLogo size={28} />,
         title: "SciGen",
         desc: "Geração de conteúdo científico",
         color: "#EC4899",
@@ -123,10 +122,7 @@ export function Navbar() {
                                             className="mega-dropdown-item"
                                             onClick={() => setDropdownOpen(false)}
                                         >
-                                            <div
-                                                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                                                style={{ background: `${product.color}15`, color: product.color }}
-                                            >
+                                            <div className="flex-shrink-0">
                                                 {product.icon}
                                             </div>
                                             <div>
@@ -220,10 +216,7 @@ export function Navbar() {
                                     className="flex items-center gap-4 py-3 text-white/70 hover:text-white transition-colors"
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
-                                    <div
-                                        className="w-10 h-10 rounded-xl flex items-center justify-center"
-                                        style={{ background: `${product.color}15`, color: product.color }}
-                                    >
+                                    <div className="flex-shrink-0">
                                         {product.icon}
                                     </div>
                                     <div>

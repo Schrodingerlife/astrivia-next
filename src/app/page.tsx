@@ -16,6 +16,14 @@ import {
   CheckCircle,
   Award,
 } from "lucide-react";
+import {
+  PharmaRoleplayLogo,
+  SocialVigilanteLogo,
+  MedSafeLogo,
+  InternMatchLogo,
+  SciGenLogo,
+  HeroBackgroundSVG,
+} from "@/components/product-logos";
 
 /* ============== PRODUCT ILLUSTRATIONS (Large Format) ============== */
 function PharmaRoleplayVisual() {
@@ -73,12 +81,11 @@ function SocialVigilanteVisual() {
           <div key={i} className="flex items-center gap-3 bg-white/[0.04] rounded-xl px-4 py-3 border border-white/[0.04]">
             <span className="text-xs text-white/30 w-24 flex-shrink-0">{post.platform}</span>
             <p className="text-xs text-white/50 flex-1 truncate">{post.text}</p>
-            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
-              post.risk === "critical" ? "bg-red-500/15 text-red-400" :
+            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${post.risk === "critical" ? "bg-red-500/15 text-red-400" :
               post.risk === "high" ? "bg-orange-500/15 text-orange-400" :
-              post.risk === "medium" ? "bg-yellow-500/15 text-yellow-400" :
-              "bg-green-500/15 text-green-400"
-            }`}>{post.risk}</span>
+                post.risk === "medium" ? "bg-yellow-500/15 text-yellow-400" :
+                  "bg-green-500/15 text-green-400"
+              }`}>{post.risk}</span>
           </div>
         ))}
         {/* Activity chart */}
@@ -121,9 +128,8 @@ function MedSafeVisual() {
                 item.status === "fail" ? <AlertTriangle size={14} className="text-red-400 flex-shrink-0" /> :
                   <AlertTriangle size={14} className="text-yellow-400 flex-shrink-0" />}
               <span className="text-xs text-white/50 flex-1">{item.label}</span>
-              <span className={`text-[10px] font-bold ${
-                item.status === "pass" ? "text-[#10B981]" : item.status === "fail" ? "text-red-400" : "text-yellow-400"
-              }`}>{item.status === "pass" ? "OK" : item.status === "fail" ? "VIOLAÇÃO" : "ATENÇÃO"}</span>
+              <span className={`text-[10px] font-bold ${item.status === "pass" ? "text-[#10B981]" : item.status === "fail" ? "text-red-400" : "text-yellow-400"
+                }`}>{item.status === "pass" ? "OK" : item.status === "fail" ? "VIOLAÇÃO" : "ATENÇÃO"}</span>
             </div>
           ))}
         </div>
@@ -136,7 +142,7 @@ function MedSafeVisual() {
 const mainProducts = [
   {
     id: "pharmaroleplay",
-    icon: <Mic size={24} />,
+    icon: <PharmaRoleplayLogo size={40} />,
     title: "PharmaRoleplay",
     headline: "Treine vendas por voz com um Médico IA",
     description: "Simulador de conversas que treina representantes farmacêuticos com feedback em tempo real sobre tom, argumentação e eficácia. Como um sparring partner que nunca cansa.",
@@ -149,7 +155,7 @@ const mainProducts = [
   },
   {
     id: "vigilante",
-    icon: <Globe size={24} />,
+    icon: <SocialVigilanteLogo size={40} />,
     title: "Social Vigilante",
     headline: "Detecte eventos adversos antes dos reportes oficiais",
     description: "Monitoramento contínuo de redes sociais, fóruns e Reclame Aqui que capta sinais precoces de farmacovigilância. Alertas em tempo real para sua equipe de segurança.",
@@ -162,7 +168,7 @@ const mainProducts = [
   },
   {
     id: "medsafe",
-    icon: <Shield size={24} />,
+    icon: <MedSafeLogo size={40} />,
     title: "MedSafe AI",
     headline: "Audite materiais promocionais em segundos",
     description: "IA auditora treinada na RDC 96 que analisa peças de marketing linha por linha, identifica claims não suportados e sugere correções — tudo com 100% de rastreabilidade.",
@@ -178,7 +184,7 @@ const mainProducts = [
 const comingSoonProducts = [
   {
     id: "internmatch",
-    icon: <Users size={24} />,
+    icon: <InternMatchLogo size={40} />,
     title: "InternMatch",
     description: "Conecta universitários às melhores oportunidades de estágio usando matching semântico com IA.",
     badge: "Vector Search",
@@ -187,7 +193,7 @@ const comingSoonProducts = [
   },
   {
     id: "scigen",
-    icon: <FileText size={24} />,
+    icon: <SciGenLogo size={40} />,
     title: "SciGen",
     description: "Transforma estudos clínicos em conteúdo acessível com citações verificáveis e anti-alucinação.",
     badge: "Gemini 3",
@@ -223,8 +229,15 @@ export default function HomePage() {
 function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-20 pb-24 px-6 overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-black to-black" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[800px] bg-gradient-radial from-[#00D9FF]/[0.03] to-transparent rounded-full blur-3xl" />
+      {/* Rich background layers */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#050510] to-[#0a0a0a]" />
+      <div className="absolute inset-0 bg-grid-pattern opacity-40" />
+      <HeroBackgroundSVG />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[900px] gradient-orb gradient-orb-cyan" />
+      <div className="absolute top-[20%] right-0 w-[600px] h-[600px] gradient-orb gradient-orb-purple" />
+      <div className="absolute bottom-0 left-0 w-[500px] h-[500px] gradient-orb gradient-orb-green opacity-20" />
+      {/* Subtle radial spotlight */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse,rgba(0,217,255,0.06),transparent_70%)]" />
 
       <div className="relative z-10 max-w-5xl mx-auto text-center">
         <motion.div
@@ -233,7 +246,7 @@ function HeroSection() {
           transition={{ duration: 0.6 }}
           className="mb-8"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-sm text-white/40">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-sm text-white/40 backdrop-blur-sm">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             Powered by Google Cloud &amp; Gemini
           </span>
@@ -263,7 +276,7 @@ function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-xl md:text-2xl text-white/40 max-w-2xl mx-auto mb-12 leading-relaxed"
+          className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto mb-12 leading-relaxed"
         >
           Agentes autônomos de IA para Life Sciences.
           Treine times, audite compliance, monitore reações adversas.
@@ -301,9 +314,12 @@ function HeroSection() {
 /* ============== TRUSTED BY (Social Proof) ============== */
 function TrustedBySection() {
   return (
-    <section className="py-20 px-6 border-t border-white/[0.04]">
-      <div className="max-w-5xl mx-auto">
-        <p className="text-center text-white/20 text-xs mb-10 tracking-[0.2em] uppercase">
+    <section className="relative py-20 px-6 overflow-hidden">
+      {/* Glow divider at top */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00D9FF]/20 to-transparent" />
+      <div className="absolute inset-0 bg-section-elevated" />
+      <div className="relative z-10 max-w-5xl mx-auto">
+        <p className="text-center text-white/25 text-xs mb-10 tracking-[0.2em] uppercase">
           Construído sobre
         </p>
         <div className="flex flex-wrap justify-center items-center gap-x-16 gap-y-8">
@@ -313,7 +329,7 @@ function TrustedBySection() {
             "Google for Startups",
             "USP",
           ].map((partner) => (
-            <span key={partner} className="text-white/20 text-lg font-medium hover:text-white/40 transition-colors cursor-default">
+            <span key={partner} className="text-white/25 text-lg font-medium hover:text-white/50 transition-colors cursor-default">
               {partner}
             </span>
           ))}
@@ -326,8 +342,12 @@ function TrustedBySection() {
 /* ============== PRODUCT SHOWCASE (Shopify-style full-width sections) ============== */
 function ProductShowcase() {
   return (
-    <section className="pt-20 pb-10">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="relative pt-20 pb-10 overflow-hidden">
+      {/* Background mesh gradient for depth */}
+      <div className="absolute inset-0 bg-mesh-gradient" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] gradient-orb gradient-orb-cyan opacity-20" />
+      <div className="absolute bottom-[30%] left-0 w-[400px] h-[400px] gradient-orb gradient-orb-purple opacity-15" />
+      <div className="relative z-10 max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -338,7 +358,7 @@ function ProductShowcase() {
           <h2 className="heading-lg mb-6">
             Cada ferramenta resolve um elo<br className="hidden md:block" /> da cadeia até o paciente
           </h2>
-          <p className="text-lg text-white/35 max-w-xl mx-auto">
+          <p className="text-lg text-white/45 max-w-xl mx-auto">
             3 demos disponíveis agora. Teste direto no navegador.
           </p>
         </motion.div>
@@ -346,11 +366,18 @@ function ProductShowcase() {
 
       {/* Full-width alternating product sections */}
       {mainProducts.map((product, index) => (
-        <div key={product.id} className="py-16 md:py-24">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className={`grid lg:grid-cols-2 gap-12 lg:gap-20 items-center ${
-              index % 2 === 1 ? "" : ""
-            }`}>
+        <div key={product.id} className="relative py-16 md:py-24">
+          {/* Per-section colored glow */}
+          <div
+            className="absolute top-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full blur-[120px] pointer-events-none opacity-[0.06]"
+            style={{
+              background: product.color,
+              [index % 2 === 0 ? 'left' : 'right']: '-10%',
+            }}
+          />
+          <div className="relative z-10 max-w-7xl mx-auto px-6">
+            <div className={`grid lg:grid-cols-2 gap-12 lg:gap-20 items-center ${index % 2 === 1 ? "" : ""
+              }`}>
               {/* Visual */}
               <motion.div
                 initial={{ opacity: 0, x: index % 2 === 0 ? -40 : 40 }}
@@ -371,10 +398,7 @@ function ProductShowcase() {
                 className={index % 2 === 1 ? "lg:order-1" : ""}
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center"
-                    style={{ background: `${product.color}12`, color: product.color }}
-                  >
+                  <div className="flex-shrink-0">
                     {product.icon}
                   </div>
                   <span className="label" style={{ color: product.color }}>{product.category}</span>
@@ -384,7 +408,7 @@ function ProductShowcase() {
                   {product.headline}
                 </h3>
 
-                <p className="text-lg text-white/40 leading-relaxed mb-8">
+                <p className="text-lg text-white/50 leading-relaxed mb-8">
                   {product.description}
                 </p>
 
@@ -416,8 +440,11 @@ function ProductShowcase() {
 /* ============== COMING SOON ============== */
 function ComingSoonSection() {
   return (
-    <section className="py-24 px-6">
-      <div className="max-w-5xl mx-auto">
+    <section className="relative py-24 px-6 overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
+      <div className="absolute inset-0 bg-dot-pattern opacity-30" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] gradient-orb gradient-orb-amber opacity-20" />
+      <div className="relative z-10 max-w-5xl mx-auto">
         <motion.p
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -434,21 +461,18 @@ function ComingSoonSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="rounded-2xl p-8 bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.1] transition-all"
+              className="rounded-2xl p-8 bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-all backdrop-blur-sm"
             >
               <div className="flex items-center gap-3 mb-4">
-                <div
-                  className="w-10 h-10 rounded-xl flex items-center justify-center"
-                  style={{ background: `${product.color}12`, color: product.color }}
-                >
+                <div className="flex-shrink-0">
                   {product.icon}
                 </div>
                 <div>
                   <h3 className="font-semibold">{product.title}</h3>
-                  <p className="text-xs text-white/25">{product.category}</p>
+                  <p className="text-xs text-white/30">{product.category}</p>
                 </div>
               </div>
-              <p className="text-white/35 text-sm leading-relaxed">{product.description}</p>
+              <p className="text-white/45 text-sm leading-relaxed">{product.description}</p>
             </motion.div>
           ))}
         </div>
@@ -460,8 +484,13 @@ function ComingSoonSection() {
 /* ============== STATS ============== */
 function StatsSection() {
   return (
-    <section className="py-32 px-6 border-t border-white/[0.04]">
-      <div className="max-w-6xl mx-auto">
+    <section className="relative py-32 px-6 overflow-hidden">
+      {/* Elevated section with gradient background */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00D9FF]/15 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0e1117] via-[#0d0f14] to-[#0a0a0a]" />
+      <div className="absolute inset-0 bg-grid-pattern opacity-25" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse,rgba(0,217,255,0.04),transparent_70%)]" />
+      <div className="relative z-10 max-w-6xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
           {impactStats.map((stat, i) => (
             <AnimatedStat key={i} stat={stat} delay={i * 0.1} />
@@ -519,8 +548,10 @@ function StepsSection() {
   ];
 
   return (
-    <section className="py-32 px-6">
-      <div className="max-w-5xl mx-auto">
+    <section className="relative py-32 px-6 overflow-hidden">
+      <div className="absolute inset-0 bg-mesh-gradient" />
+      <div className="absolute bottom-0 left-[10%] w-[500px] h-[500px] gradient-orb gradient-orb-green opacity-15" />
+      <div className="relative z-10 max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -544,7 +575,7 @@ function StepsSection() {
               <span className="step-number flex-shrink-0 w-20">{step.num}</span>
               <div className="pt-2">
                 <h3 className="text-2xl md:text-3xl font-semibold mb-4" style={{ fontFamily: "var(--font-heading)" }}>{step.title}</h3>
-                <p className="text-white/35 text-lg max-w-lg leading-relaxed">{step.desc}</p>
+                <p className="text-white/45 text-lg max-w-lg leading-relaxed">{step.desc}</p>
               </div>
             </motion.div>
           ))}
@@ -592,8 +623,11 @@ function TeamSection() {
   ];
 
   return (
-    <section className="py-32 px-6 border-t border-white/[0.04]">
-      <div className="max-w-5xl mx-auto">
+    <section className="relative py-32 px-6 overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
+      <div className="absolute inset-0 bg-dot-pattern opacity-20" />
+      <div className="absolute top-[20%] right-0 w-[400px] h-[400px] gradient-orb gradient-orb-cyan opacity-10" />
+      <div className="relative z-10 max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -616,7 +650,7 @@ function TeamSection() {
               transition={{ delay: i * 0.1 }}
               className="text-center group"
             >
-              <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border border-white/[0.08] group-hover:border-white/[0.15] transition-colors">
+              <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border border-white/[0.08] group-hover:border-[#00D9FF]/30 transition-colors">
                 <Image
                   src={member.image}
                   alt={member.name}
@@ -626,11 +660,11 @@ function TeamSection() {
               </div>
               <h3 className="font-semibold text-lg">{member.name}</h3>
               <p className="text-[#00D9FF] text-sm font-medium mb-1">{member.role}</p>
-              <p className="text-white/30 text-sm mb-3">{member.desc}</p>
+              <p className="text-white/40 text-sm mb-3">{member.desc}</p>
               <Link
                 href={member.linkedin}
                 target="_blank"
-                className="text-xs text-white/20 hover:text-white/50 transition-colors"
+                className="text-xs text-white/25 hover:text-white/60 transition-colors"
               >
                 LinkedIn ↗
               </Link>
@@ -645,8 +679,15 @@ function TeamSection() {
 /* ============== CTA ============== */
 function CTASection() {
   return (
-    <section className="py-40 px-6">
-      <div className="max-w-3xl mx-auto text-center">
+    <section className="relative py-40 px-6 overflow-hidden">
+      {/* Rich CTA background */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a0e18] to-[#0a0a0a]" />
+      <div className="absolute inset-0 bg-grid-pattern opacity-20" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse,rgba(0,217,255,0.06),transparent_60%)]" />
+      <div className="absolute top-0 left-0 w-[400px] h-[400px] gradient-orb gradient-orb-purple opacity-15" />
+      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] gradient-orb gradient-orb-cyan opacity-15" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/15 to-transparent" />
+      <div className="relative z-10 max-w-3xl mx-auto text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -659,7 +700,7 @@ function CTASection() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="text-xl text-white/35 mb-12 leading-relaxed"
+          className="text-xl text-white/45 mb-12 leading-relaxed"
         >
           Descubra como agentes de IA auditáveis podem
           transformar suas operações em Life Sciences.

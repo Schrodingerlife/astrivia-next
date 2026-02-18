@@ -8,15 +8,15 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg: #000000;
-  --bg-card: #111111;
-  --bg-card-hover: #191919;
-  --bg-elevated: #1a1a1a;
-  --border: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.16);
+  --bg: #0a0a0a;
+  --bg-card: #141414;
+  --bg-card-hover: #1c1c1c;
+  --bg-elevated: #1e1e1e;
+  --border: rgba(255, 255, 255, 0.10);
+  --border-hover: rgba(255, 255, 255, 0.20);
   --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.6);
-  --text-muted: rgba(255, 255, 255, 0.35);
+  --text-secondary: rgba(255, 255, 255, 0.72);
+  --text-muted: rgba(255, 255, 255, 0.48);
   --accent: #95BF47;
   /* Shopify-inspired green for Astrivia */
   --accent-cyan: #00D9FF;
@@ -50,7 +50,7 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #000;
+  background: #0a0a0a;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -275,7 +275,7 @@ h6 {
   font-family: var(--font-heading);
   font-size: clamp(3rem, 4vw, 5rem);
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.10);
   line-height: 1;
   letter-spacing: -0.04em;
 }
@@ -283,7 +283,7 @@ h6 {
 /* ---------- STAT NUMBER ---------- */
 .stat-number {
   font-family: var(--font-heading);
-  font-size: clamp(3rem, 5vw, 6rem);
+  font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 700;
   line-height: 1;
   letter-spacing: -0.04em;
@@ -414,7 +414,7 @@ select.form-input option {
   border: 1px solid var(--border);
   border-radius: 20px;
   padding: 24px;
-  min-width: 600px;
+  min-width: 680px;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s var(--ease-out-expo);
@@ -459,6 +459,74 @@ select.form-input option {
 .section-divider {
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--border), transparent);
+}
+
+/* ---------- BACKGROUND VISUALS ---------- */
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+.bg-dot-pattern {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+
+.gradient-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  opacity: 0.4;
+}
+
+.gradient-orb-cyan {
+  background: radial-gradient(circle, rgba(0, 217, 255, 0.15), transparent 70%);
+}
+
+.gradient-orb-purple {
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.12), transparent 70%);
+}
+
+.gradient-orb-green {
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.12), transparent 70%);
+}
+
+.gradient-orb-amber {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.1), transparent 70%);
+}
+
+.section-glow {
+  position: relative;
+}
+
+.section-glow::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 800px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 217, 255, 0.2), transparent);
+}
+
+.bg-section-elevated {
+  background: linear-gradient(180deg, rgba(20, 20, 20, 0.6) 0%, rgba(10, 10, 10, 0) 100%);
+}
+
+.bg-section-dark {
+  background: linear-gradient(180deg, #0e0e0e, #0a0a0a);
+}
+
+.bg-mesh-gradient {
+  background:
+    radial-gradient(at 20% 30%, rgba(0, 217, 255, 0.04) 0%, transparent 50%),
+    radial-gradient(at 80% 70%, rgba(168, 85, 247, 0.04) 0%, transparent 50%),
+    radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.02) 0%, transparent 50%);
 }
 
 /* ---------- ANIMATIONS ---------- */
