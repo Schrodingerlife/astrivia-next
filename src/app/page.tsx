@@ -12,51 +12,49 @@ import {
   Shield,
   Users,
   FileText,
-  Zap,
-  BarChart3,
-  Lock,
-  Cpu,
-  MessageSquare,
-  Search,
   AlertTriangle,
   CheckCircle,
   Award,
 } from "lucide-react";
 
-/* ============== PRODUCT ILLUSTRATIONS (CSS-Based) ============== */
+/* ============== PRODUCT ILLUSTRATIONS (Large Format) ============== */
 function PharmaRoleplayVisual() {
   return (
-    <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#00D9FF]/5 to-transparent border border-[#00D9FF]/10">
-      {/* Chat bubbles */}
-      <div className="absolute top-4 left-4 right-4 space-y-3">
-        <div className="flex items-start gap-2">
-          <div className="w-7 h-7 rounded-full bg-[#00D9FF]/20 flex items-center justify-center flex-shrink-0">
-            <Mic size={12} className="text-[#00D9FF]" />
+    <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-to-br from-[#00D9FF]/[0.06] to-transparent border border-white/[0.06]">
+      <div className="absolute inset-6 md:inset-8 space-y-4">
+        <div className="flex items-start gap-3">
+          <div className="w-9 h-9 rounded-full bg-[#00D9FF]/20 flex items-center justify-center flex-shrink-0">
+            <Mic size={16} className="text-[#00D9FF]" />
           </div>
-          <div className="bg-white/[0.06] rounded-xl rounded-tl-sm px-3 py-2 max-w-[75%]">
-            <p className="text-[10px] text-white/50">Dr. Silva — Cardiologista</p>
-            <p className="text-xs text-white/70">&quot;Quais são os efeitos adversos mais comuns?&quot;</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-2 justify-end">
-          <div className="bg-[#00D9FF]/10 rounded-xl rounded-tr-sm px-3 py-2 max-w-[75%]">
-            <p className="text-[10px] text-[#00D9FF]/60">Representante IA</p>
-            <p className="text-xs text-white/70">&quot;Os dados clínicos mostram que...&quot;</p>
+          <div className="bg-white/[0.06] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[80%]">
+            <p className="text-xs text-white/40 mb-1">Dr. Silva — Cardiologista</p>
+            <p className="text-sm text-white/70">&quot;Quais são os efeitos adversos mais comuns?&quot;</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 px-2">
-          <div className="flex gap-0.5">
-            {[1, 2, 3, 4, 5].map(i => (
-              <div key={i} className="w-1 bg-[#00D9FF]/40 rounded-full animate-pulse" style={{ height: `${8 + Math.random() * 12}px`, animationDelay: `${i * 0.15}s` }} />
+        <div className="flex items-start gap-3 justify-end">
+          <div className="bg-[#00D9FF]/10 rounded-2xl rounded-tr-sm px-4 py-3 max-w-[80%]">
+            <p className="text-xs text-[#00D9FF]/50 mb-1">Representante IA</p>
+            <p className="text-sm text-white/70">&quot;Os dados clínicos do estudo PIONEER mostram que...&quot;</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 px-3">
+          <div className="flex gap-1">
+            {[1, 2, 3, 4, 5, 6, 7].map(i => (
+              <div key={i} className="w-1.5 bg-[#00D9FF]/40 rounded-full animate-pulse" style={{ height: `${10 + Math.random() * 20}px`, animationDelay: `${i * 0.15}s` }} />
             ))}
           </div>
-          <span className="text-[10px] text-[#00D9FF]/40">Ouvindo...</span>
+          <span className="text-xs text-[#00D9FF]/40">Ouvindo...</span>
+        </div>
+        <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 mt-2">
+          <p className="text-green-400 text-sm flex items-center gap-2">
+            <CheckCircle size={14} />
+            Ótimo uso de referência científica!
+          </p>
         </div>
       </div>
-      {/* Score */}
-      <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-2.5 py-1">
-        <Award size={10} className="text-[#00D9FF]" />
-        <span className="text-[10px] font-medium text-[#00D9FF]">Score: 87%</span>
+      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1.5">
+        <Award size={12} className="text-[#00D9FF]" />
+        <span className="text-xs font-medium text-[#00D9FF]">Score: 87%</span>
       </div>
     </div>
   );
@@ -64,34 +62,35 @@ function PharmaRoleplayVisual() {
 
 function SocialVigilanteVisual() {
   return (
-    <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#A855F7]/5 to-transparent border border-[#A855F7]/10">
-      {/* Social posts feed */}
-      <div className="absolute inset-3 space-y-2">
+    <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-to-br from-[#A855F7]/[0.06] to-transparent border border-white/[0.06]">
+      <div className="absolute inset-6 md:inset-8 space-y-3">
         {[
-          { platform: "🐦", risk: "critical", text: "Relato de náusea persistente com..." },
-          { platform: "📢", risk: "high", text: "Lote com alteração organoléptica..." },
-          { platform: "👽", risk: "medium", text: "Hepatotoxicidade mencionada em..." },
+          { platform: "X (Twitter)", risk: "critical", text: "Relato de náusea persistente após uso contínuo de..." },
+          { platform: "Reclame Aqui", risk: "high", text: "Lote apresentando alteração organoléptica significativa..." },
+          { platform: "Reddit", risk: "medium", text: "Hepatotoxicidade mencionada em fórum de pacientes..." },
+          { platform: "Instagram", risk: "low", text: "Dúvida sobre interação medicamentosa com..." },
         ].map((post, i) => (
-          <div key={i} className="flex items-center gap-2 bg-white/[0.04] rounded-lg px-2.5 py-1.5 border border-white/[0.04]">
-            <span className="text-xs">{post.platform}</span>
-            <p className="text-[10px] text-white/50 flex-1 truncate">{post.text}</p>
-            <span className={`text-[8px] uppercase font-bold px-1.5 py-0.5 rounded ${post.risk === "critical" ? "bg-red-500/15 text-red-400" :
+          <div key={i} className="flex items-center gap-3 bg-white/[0.04] rounded-xl px-4 py-3 border border-white/[0.04]">
+            <span className="text-xs text-white/30 w-24 flex-shrink-0">{post.platform}</span>
+            <p className="text-xs text-white/50 flex-1 truncate">{post.text}</p>
+            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${
+              post.risk === "critical" ? "bg-red-500/15 text-red-400" :
               post.risk === "high" ? "bg-orange-500/15 text-orange-400" :
-                "bg-yellow-500/15 text-yellow-400"
-              }`}>{post.risk}</span>
+              post.risk === "medium" ? "bg-yellow-500/15 text-yellow-400" :
+              "bg-green-500/15 text-green-400"
+            }`}>{post.risk}</span>
           </div>
         ))}
-        {/* Activity indicator */}
-        <div className="flex items-end gap-px h-8 mt-1 px-1">
-          {[35, 60, 25, 80, 45, 70, 30, 55, 75, 40, 65, 50].map((h, i) => (
-            <div key={i} className="flex-1 bg-gradient-to-t from-[#A855F7]/15 to-[#A855F7]/50 rounded-t-sm" style={{ height: `${h}%` }} />
+        {/* Activity chart */}
+        <div className="flex items-end gap-0.5 h-16 mt-3 px-2">
+          {[35, 60, 25, 80, 45, 70, 30, 55, 75, 40, 65, 50, 85, 35, 60, 45].map((h, i) => (
+            <div key={i} className="flex-1 bg-gradient-to-t from-[#A855F7]/10 to-[#A855F7]/50 rounded-t-sm" style={{ height: `${h}%` }} />
           ))}
         </div>
       </div>
-      {/* Live badge */}
-      <div className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-black/40 backdrop-blur-sm rounded-full px-2.5 py-1">
-        <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-        <span className="text-[10px] font-medium text-white/50">4 fontes ativas</span>
+      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1.5">
+        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+        <span className="text-xs font-medium text-white/50">4 fontes ativas</span>
       </div>
     </div>
   );
@@ -99,88 +98,34 @@ function SocialVigilanteVisual() {
 
 function MedSafeVisual() {
   return (
-    <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#10B981]/5 to-transparent border border-[#10B981]/10">
-      {/* Document analysis */}
-      <div className="absolute inset-3">
-        <div className="flex items-center gap-2 mb-3">
-          <div className="h-1 flex-1 bg-[#10B981]/30 rounded-full overflow-hidden">
-            <div className="h-full w-[78%] bg-[#10B981] rounded-full" />
+    <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-to-br from-[#10B981]/[0.06] to-transparent border border-white/[0.06]">
+      <div className="absolute inset-6 md:inset-8">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-xs text-white/40">Compliance Score</span>
+          <div className="h-2 flex-1 bg-white/[0.06] rounded-full overflow-hidden">
+            <div className="h-full w-[78%] bg-gradient-to-r from-[#10B981] to-[#10B981]/70 rounded-full" />
           </div>
-          <span className="text-[10px] text-[#10B981]">78%</span>
+          <span className="text-sm font-bold text-[#10B981]">78%</span>
         </div>
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           {[
-            { label: "RDC 96 — Art. 3", status: "pass" },
-            { label: "Indicação aprovada", status: "pass" },
-            { label: "Claim sem referência", status: "fail" },
-            { label: "Fonte bibliográfica", status: "pass" },
-            { label: "Linguagem promocional", status: "warn" },
+            { label: "RDC 96 — Art. 3º: Requisitos obrigatórios", status: "pass" },
+            { label: "Indicação terapêutica aprovada pela ANVISA", status: "pass" },
+            { label: "Claim de superioridade sem referência", status: "fail" },
+            { label: "Fonte bibliográfica válida e rastreável", status: "pass" },
+            { label: "Linguagem promocional sem moderação", status: "warn" },
+            { label: "Informações de segurança do produto", status: "pass" },
           ].map((item, i) => (
-            <div key={i} className="flex items-center gap-2 bg-white/[0.03] rounded-md px-2 py-1">
-              {item.status === "pass" ? <CheckCircle size={10} className="text-[#10B981] flex-shrink-0" /> :
-                item.status === "fail" ? <AlertTriangle size={10} className="text-red-400 flex-shrink-0" /> :
-                  <AlertTriangle size={10} className="text-yellow-400 flex-shrink-0" />}
-              <span className="text-[10px] text-white/50">{item.label}</span>
-              <span className={`text-[8px] ml-auto font-medium ${item.status === "pass" ? "text-[#10B981]" : item.status === "fail" ? "text-red-400" : "text-yellow-400"
-                }`}>{item.status === "pass" ? "OK" : item.status === "fail" ? "VIOLAÇÃO" : "ATENÇÃO"}</span>
+            <div key={i} className="flex items-center gap-3 bg-white/[0.03] rounded-xl px-4 py-2.5">
+              {item.status === "pass" ? <CheckCircle size={14} className="text-[#10B981] flex-shrink-0" /> :
+                item.status === "fail" ? <AlertTriangle size={14} className="text-red-400 flex-shrink-0" /> :
+                  <AlertTriangle size={14} className="text-yellow-400 flex-shrink-0" />}
+              <span className="text-xs text-white/50 flex-1">{item.label}</span>
+              <span className={`text-[10px] font-bold ${
+                item.status === "pass" ? "text-[#10B981]" : item.status === "fail" ? "text-red-400" : "text-yellow-400"
+              }`}>{item.status === "pass" ? "OK" : item.status === "fail" ? "VIOLAÇÃO" : "ATENÇÃO"}</span>
             </div>
           ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function InternMatchVisual() {
-  return (
-    <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#F59E0B]/5 to-transparent border border-[#F59E0B]/10">
-      <div className="absolute inset-3 space-y-2">
-        <div className="flex items-center gap-2 mb-2">
-          <Search size={12} className="text-[#F59E0B]/50" />
-          <div className="flex-1 h-6 bg-white/[0.04] rounded-md flex items-center px-2">
-            <span className="text-[10px] text-white/30">Farmácia · São Paulo · Estágio</span>
-          </div>
-        </div>
-        {[
-          { name: "Vaga — Lab Análisis Clínicas", match: "94%" },
-          { name: "Vaga — CRA Pharma Int.", match: "89%" },
-          { name: "Vaga — Regulatory Affairs Jr.", match: "82%" },
-        ].map((v, i) => (
-          <div key={i} className="flex items-center gap-2 bg-white/[0.04] rounded-lg px-2.5 py-2 border border-white/[0.04]">
-            <div className="w-6 h-6 rounded-md bg-[#F59E0B]/10 flex items-center justify-center">
-              <Users size={10} className="text-[#F59E0B]" />
-            </div>
-            <span className="text-[10px] text-white/60 flex-1">{v.name}</span>
-            <span className="text-[10px] font-bold text-[#F59E0B]">{v.match}</span>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function SciGenVisual() {
-  return (
-    <div className="relative h-48 w-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#EC4899]/5 to-transparent border border-[#EC4899]/10">
-      <div className="absolute inset-3">
-        <div className="flex items-center gap-2 mb-3">
-          <FileText size={12} className="text-[#EC4899]/50" />
-          <span className="text-[10px] text-white/40">Gerando conteúdo científico...</span>
-        </div>
-        <div className="space-y-1">
-          {["Resumo do Estudo Clínico", "", "Pacientes com DM2 tratados com", "o composto X apresentaram...", "", "[1] Smith et al., NEJM 2024", "[2] Chen et al., Lancet 2024"].map((line, i) => (
-            <div key={i} className={`h-${line ? '2.5' : '1'} rounded-sm ${line.startsWith("[") ? "bg-[#EC4899]/15 w-3/4" :
-              line === "" ? "bg-transparent" :
-                i === 0 ? "bg-white/10 w-2/3" :
-                  "bg-white/[0.04] w-full"
-              }`}>
-              {line && <span className="text-[9px] text-white/40 px-1 leading-none">{line}</span>}
-            </div>
-          ))}
-        </div>
-        <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-black/40 backdrop-blur-sm rounded-full px-2 py-0.5">
-          <CheckCircle size={8} className="text-[#EC4899]" />
-          <span className="text-[8px] text-[#EC4899]">Anti-hallucination ON</span>
         </div>
       </div>
     </div>
@@ -188,80 +133,74 @@ function SciGenVisual() {
 }
 
 /* ============== DATA ============== */
-const products = [
+const mainProducts = [
   {
     id: "pharmaroleplay",
     icon: <Mic size={24} />,
     title: "PharmaRoleplay",
-    description: "Treina equipes de campo em conversas com um Médico IA que responde naturalmente, desafia objeções e avalia performance em tempo real.",
+    headline: "Treine vendas por voz com um Médico IA",
+    description: "Simulador de conversas que treina representantes farmacêuticos com feedback em tempo real sobre tom, argumentação e eficácia. Como um sparring partner que nunca cansa.",
     badge: "Google Cloud TPU",
     category: "Treinamento por Voz",
     demoUrl: "/tools/pharmaroleplay",
-    status: "live" as const,
     color: "#00D9FF",
     visual: <PharmaRoleplayVisual />,
+    metrics: ["Ramp-up 50% mais rápido", "<200ms latência", "24/7 disponível"],
   },
   {
     id: "vigilante",
     icon: <Globe size={24} />,
     title: "Social Vigilante",
-    description: "Capta sinais precoces de eventos adversos em redes sociais, fóruns e Reclame Aqui — gerando alertas de risco antes dos reportes oficiais.",
+    headline: "Detecte eventos adversos antes dos reportes oficiais",
+    description: "Monitoramento contínuo de redes sociais, fóruns e Reclame Aqui que capta sinais precoces de farmacovigilância. Alertas em tempo real para sua equipe de segurança.",
     badge: "BigQuery ML",
     category: "Vigilância Pós-Mercado",
     demoUrl: "/tools/social-vigilante",
-    status: "live" as const,
     color: "#A855F7",
     visual: <SocialVigilanteVisual />,
+    metrics: ["100% cobertura pública", "Terabytes/dia", "Alertas em tempo real"],
   },
   {
     id: "medsafe",
     icon: <Shield size={24} />,
     title: "MedSafe AI",
-    description: "IA auditora treinada na RDC 96 que analisa materiais promocionais em segundos — reduzindo erro humano e risco regulatório.",
+    headline: "Audite materiais promocionais em segundos",
+    description: "IA auditora treinada na RDC 96 que analisa peças de marketing linha por linha, identifica claims não suportados e sugere correções — tudo com 100% de rastreabilidade.",
     badge: "Vertex AI",
     category: "Compliance Regulatório",
     demoUrl: "/tools/medsafe",
-    status: "live" as const,
     color: "#10B981",
     visual: <MedSafeVisual />,
+    metrics: ["90% menos tempo de revisão", "Zero falsos positivos", "Auditoria completa"],
   },
+];
+
+const comingSoonProducts = [
   {
     id: "internmatch",
     icon: <Users size={24} />,
     title: "InternMatch",
-    description: "Conecta universitários de todos os cursos às melhores oportunidades de estágio usando matching semântico com IA.",
+    description: "Conecta universitários às melhores oportunidades de estágio usando matching semântico com IA.",
     badge: "Vector Search",
     category: "Talent Matching",
-    status: "soon" as const,
     color: "#F59E0B",
-    visual: <InternMatchVisual />,
   },
   {
     id: "scigen",
     icon: <FileText size={24} />,
     title: "SciGen",
-    description: "Transforma estudos clínicos em conteúdo acessível para médicos e pacientes, com citações verificáveis e anti-alucinação.",
+    description: "Transforma estudos clínicos em conteúdo acessível com citações verificáveis e anti-alucinação.",
     badge: "Gemini 3",
     category: "Geração de Conteúdo",
-    status: "soon" as const,
     color: "#EC4899",
-    visual: <SciGenVisual />,
   },
 ];
 
 const impactStats = [
-  { value: "90", suffix: "%", label: "Redução no Tempo de Revisão", desc: "Materiais revisados em segundos, não semanas" },
-  { value: "50", suffix: "%", label: "Ramp-up Mais Rápido", desc: "Representantes preparados em metade do tempo" },
-  { value: "100", suffix: "%", label: "Cobertura de Menções", desc: "Vigilância contínua em redes sociais públicas" },
-];
-
-const features = [
-  { icon: <Zap size={20} />, title: "Velocidade", desc: "Resposta em tempo real com latência de milissegundos" },
-  { icon: <Lock size={20} />, title: "Compliance", desc: "Análise automática contra normas regulatórias" },
-  { icon: <BarChart3 size={20} />, title: "Analytics", desc: "Dashboards e métricas de performance em tempo real" },
-  { icon: <Cpu size={20} />, title: "Google Cloud", desc: "Infraestrutura 100% Google Cloud com TPU v5e" },
-  { icon: <MessageSquare size={20} />, title: "Voz Natural", desc: "Conversação por voz com TTS e STT de alta qualidade" },
-  { icon: <Search size={20} />, title: "Monitoramento", desc: "Rastreamento de sinais em milhões de fontes" },
+  { value: "90", suffix: "%", label: "Menos tempo de revisão" },
+  { value: "50", suffix: "%", label: "Ramp-up mais rápido" },
+  { value: "100", suffix: "%", label: "Cobertura de menções" },
+  { value: "5", suffix: "", label: "Produtos no ecossistema" },
 ];
 
 /* ============== PAGE ============== */
@@ -269,10 +208,10 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       <HeroSection />
-      <ShowcaseSection />
-      <ProductsSection />
+      <TrustedBySection />
+      <ProductShowcase />
+      <ComingSoonSection />
       <StatsSection />
-      <FeaturesGrid />
       <StepsSection />
       <TeamSection />
       <CTASection />
@@ -283,19 +222,18 @@ export default function HomePage() {
 /* ============== HERO ============== */
 function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center pt-20 pb-16 px-6 overflow-hidden">
-      {/* Background gradient */}
+    <section className="relative min-h-screen flex items-center justify-center pt-20 pb-24 px-6 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-black to-black" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-radial from-[#00D9FF]/[0.04] to-transparent rounded-full blur-3xl" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[800px] bg-gradient-radial from-[#00D9FF]/[0.03] to-transparent rounded-full blur-3xl" />
 
       <div className="relative z-10 max-w-5xl mx-auto text-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="mb-6"
+          className="mb-8"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.08] text-sm text-white/50">
+          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-sm text-white/40">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
             Powered by Google Cloud &amp; Gemini
           </span>
@@ -305,7 +243,7 @@ function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="heading-xl mb-8"
+          className="heading-xl mb-10"
         >
           A cadeia que conecta
           <br />
@@ -325,11 +263,10 @@ function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="body-lg max-w-2xl mx-auto mb-10"
+          className="text-xl md:text-2xl text-white/40 max-w-2xl mx-auto mb-12 leading-relaxed"
         >
-          Sistema de agentes autônomos para Life Sciences.
-          Treine times, audite compliance, monitore reações adversas — tudo com IA
-          que raciocina, age e aprende.
+          Agentes autônomos de IA para Life Sciences.
+          Treine times, audite compliance, monitore reações adversas.
         </motion.p>
 
         <motion.div
@@ -338,41 +275,22 @@ function HeroSection() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <Link href="/tools/social-vigilante" className="btn-primary">
+          <Link href="/tools/social-vigilante" className="btn-primary text-base px-8 py-4">
             Testar Demo Grátis <ArrowRight size={18} />
           </Link>
-          <Link href="/products" className="btn-outline">
-            Ver Produtos
+          <Link href="/contact" className="btn-outline text-base px-8 py-4">
+            Agendar Demonstração
           </Link>
         </motion.div>
 
-        {/* Product preview thumbnails */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7 }}
-          className="mt-16 flex justify-center gap-6 flex-wrap"
-        >
-          {products.slice(0, 3).map((p) => (
-            <Link key={p.id} href={p.demoUrl || "#"} className="group">
-              <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/[0.03] border border-white/[0.06] hover:border-white/[0.15] transition-all">
-                <div style={{ color: p.color }}>{p.icon}</div>
-                <span className="text-sm text-white/50 group-hover:text-white/80 transition-colors">{p.title}</span>
-                <ArrowRight size={12} className="text-white/20 group-hover:text-white/50 transition-colors" />
-              </div>
-            </Link>
-          ))}
-        </motion.div>
-
-        {/* Scroll Indicator */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2 }}
-          className="mt-16 scroll-indicator"
+          className="mt-20 scroll-indicator"
         >
-          <div className="w-6 h-10 rounded-full border border-white/15 flex justify-center pt-2 mx-auto">
-            <div className="w-1 h-2.5 bg-white/30 rounded-full" />
+          <div className="w-6 h-10 rounded-full border border-white/10 flex justify-center pt-2 mx-auto">
+            <div className="w-1 h-2.5 bg-white/20 rounded-full" />
           </div>
         </motion.div>
       </div>
@@ -380,21 +298,23 @@ function HeroSection() {
   );
 }
 
-/* ============== SHOWCASE (tech badges) ============== */
-function ShowcaseSection() {
+/* ============== TRUSTED BY (Social Proof) ============== */
+function TrustedBySection() {
   return (
-    <section className="py-16 px-6 border-t border-white/[0.04]">
-      <div className="max-w-6xl mx-auto">
-        <p className="text-center text-white/25 text-sm mb-8 tracking-wide uppercase">
-          Infraestrutura Enterprise
+    <section className="py-20 px-6 border-t border-white/[0.04]">
+      <div className="max-w-5xl mx-auto">
+        <p className="text-center text-white/20 text-xs mb-10 tracking-[0.2em] uppercase">
+          Construído sobre
         </p>
-        <div className="flex flex-wrap justify-center gap-6">
+        <div className="flex flex-wrap justify-center items-center gap-x-16 gap-y-8">
           {[
-            "Vertex AI", "Cloud Run", "BigQuery ML", "TPU v5e",
-            "Gemini 3", "LangChain", "ReAct Framework", "Imagen 3"
-          ].map((tech) => (
-            <span key={tech} className="tech-badge">
-              {tech}
+            "Google Cloud",
+            "Vertex AI",
+            "Google for Startups",
+            "USP",
+          ].map((partner) => (
+            <span key={partner} className="text-white/20 text-lg font-medium hover:text-white/40 transition-colors cursor-default">
+              {partner}
             </span>
           ))}
         </div>
@@ -403,115 +323,146 @@ function ShowcaseSection() {
   );
 }
 
-/* ============== PRODUCTS WITH VISUALS ============== */
-function ProductsSection() {
+/* ============== PRODUCT SHOWCASE (Shopify-style full-width sections) ============== */
+function ProductShowcase() {
   return (
-    <section id="products" className="py-32 px-6">
-      <div className="max-w-7xl mx-auto">
+    <section className="pt-20 pb-10">
+      <div className="max-w-7xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-24"
         >
-          <p className="label mb-4 text-[#00D9FF]">Nossos Produtos</p>
-          <h2 className="heading-lg mb-4">
+          <p className="label mb-4 text-[#00D9FF]">Produtos</p>
+          <h2 className="heading-lg mb-6">
             Cada ferramenta resolve um elo<br className="hidden md:block" /> da cadeia até o paciente
           </h2>
-          <p className="body-lg max-w-xl mx-auto">
-            Teste direto no navegador — 3 demos disponíveis agora
+          <p className="text-lg text-white/35 max-w-xl mx-auto">
+            3 demos disponíveis agora. Teste direto no navegador.
           </p>
         </motion.div>
+      </div>
 
-        {/* Product Cards with visuals — 3+2 layout */}
-        <div className="space-y-6">
-          <div className="grid md:grid-cols-3 gap-6">
-            {products.slice(0, 3).map((product, i) => (
-              <ProductCard key={product.id} product={product} index={i} />
-            ))}
-          </div>
-          <div className="grid md:grid-cols-2 gap-6">
-            {products.slice(3).map((product, i) => (
-              <ProductCard key={product.id} product={product} index={i + 3} />
-            ))}
+      {/* Full-width alternating product sections */}
+      {mainProducts.map((product, index) => (
+        <div key={product.id} className="py-16 md:py-24">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className={`grid lg:grid-cols-2 gap-12 lg:gap-20 items-center ${
+              index % 2 === 1 ? "" : ""
+            }`}>
+              {/* Visual */}
+              <motion.div
+                initial={{ opacity: 0, x: index % 2 === 0 ? -40 : 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+                className={index % 2 === 1 ? "lg:order-2" : ""}
+              >
+                {product.visual}
+              </motion.div>
+
+              {/* Text */}
+              <motion.div
+                initial={{ opacity: 0, x: index % 2 === 0 ? 40 : -40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7 }}
+                className={index % 2 === 1 ? "lg:order-1" : ""}
+              >
+                <div className="flex items-center gap-3 mb-6">
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: `${product.color}12`, color: product.color }}
+                  >
+                    {product.icon}
+                  </div>
+                  <span className="label" style={{ color: product.color }}>{product.category}</span>
+                </div>
+
+                <h3 className="text-3xl md:text-4xl font-bold mb-6 leading-tight" style={{ fontFamily: "var(--font-heading)" }}>
+                  {product.headline}
+                </h3>
+
+                <p className="text-lg text-white/40 leading-relaxed mb-8">
+                  {product.description}
+                </p>
+
+                {/* Metrics */}
+                <div className="flex flex-wrap gap-3 mb-8">
+                  {product.metrics.map((m) => (
+                    <span key={m} className="text-sm px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-white/50">
+                      {m}
+                    </span>
+                  ))}
+                </div>
+
+                <Link
+                  href={product.demoUrl}
+                  className="inline-flex items-center gap-2 text-white font-medium hover:gap-3 transition-all group"
+                >
+                  Testar Demo
+                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                </Link>
+              </motion.div>
+            </div>
           </div>
         </div>
-      </div>
+      ))}
     </section>
   );
 }
 
-function ProductCard({ product, index }: { product: typeof products[number]; index: number }) {
+/* ============== COMING SOON ============== */
+function ComingSoonSection() {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.08 }}
-      className="glass-card overflow-hidden group"
-    >
-      {/* Visual illustration */}
-      <div className="p-4 pb-0">
-        {product.visual}
-      </div>
-
-      {/* Content */}
-      <div className="p-6 pt-4">
-        <div className="flex items-start justify-between mb-4">
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center"
-            style={{ background: `${product.color}12`, color: product.color }}
-          >
-            {product.icon}
-          </div>
-          {product.status === "live" ? (
-            <span className="flex items-center gap-1.5 text-xs text-green-400">
-              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
-              Live
-            </span>
-          ) : (
-            <span className="text-xs text-white/25">Em breve</span>
-          )}
-        </div>
-
-        <p className="label mb-1.5" style={{ color: product.color }}>{product.category}</p>
-        <h3 className="heading-md text-lg mb-2">{product.title}</h3>
-        <p className="text-white/40 text-sm leading-relaxed mb-5">{product.description}</p>
-
-        <div className="flex items-center gap-3">
-          {product.demoUrl ? (
-            <Link
-              href={product.demoUrl}
-              className="text-sm font-medium text-white flex items-center gap-1.5 group-hover:gap-2.5 transition-all"
+    <section className="py-24 px-6">
+      <div className="max-w-5xl mx-auto">
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="label mb-8 text-center"
+        >
+          Em breve
+        </motion.p>
+        <div className="grid md:grid-cols-2 gap-6">
+          {comingSoonProducts.map((product, i) => (
+            <motion.div
+              key={product.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="rounded-2xl p-8 bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.1] transition-all"
             >
-              Testar Demo <ArrowRight size={14} />
-            </Link>
-          ) : (
-            <span className="text-sm text-white/25">Em breve</span>
-          )}
-          <span className="tech-badge !text-[10px] !py-1 !px-2">{product.badge}</span>
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  className="w-10 h-10 rounded-xl flex items-center justify-center"
+                  style={{ background: `${product.color}12`, color: product.color }}
+                >
+                  {product.icon}
+                </div>
+                <div>
+                  <h3 className="font-semibold">{product.title}</h3>
+                  <p className="text-xs text-white/25">{product.category}</p>
+                </div>
+              </div>
+              <p className="text-white/35 text-sm leading-relaxed">{product.description}</p>
+            </motion.div>
+          ))}
         </div>
       </div>
-    </motion.div>
+    </section>
   );
 }
 
 /* ============== STATS ============== */
 function StatsSection() {
   return (
-    <section className="py-32 px-6">
+    <section className="py-32 px-6 border-t border-white/[0.04]">
       <div className="max-w-6xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <p className="label mb-4 text-[#A855F7]">Impacto</p>
-          <h2 className="heading-lg">Resultados mensuráveis</h2>
-        </motion.div>
-
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
           {impactStats.map((stat, i) => (
             <AnimatedStat key={i} stat={stat} delay={i * 0.1} />
           ))}
@@ -545,48 +496,21 @@ function AnimatedStat({ stat, delay }: { stat: typeof impactStats[number]; delay
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 30 }}
+      initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ delay }}
       className="text-center"
     >
-      <p className="stat-number">
-        {count}<span className="text-white/30">{stat.suffix}</span>
+      <p className="stat-number text-5xl md:text-6xl">
+        {count}<span className="text-white/20">{stat.suffix}</span>
       </p>
-      <p className="text-white font-medium mt-3">{stat.label}</p>
-      <p className="text-white/35 text-sm mt-1">{stat.desc}</p>
+      <p className="text-white/35 text-sm mt-3">{stat.label}</p>
     </motion.div>
   );
 }
 
-/* ============== FEATURES GRID ============== */
-function FeaturesGrid() {
-  return (
-    <section className="py-24 px-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="grid md:grid-cols-3 gap-px bg-white/[0.04] rounded-2xl overflow-hidden">
-          {features.map((f, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.05 }}
-              className="bg-black p-8 hover:bg-white/[0.02] transition-colors"
-            >
-              <div className="text-white/30 mb-4">{f.icon}</div>
-              <h3 className="font-semibold mb-2">{f.title}</h3>
-              <p className="text-sm text-white/40">{f.desc}</p>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* ============== STEPS (01, 02, 03) ============== */
+/* ============== STEPS ============== */
 function StepsSection() {
   const steps = [
     { num: "01", title: "Escolha sua ferramenta", desc: "PharmaRoleplay, Social Vigilante ou MedSafe — cada uma resolve um problema diferente na cadeia." },
@@ -595,19 +519,19 @@ function StepsSection() {
   ];
 
   return (
-    <section className="py-32 px-6 border-t border-white/[0.04]">
+    <section className="py-32 px-6">
       <div className="max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-20"
+          className="text-center mb-24"
         >
           <p className="label mb-4 text-[#10B981]">Como funciona</p>
-          <h2 className="heading-lg">É fácil começar</h2>
+          <h2 className="heading-lg">É simples começar</h2>
         </motion.div>
 
-        <div className="space-y-16">
+        <div className="space-y-20">
           {steps.map((step, i) => (
             <motion.div
               key={i}
@@ -615,12 +539,12 @@ function StepsSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="flex gap-8 items-start"
+              className="flex gap-8 md:gap-12 items-start"
             >
               <span className="step-number flex-shrink-0 w-20">{step.num}</span>
               <div className="pt-2">
-                <h3 className="heading-md mb-3">{step.title}</h3>
-                <p className="text-white/40 max-w-lg">{step.desc}</p>
+                <h3 className="text-2xl md:text-3xl font-semibold mb-4" style={{ fontFamily: "var(--font-heading)" }}>{step.title}</h3>
+                <p className="text-white/35 text-lg max-w-lg leading-relaxed">{step.desc}</p>
               </div>
             </motion.div>
           ))}
@@ -630,9 +554,9 @@ function StepsSection() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mt-16 text-center"
+          className="mt-20 text-center"
         >
-          <Link href="/tools/social-vigilante" className="btn-primary">
+          <Link href="/tools/social-vigilante" className="btn-primary text-base px-8 py-4">
             Comece agora <ArrowRight size={18} />
           </Link>
         </motion.div>
@@ -674,15 +598,15 @@ function TeamSection() {
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-20"
         >
           <p className="label mb-4">Liderança</p>
-          <h2 className="heading-lg mb-4">
-            Profissionais de Farmácia-USP com<br className="hidden md:block" /> experiência em Big Pharma
+          <h2 className="heading-lg">
+            Formados na USP, forjados<br className="hidden md:block" /> na indústria farmacêutica
           </h2>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-12">
           {team.map((member, i) => (
             <motion.div
               key={i}
@@ -692,7 +616,7 @@ function TeamSection() {
               transition={{ delay: i * 0.1 }}
               className="text-center group"
             >
-              <div className="relative w-28 h-28 mx-auto mb-5 rounded-full overflow-hidden border border-white/10 group-hover:border-white/20 transition-colors">
+              <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border border-white/[0.08] group-hover:border-white/[0.15] transition-colors">
                 <Image
                   src={member.image}
                   alt={member.name}
@@ -702,11 +626,11 @@ function TeamSection() {
               </div>
               <h3 className="font-semibold text-lg">{member.name}</h3>
               <p className="text-[#00D9FF] text-sm font-medium mb-1">{member.role}</p>
-              <p className="text-white/35 text-sm mb-3">{member.desc}</p>
+              <p className="text-white/30 text-sm mb-3">{member.desc}</p>
               <Link
                 href={member.linkedin}
                 target="_blank"
-                className="text-xs text-white/25 hover:text-white/60 transition-colors"
+                className="text-xs text-white/20 hover:text-white/50 transition-colors"
               >
                 LinkedIn ↗
               </Link>
@@ -721,13 +645,13 @@ function TeamSection() {
 /* ============== CTA ============== */
 function CTASection() {
   return (
-    <section className="py-32 px-6">
+    <section className="py-40 px-6">
       <div className="max-w-3xl mx-auto text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="heading-lg mb-6"
+          className="heading-lg mb-8"
         >
           Construa uma cadeia mais segura para o paciente
         </motion.h2>
@@ -735,10 +659,10 @@ function CTASection() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="body-lg mb-10"
+          className="text-xl text-white/35 mb-12 leading-relaxed"
         >
-          Fale com nossos especialistas e descubra como agentes de IA auditáveis
-          podem transformar suas operações em Life Sciences.
+          Descubra como agentes de IA auditáveis podem
+          transformar suas operações em Life Sciences.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -746,10 +670,10 @@ function CTASection() {
           viewport={{ once: true }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <Link href="/contact" className="btn-primary">
+          <Link href="/contact" className="btn-primary text-base px-8 py-4">
             Agendar Demonstração <ArrowRight size={18} />
           </Link>
-          <Link href="/tools/social-vigilante" className="btn-outline">
+          <Link href="/tools/social-vigilante" className="btn-outline text-base px-8 py-4">
             <Play size={16} /> Testar Demo Grátis
           </Link>
         </motion.div>
@@ -757,4 +681,3 @@ function CTASection() {
     </section>
   );
 }
-

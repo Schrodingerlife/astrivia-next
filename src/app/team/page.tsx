@@ -103,7 +103,7 @@ export default function TeamPage() {
                         Nosso <span className="text-gradient-cyan">Time</span>
                     </h1>
                     <p className="body-lg max-w-2xl mx-auto">
-                        Profissionais de Farmácia-USP com experiência em Big Pharma
+                        Formados na USP, forjados na indústria farmacêutica
                     </p>
                 </motion.div>
             </section>
