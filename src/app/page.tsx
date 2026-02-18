@@ -25,115 +25,48 @@ import {
   HeroBackgroundSVG,
 } from "@/components/product-logos";
 
-/* ============== PRODUCT ILLUSTRATIONS (Large Format) ============== */
+/* ============== PRODUCT ILLUSTRATIONS (Image-based) ============== */
 function PharmaRoleplayVisual() {
   return (
-    <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-to-br from-[#00D9FF]/[0.06] to-transparent border border-white/[0.06]">
-      <div className="absolute inset-6 md:inset-8 space-y-4">
-        <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-full bg-[#00D9FF]/20 flex items-center justify-center flex-shrink-0">
-            <Mic size={16} className="text-[#00D9FF]" />
-          </div>
-          <div className="bg-white/[0.06] rounded-2xl rounded-tl-sm px-4 py-3 max-w-[80%]">
-            <p className="text-xs text-white/40 mb-1">Dr. Silva — Cardiologista</p>
-            <p className="text-sm text-white/70">&quot;Quais são os efeitos adversos mais comuns?&quot;</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-3 justify-end">
-          <div className="bg-[#00D9FF]/10 rounded-2xl rounded-tr-sm px-4 py-3 max-w-[80%]">
-            <p className="text-xs text-[#00D9FF]/50 mb-1">Representante IA</p>
-            <p className="text-sm text-white/70">&quot;Os dados clínicos do estudo PIONEER mostram que...&quot;</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 px-3">
-          <div className="flex gap-1">
-            {[1, 2, 3, 4, 5, 6, 7].map(i => (
-              <div key={i} className="w-1.5 bg-[#00D9FF]/40 rounded-full animate-pulse" style={{ height: `${10 + Math.random() * 20}px`, animationDelay: `${i * 0.15}s` }} />
-            ))}
-          </div>
-          <span className="text-xs text-[#00D9FF]/40">Ouvindo...</span>
-        </div>
-        <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 mt-2">
-          <p className="text-green-400 text-sm flex items-center gap-2">
-            <CheckCircle size={14} />
-            Ótimo uso de referência científica!
-          </p>
-        </div>
-      </div>
-      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1.5">
-        <Award size={12} className="text-[#00D9FF]" />
-        <span className="text-xs font-medium text-[#00D9FF]">Score: 87%</span>
-      </div>
+    <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl shadow-[#00D9FF]/10 group">
+      <Image
+        src="/images/product-pharmaroleplay.png"
+        alt="PharmaRoleplay - Simulador de treinamento por voz com IA"
+        fill
+        className="object-cover transition-transform duration-700 group-hover:scale-105"
+        sizes="(max-width: 768px) 100vw, 50vw"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
     </div>
   );
 }
 
 function SocialVigilanteVisual() {
   return (
-    <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-to-br from-[#A855F7]/[0.06] to-transparent border border-white/[0.06]">
-      <div className="absolute inset-6 md:inset-8 space-y-3">
-        {[
-          { platform: "X (Twitter)", risk: "critical", text: "Relato de náusea persistente após uso contínuo de..." },
-          { platform: "Reclame Aqui", risk: "high", text: "Lote apresentando alteração organoléptica significativa..." },
-          { platform: "Reddit", risk: "medium", text: "Hepatotoxicidade mencionada em fórum de pacientes..." },
-          { platform: "Instagram", risk: "low", text: "Dúvida sobre interação medicamentosa com..." },
-        ].map((post, i) => (
-          <div key={i} className="flex items-center gap-3 bg-white/[0.04] rounded-xl px-4 py-3 border border-white/[0.04]">
-            <span className="text-xs text-white/30 w-24 flex-shrink-0">{post.platform}</span>
-            <p className="text-xs text-white/50 flex-1 truncate">{post.text}</p>
-            <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-full ${post.risk === "critical" ? "bg-red-500/15 text-red-400" :
-              post.risk === "high" ? "bg-orange-500/15 text-orange-400" :
-                post.risk === "medium" ? "bg-yellow-500/15 text-yellow-400" :
-                  "bg-green-500/15 text-green-400"
-              }`}>{post.risk}</span>
-          </div>
-        ))}
-        {/* Activity chart */}
-        <div className="flex items-end gap-0.5 h-16 mt-3 px-2">
-          {[35, 60, 25, 80, 45, 70, 30, 55, 75, 40, 65, 50, 85, 35, 60, 45].map((h, i) => (
-            <div key={i} className="flex-1 bg-gradient-to-t from-[#A855F7]/10 to-[#A855F7]/50 rounded-t-sm" style={{ height: `${h}%` }} />
-          ))}
-        </div>
-      </div>
-      <div className="absolute bottom-4 right-4 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1.5">
-        <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-        <span className="text-xs font-medium text-white/50">4 fontes ativas</span>
-      </div>
+    <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl shadow-[#A855F7]/10 group">
+      <Image
+        src="/images/product-socialvigilante.png"
+        alt="Social Vigilante - Dashboard de vigilância pós-mercado"
+        fill
+        className="object-cover transition-transform duration-700 group-hover:scale-105"
+        sizes="(max-width: 768px) 100vw, 50vw"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
     </div>
   );
 }
 
 function MedSafeVisual() {
   return (
-    <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden bg-gradient-to-br from-[#10B981]/[0.06] to-transparent border border-white/[0.06]">
-      <div className="absolute inset-6 md:inset-8">
-        <div className="flex items-center gap-3 mb-4">
-          <span className="text-xs text-white/40">Compliance Score</span>
-          <div className="h-2 flex-1 bg-white/[0.06] rounded-full overflow-hidden">
-            <div className="h-full w-[78%] bg-gradient-to-r from-[#10B981] to-[#10B981]/70 rounded-full" />
-          </div>
-          <span className="text-sm font-bold text-[#10B981]">78%</span>
-        </div>
-        <div className="space-y-2">
-          {[
-            { label: "RDC 96 — Art. 3º: Requisitos obrigatórios", status: "pass" },
-            { label: "Indicação terapêutica aprovada pela ANVISA", status: "pass" },
-            { label: "Claim de superioridade sem referência", status: "fail" },
-            { label: "Fonte bibliográfica válida e rastreável", status: "pass" },
-            { label: "Linguagem promocional sem moderação", status: "warn" },
-            { label: "Informações de segurança do produto", status: "pass" },
-          ].map((item, i) => (
-            <div key={i} className="flex items-center gap-3 bg-white/[0.03] rounded-xl px-4 py-2.5">
-              {item.status === "pass" ? <CheckCircle size={14} className="text-[#10B981] flex-shrink-0" /> :
-                item.status === "fail" ? <AlertTriangle size={14} className="text-red-400 flex-shrink-0" /> :
-                  <AlertTriangle size={14} className="text-yellow-400 flex-shrink-0" />}
-              <span className="text-xs text-white/50 flex-1">{item.label}</span>
-              <span className={`text-[10px] font-bold ${item.status === "pass" ? "text-[#10B981]" : item.status === "fail" ? "text-red-400" : "text-yellow-400"
-                }`}>{item.status === "pass" ? "OK" : item.status === "fail" ? "VIOLAÇÃO" : "ATENÇÃO"}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+    <div className="relative w-full aspect-[4/3] rounded-3xl overflow-hidden border border-white/[0.08] shadow-2xl shadow-[#10B981]/10 group">
+      <Image
+        src="/images/product-medsafe.png"
+        alt="MedSafe AI - Auditoria de compliance regulatório"
+        fill
+        className="object-cover transition-transform duration-700 group-hover:scale-105"
+        sizes="(max-width: 768px) 100vw, 50vw"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
     </div>
   );
 }
@@ -232,6 +165,16 @@ function HeroSection() {
       {/* Rich background layers */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#050510] to-[#0a0a0a]" />
       <div className="absolute inset-0 bg-grid-pattern opacity-40" />
+      {/* Pharma-themed hero background image */}
+      <div className="absolute inset-0 opacity-[0.12]">
+        <Image
+          src="/images/hero-pharma-bg.png"
+          alt=""
+          fill
+          className="object-cover"
+          priority
+        />
+      </div>
       <HeroBackgroundSVG />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[900px] gradient-orb gradient-orb-cyan" />
       <div className="absolute top-[20%] right-0 w-[600px] h-[600px] gradient-orb gradient-orb-purple" />
