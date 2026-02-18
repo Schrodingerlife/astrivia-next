@@ -2,60 +2,82 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
-// Usando Gemini 2.0 para alta velocidade e capacidade de gerar JSON estruturado complexo
-const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
+const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
 
 export async function POST(req: Request) {
     try {
-        const { keyword } = await req.json();
+        const body = await req.json();
+        const keyword = typeof body.keyword === "string" ? body.keyword.trim().slice(0, 100) : "";
         const term = keyword || "medicamento genérico";
 
-        // Prompt para gerar dados sintéticos realistas de redes sociais E a análise de farmacovigilância
-        // Simulando a pipeline completa: Ingestão -> BigQuery/NLP -> Insights
-        const prompt = `
-            Atue como uma Engine de Simulação de Farmacovigilância Avançada baseada em BigQuery ML e Vertex AI.
-            
-            Gere 4 posts de redes sociais (Twitter, Instagram, Reddit ou ReclameAqui) sobre o termo: "${term}".
-            
-            Para cada post, você DEVE gerar também a análise técnica de farmacovigilância baseada no texto.
-            Misture sentimentos e riscos (tontura, dor de cabeça, elogios, dúvidas).
-            
-            Retorne APENAS um JSON array puro com este formato (sem markdown):
-            [
-                {
-                    "id": "string (uuid)",
-                    "platform": "twitter" | "instagram" | "reddit" | "reclameaqui",
-                    "author": "string (nome realista)",
-                    "handle": "string (usuario)",
-                    "avatar": "url (use https://i.pravatar.cc/150?u=... com seed aleatoria)",
-                    "content": "string (texto do post, pt-BR, gírias realistas)",
-                    "timestamp": "ISO String (data recente)",
-                    "likes": number,
-                    "shares": number,
-                    "sentiment": "positive" | "neutral" | "negative",
-                    "riskLevel": "low" | "medium" | "high" | "critical",
-                    "aiAnalysis": {
-                        "detectedEvent": "string (ex: Cefaléia, Náusea, Ineficácia - ou null se baixo risco)",
-                        "drugMentioned": "${term}",
-                        "complianceFlag": boolean (true se precisa reportar anvisa)
-                    }
-                }
-            ]
-        `;
+        const prompt = `Você é um sistema avançado de farmacovigilância em redes sociais. Gere posts REALISTAS e ÚNICOS simulando monitoramento de redes sociais brasileiras sobre "${term}".
+
+REGRAS:
+- Cada post deve ser COMPLETAMENTE DIFERENTE em tom, contexto, autor e plataforma
+- Use linguagem REAL de cada plataforma (gírias do Twitter, tom informal do Reddit, reclamações detalhadas do ReclameAqui, emojis do Instagram)
+- Inclua reações adversas REAIS e específicas de "${term}" baseadas em bulas e literatura médica real
+- NÃO repita padrões. Cada post conta uma história diferente
+- Timestamps das últimas 24 horas
+- SEMPRE retorne JSON válido, sem markdown, sem crases
+
+Gere exatamente 3 posts:
+1. NEGATIVO: relato de evento adverso real e específico (use termos MedDRA quando possível)
+2. NEUTRO: dúvida, comparação entre tratamentos, ou pedido de informação
+3. POSITIVO ou sinal de uso off-label/uso indevido que merece atenção regulatória
+
+JSON array puro:
+[{"id":"${Date.now()}-1","platform":"twitter"|"instagram"|"reddit"|"reclameaqui","author":"nome brasileiro","handle":"@usuario","avatar":"https://i.pravatar.cc/150?u=SEED_UNICO","content":"texto pt-BR mínimo 2 frases com linguagem natural da plataforma","timestamp":"ISO date recente","likes":0,"shares":0,"sentiment":"positive"|"neutral"|"negative","riskLevel":"low"|"medium"|"high"|"critical","aiAnalysis":{"detectedEvent":"termo técnico do evento ou null","drugMentioned":"${term}","complianceFlag":true|false,"confidence":0.85}}]`;
 
         const result = await model.generateContent(prompt);
         const responseText = result.response.text();
 
-        // Limpeza básica do JSON
-        const cleanedJson = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+        // Robust JSON cleaning
+        let cleanedJson = responseText
+            .replace(/```json\s*/gi, "")
+            .replace(/```\s*/g, "")
+            .trim();
+
+        // Extract JSON array if there's extra text around it
+        const arrayMatch = cleanedJson.match(/\[[\s\S]*\]/);
+        if (arrayMatch) {
+            cleanedJson = arrayMatch[0];
+        }
+
         const posts = JSON.parse(cleanedJson);
 
-        return NextResponse.json({ posts });
+        if (!Array.isArray(posts) || posts.length === 0) {
+            throw new Error("Invalid response structure");
+        }
 
-    } catch (error) {
-        console.error("Error simulating social stream:", error);
+        // Validate and sanitize each post
+        const validatedPosts = posts.map((post: any, i: number) => ({
+            id: post.id || `gen-${Date.now()}-${i}`,
+            platform: post.platform || "twitter",
+            author: post.author || "Usuário",
+            handle: post.handle || "@user",
+            avatar: post.avatar || `https://i.pravatar.cc/150?u=${Date.now()}-${i}`,
+            content: post.content || "",
+            timestamp: post.timestamp || new Date().toISOString(),
+            likes: typeof post.likes === "number" ? post.likes : 0,
+            shares: typeof post.shares === "number" ? post.shares : 0,
+            sentiment: post.sentiment || "neutral",
+            riskLevel: post.riskLevel || "medium",
+            aiAnalysis: post.aiAnalysis ? {
+                detectedEvent: post.aiAnalysis.detectedEvent || null,
+                drugMentioned: post.aiAnalysis.drugMentioned || term,
+                complianceFlag: !!post.aiAnalysis.complianceFlag,
+                confidence: post.aiAnalysis.confidence || null,
+            } : undefined,
+            status: "new",
+        }));
+
+        return NextResponse.json({ posts: validatedPosts });
+
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "Unknown error";
+        console.error("Social Vigilante API error:", message);
         return NextResponse.json(
-            { error: "Failed to generate simulation data" },
+            { error: "Failed to generate data", details: message },
             { status: 500 }
         );
     }

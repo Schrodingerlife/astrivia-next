@@ -1,22 +1,69 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+    Mic,
+    Globe,
+    Shield,
+    Users,
+    FileText,
+    ChevronDown,
+} from "lucide-react";
+
+const products = [
+    {
+        href: "/tools/pharmaroleplay",
+        icon: <Mic size={20} />,
+        title: "PharmaRoleplay",
+        desc: "Treinamento por voz com IA",
+        color: "#00D9FF",
+    },
+    {
+        href: "/tools/social-vigilante",
+        icon: <Globe size={20} />,
+        title: "Social Vigilante",
+        desc: "Vigilância pós-mercado",
+        color: "#A855F7",
+    },
+    {
+        href: "/tools/medsafe",
+        icon: <Shield size={20} />,
+        title: "MedSafe AI",
+        desc: "Compliance regulatório",
+        color: "#10B981",
+    },
+    {
+        href: "/contact",
+        icon: <Users size={20} />,
+        title: "InternMatch",
+        desc: "Talent matching com IA",
+        color: "#F59E0B",
+        soon: true,
+    },
+    {
+        href: "/contact",
+        icon: <FileText size={20} />,
+        title: "SciGen",
+        desc: "Geração de conteúdo científico",
+        color: "#EC4899",
+        soon: true,
+    },
+];
 
 const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Products", href: "/products" },
-    { name: "Technology", href: "/technology" },
-    { name: "Team", href: "/team" },
-    { name: "Docs", href: "/docs" },
-    { name: "Status", href: "/status" },
-    { name: "Contact", href: "/contact" },
+    { name: "Tecnologia", href: "/technology" },
+    { name: "Time", href: "/team" },
+    { name: "Contato", href: "/contact" },
 ];
 
 export function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef<HTMLDivElement>(null);
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -24,13 +71,22 @@ export function Navbar() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    const handleDropdownEnter = () => {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setDropdownOpen(true);
+    };
+
+    const handleDropdownLeave = () => {
+        timeoutRef.current = setTimeout(() => setDropdownOpen(false), 200);
+    };
+
     return (
         <>
             <nav className={`navbar fixed top-0 w-full z-50 ${isScrolled ? "scrolled" : ""}`}>
                 <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+                    {/* Logo */}
                     <Link href="/" className="flex items-center group">
-                        <span className="relative h-12 w-auto block">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <span className="relative h-10 w-auto block">
                             <img
                                 src="/images/astrivia-logo-fixed.png"
                                 alt="Astrivia AI"
@@ -40,31 +96,90 @@ export function Navbar() {
                     </Link>
 
                     {/* Desktop Navigation */}
-                    <div className="hidden lg:flex items-center gap-8 text-sm font-medium">
+                    <div className="hidden lg:flex items-center gap-1">
+                        {/* Produtos Dropdown */}
+                        <div
+                            ref={dropdownRef}
+                            className="relative"
+                            onMouseEnter={handleDropdownEnter}
+                            onMouseLeave={handleDropdownLeave}
+                        >
+                            <button className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-white/60 hover:text-white transition-colors rounded-full hover:bg-white/[0.04]">
+                                Produtos
+                                <ChevronDown
+                                    size={14}
+                                    className={`transition-transform duration-300 ${dropdownOpen ? "rotate-180" : ""}`}
+                                />
+                            </button>
+
+                            {/* Mega Dropdown */}
+                            <div className={`mega-dropdown ${dropdownOpen ? "open" : ""}`}>
+                                <p className="label px-4 mb-3">Ferramentas</p>
+                                <div className="grid grid-cols-2 gap-1">
+                                    {products.map((product) => (
+                                        <Link
+                                            key={product.title}
+                                            href={product.href}
+                                            className="mega-dropdown-item"
+                                            onClick={() => setDropdownOpen(false)}
+                                        >
+                                            <div
+                                                className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+                                                style={{ background: `${product.color}15`, color: product.color }}
+                                            >
+                                                {product.icon}
+                                            </div>
+                                            <div>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-sm font-medium text-white">{product.title}</p>
+                                                    {product.soon && (
+                                                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/10 text-white/40">
+                                                            Em breve
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <p className="text-xs text-white/40">{product.desc}</p>
+                                            </div>
+                                        </Link>
+                                    ))}
+                                </div>
+                                <div className="mt-4 pt-4 border-t border-white/[0.06]">
+                                    <Link
+                                        href="/products"
+                                        className="text-sm text-white/40 hover:text-white transition-colors px-4"
+                                        onClick={() => setDropdownOpen(false)}
+                                    >
+                                        Ver todos os produtos →
+                                    </Link>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Other Links */}
                         {navLinks.map((link) => (
                             <Link
                                 key={link.name}
                                 href={link.href}
-                                className="text-white/60 hover:text-[#00D9FF] transition-colors relative group"
+                                className="px-4 py-2 text-sm font-medium text-white/60 hover:text-white transition-colors rounded-full hover:bg-white/[0.04]"
                             >
                                 {link.name}
-                                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-[#00D9FF] group-hover:w-full transition-all duration-300" />
                             </Link>
                         ))}
                     </div>
 
+                    {/* Desktop CTA */}
                     <div className="hidden lg:flex items-center gap-3">
                         <Link
                             href="/platform"
-                            className="btn-outline px-5 py-2.5 rounded-lg text-sm"
+                            className="text-sm font-medium text-white/60 hover:text-white transition-colors px-4 py-2"
                         >
                             Login
                         </Link>
                         <Link
-                            href="/contact"
-                            className="btn-primary px-6 py-2.5 rounded-lg text-sm"
+                            href="/tools/social-vigilante"
+                            className="btn-primary text-sm !py-2.5 !px-6"
                         >
-                            Get Started
+                            Testar Grátis
                         </Link>
                     </div>
 
@@ -93,26 +208,52 @@ export function Navbar() {
                         initial={{ x: "100%" }}
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
-                        transition={{ type: "tween", duration: 0.3 }}
-                        className="fixed top-0 right-0 w-[80%] max-w-[300px] h-screen bg-[#0A1628]/98 backdrop-blur-xl z-[100] p-8 pt-20"
+                        transition={{ type: "tween", duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                        className="fixed top-0 right-0 w-full h-screen bg-black/98 backdrop-blur-xl z-[100] p-10 pt-24"
                     >
-                        <div className="flex flex-col gap-6">
+                        <div className="flex flex-col gap-2">
+                            <p className="label mb-4">Produtos</p>
+                            {products.map((product) => (
+                                <Link
+                                    key={product.title}
+                                    href={product.href}
+                                    className="flex items-center gap-4 py-3 text-white/70 hover:text-white transition-colors"
+                                    onClick={() => setMobileMenuOpen(false)}
+                                >
+                                    <div
+                                        className="w-10 h-10 rounded-xl flex items-center justify-center"
+                                        style={{ background: `${product.color}15`, color: product.color }}
+                                    >
+                                        {product.icon}
+                                    </div>
+                                    <div>
+                                        <p className="font-medium">{product.title}</p>
+                                        <p className="text-xs text-white/30">{product.desc}</p>
+                                    </div>
+                                </Link>
+                            ))}
+
+                            <div className="h-px bg-white/[0.06] my-4" />
+
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.name}
                                     href={link.href}
-                                    className="text-xl text-white/80 hover:text-[#00D9FF] transition-colors"
+                                    className="text-xl text-white/70 hover:text-white transition-colors py-2"
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
                                     {link.name}
                                 </Link>
                             ))}
+
+                            <div className="h-px bg-white/[0.06] my-4" />
+
                             <Link
-                                href="/contact"
-                                className="btn-primary px-6 py-3 rounded-lg text-center mt-4"
+                                href="/tools/social-vigilante"
+                                className="btn-primary text-center mt-2"
                                 onClick={() => setMobileMenuOpen(false)}
                             >
-                                Get Started
+                                Testar Grátis
                             </Link>
                         </div>
                     </motion.div>

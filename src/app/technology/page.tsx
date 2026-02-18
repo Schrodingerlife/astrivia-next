@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { Cpu, GitBranch, Layers, Shield } from "lucide-react";
 
 const techStack = [
     { name: "Vertex AI Agent Engine", description: "Orquestração de agentes autônomos" },
@@ -13,7 +14,7 @@ const techStack = [
     { name: "BigQuery ML", description: "Machine learning em escala de terabytes" },
     { name: "TPU v5e", description: "Inferência de alta performance" },
     { name: "Imagen 3", description: "Geração e edição de imagens" },
-    { name: "Gemini Pro", description: "LLM multimodal de última geração" },
+    { name: "Gemini 3 Pro", description: "LLM multimodal de última geração" },
 ];
 
 const tabs = [
@@ -21,10 +22,10 @@ const tabs = [
         name: "ReAct Framework",
         content: (
             <div className="text-center">
-                <h3 className="text-2xl font-bold mb-4 text-gradient-cyan">
+                <h3 className="heading-md mb-4 text-gradient-cyan">
                     Reasoning → Action → Observation
                 </h3>
-                <p className="text-white/70 max-w-2xl mx-auto">
+                <p className="text-white/50 max-w-2xl mx-auto">
                     Nossos agentes seguem o ciclo ReAct do Google DeepMind: raciocinam sobre o problema,
                     executam uma ação, observam o resultado e iteram até a solução. Isso permite
                     comportamento adaptativo e resolução de problemas complexos.
@@ -32,10 +33,10 @@ const tabs = [
                 <div className="flex justify-center gap-8 mt-8">
                     {["Raciocínio", "Ação", "Observação"].map((step, i) => (
                         <div key={step} className="text-center">
-                            <div className="w-16 h-16 rounded-full bg-[#00D9FF]/10 border border-[#00D9FF]/30 flex items-center justify-center mx-auto mb-2">
+                            <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center mx-auto mb-2">
                                 <span className="text-2xl font-bold text-[#00D9FF]">{i + 1}</span>
                             </div>
-                            <p className="text-white/80 font-medium">{step}</p>
+                            <p className="text-white/60 font-medium text-sm">{step}</p>
                         </div>
                     ))}
                 </div>
@@ -46,10 +47,10 @@ const tabs = [
         name: "AgentOps Pipeline",
         content: (
             <div className="text-center">
-                <h3 className="text-2xl font-bold mb-4 text-gradient-cyan">
+                <h3 className="heading-md mb-4 text-gradient-cyan">
                     Code → Build → Test → Deploy
                 </h3>
-                <p className="text-white/70 max-w-2xl mx-auto">
+                <p className="text-white/50 max-w-2xl mx-auto">
                     Pipeline CI/CD completo para agentes. Cada mudança passa por validação de trajetórias,
                     testes de integração e deploy automático no Cloud Run. Rollback instantâneo se necessário.
                 </p>
@@ -60,9 +61,9 @@ const tabs = [
                         { name: "Test", desc: "Trajectory Validation" },
                         { name: "Deploy", desc: "Cloud Run" },
                     ].map((stage) => (
-                        <div key={stage.name} className="glass rounded-xl p-4 text-center">
-                            <p className="text-[#00D9FF] font-bold">{stage.name}</p>
-                            <p className="text-white/50 text-xs mt-1">{stage.desc}</p>
+                        <div key={stage.name} className="glass-card rounded-xl p-4 text-center">
+                            <p className="text-[#00D9FF] font-bold text-sm">{stage.name}</p>
+                            <p className="text-white/35 text-xs mt-1">{stage.desc}</p>
                         </div>
                     ))}
                 </div>
@@ -73,14 +74,14 @@ const tabs = [
         name: "Tech Stack",
         content: (
             <div>
-                <h3 className="text-2xl font-bold mb-6 text-center text-gradient-cyan">
+                <h3 className="heading-md mb-6 text-center text-gradient-cyan">
                     Powered by Google Cloud
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
                     {techStack.map((tech) => (
-                        <div key={tech.name} className="glass rounded-xl p-4 text-center group hover:border-[#00D9FF]/40 transition-colors">
+                        <div key={tech.name} className="glass-card rounded-xl p-4 text-center">
                             <p className="text-white font-medium text-sm">{tech.name}</p>
-                            <p className="text-white/40 text-xs mt-1">{tech.description}</p>
+                            <p className="text-white/35 text-xs mt-1">{tech.description}</p>
                         </div>
                     ))}
                 </div>
@@ -95,22 +96,19 @@ export default function TechnologyPage() {
     return (
         <div className="min-h-screen pt-24">
             {/* Hero */}
-            <section className="py-16 px-6 text-center">
-                <motion.h1
+            <section className="py-20 px-6 text-center">
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-4xl md:text-5xl font-bold mb-4"
                 >
-                    Arquitetura <span className="text-gradient-cyan">Técnica</span>
-                </motion.h1>
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-white/60 text-lg max-w-2xl mx-auto"
-                >
-                    Powered by Google Cloud & Vertex AI Agent Engine
-                </motion.p>
+                    <p className="label mb-4 text-[#00D9FF]">Arquitetura</p>
+                    <h1 className="heading-lg mb-4">
+                        Arquitetura <span className="text-gradient-cyan">Técnica</span>
+                    </h1>
+                    <p className="body-lg max-w-2xl mx-auto">
+                        Powered by Google Cloud & Vertex AI Agent Engine
+                    </p>
+                </motion.div>
             </section>
 
             {/* AgentOps Diagram */}
@@ -126,14 +124,14 @@ export default function TechnologyPage() {
                             alt="AgentOps Pipeline"
                             width={1400}
                             height={600}
-                            className="w-full rounded-3xl shadow-2xl"
+                            className="w-full rounded-2xl border border-white/[0.08]"
                         />
                     </motion.div>
                 </div>
             </section>
 
             {/* Tabs */}
-            <section className="py-16 px-6 bg-[#0D1B2A]">
+            <section className="py-24 px-6 border-t border-white/[0.04]">
                 <div className="max-w-5xl mx-auto">
                     <div className="flex flex-wrap justify-center gap-4 mb-12">
                         {tabs.map((tab, i) => (
@@ -161,43 +159,34 @@ export default function TechnologyPage() {
             {/* Security & Compliance */}
             <section className="py-24 px-6">
                 <div className="max-w-7xl mx-auto">
-                    <motion.h2
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-3xl font-bold text-center mb-12"
+                        className="text-center mb-16"
                     >
-                        Segurança & Compliance
-                    </motion.h2>
+                        <p className="label mb-4 text-[#10B981]">Segurança</p>
+                        <h2 className="heading-lg">Segurança & Compliance</h2>
+                    </motion.div>
 
                     <div className="grid md:grid-cols-4 gap-6">
                         {[
-                            {
-                                title: "Zero Hallucination",
-                                desc: "Grounding em fontes verificáveis",
-                            },
-                            {
-                                title: "Auditoria Completa",
-                                desc: "Log de todas as decisões de agentes",
-                            },
-                            {
-                                title: "RDC 96 Compliance",
-                                desc: "Treinamento na legislação ANVISA",
-                            },
-                            {
-                                title: "LGPD Compliant",
-                                desc: "Dados processados no Brasil",
-                            },
-                        ].map((item) => (
+                            { icon: <Shield size={20} />, title: "Zero Hallucination", desc: "Grounding em fontes verificáveis" },
+                            { icon: <Layers size={20} />, title: "Auditoria Completa", desc: "Log de todas as decisões de agentes" },
+                            { icon: <GitBranch size={20} />, title: "RDC 96 Compliance", desc: "Treinamento na legislação ANVISA" },
+                            { icon: <Cpu size={20} />, title: "LGPD Compliant", desc: "Dados processados no Brasil" },
+                        ].map((item, index) => (
                             <motion.div
                                 key={item.title}
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
+                                transition={{ delay: index * 0.08 }}
                                 className="glass-card rounded-xl p-6 text-center"
                             >
-                                <h3 className="text-lg font-bold text-[#10B981] mb-2">{item.title}</h3>
-                                <p className="text-white/50 text-sm">{item.desc}</p>
+                                <div className="text-[#10B981] mb-4 flex justify-center">{item.icon}</div>
+                                <h3 className="font-semibold mb-2">{item.title}</h3>
+                                <p className="text-white/40 text-sm">{item.desc}</p>
                             </motion.div>
                         ))}
                     </div>
@@ -205,16 +194,17 @@ export default function TechnologyPage() {
             </section>
 
             {/* Performance */}
-            <section className="py-24 px-6 bg-[#0D1B2A]">
+            <section className="py-24 px-6 border-t border-white/[0.04]">
                 <div className="max-w-7xl mx-auto">
-                    <motion.h2
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-3xl font-bold text-center mb-12"
+                        className="text-center mb-16"
                     >
-                        Performance Metrics
-                    </motion.h2>
+                        <p className="label mb-4 text-[#A855F7]">Performance</p>
+                        <h2 className="heading-lg">Métricas de Performance</h2>
+                    </motion.div>
 
                     <div className="grid md:grid-cols-4 gap-6">
                         {[
@@ -222,16 +212,17 @@ export default function TechnologyPage() {
                             { value: "TB/dia", label: "Dados processados" },
                             { value: "99.9%", label: "Uptime garantido" },
                             { value: "100%", label: "Rastreabilidade" },
-                        ].map((stat) => (
+                        ].map((stat, index) => (
                             <motion.div
                                 key={stat.label}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 whileInView={{ opacity: 1, scale: 1 }}
                                 viewport={{ once: true }}
+                                transition={{ delay: index * 0.08 }}
                                 className="glass-card rounded-xl p-6 text-center"
                             >
-                                <p className="text-3xl font-bold neon-number mb-2">{stat.value}</p>
-                                <p className="text-white/50 text-sm">{stat.label}</p>
+                                <p className="stat-number text-3xl mb-2">{stat.value}</p>
+                                <p className="text-white/40 text-sm">{stat.label}</p>
                             </motion.div>
                         ))}
                     </div>

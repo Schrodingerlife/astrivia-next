@@ -41,84 +41,124 @@ interface SocialPost {
 const MOCK_POSTS_POOL: Omit<SocialPost, "id" | "timestamp" | "status">[] = [
     {
         platform: "twitter",
-        author: "Ana Silva",
-        handle: "@ana_s",
-        avatar: "https://i.pravatar.cc/150?u=a",
-        content: "Tomei o #CardioFix hoje cedo e senti uma tontura muito forte, quase desmaiei no trabalho. Alguém mais teve isso? 😰",
-        likes: 12,
-        shares: 4,
+        author: "Ana Paula Ferreira",
+        handle: "@anapaula_fer",
+        avatar: "https://i.pravatar.cc/150?u=anapaula1",
+        content: "Gente, comecei a tomar DRUG_NAME faz 3 semanas e estou com uma náusea constante que não passa. Meu médico disse pra continuar, mas tá difícil. Alguém mais passou por isso no início? 😰",
+        likes: 23,
+        shares: 7,
         sentiment: "negative",
         riskLevel: "high",
-        aiAnalysis: {
-            detectedEvent: "Tontura, Síncope",
-            drugMentioned: "CardioFix",
-            complianceFlag: true
-        }
+        aiAnalysis: { detectedEvent: "Náusea persistente (SOC: Distúrbios gastrointestinais)", drugMentioned: "DRUG_NAME", complianceFlag: true }
     },
     {
         platform: "reddit",
-        author: "PharmaGuy99",
-        handle: "u/pharmaguy",
-        avatar: "https://i.pravatar.cc/150?u=b",
-        content: "Review honesto do NeuroCalm: funciona bem para ansiedade, mas tenho notado que minha boca fica muito seca 30min depois de tomar.",
-        likes: 45,
-        shares: 0,
-        sentiment: "neutral",
-        riskLevel: "medium",
-        aiAnalysis: {
-            detectedEvent: "Boca seca (Xerostomia)",
-            drugMentioned: "NeuroCalm",
-            complianceFlag: true
-        }
+        author: "MarcosFarma",
+        handle: "u/marcos_farma",
+        avatar: "https://i.pravatar.cc/150?u=marcos2",
+        content: "Alguém que toma DRUG_NAME notou alteração nos exames de função hepática? Minhas transaminases subiram bastante na última coleta e meu hepato pediu pra investigar. Estou preocupado se pode ser do medicamento.",
+        likes: 67,
+        shares: 12,
+        sentiment: "negative",
+        riskLevel: "critical",
+        aiAnalysis: { detectedEvent: "Hepatotoxicidade (elevação de ALT/AST)", drugMentioned: "DRUG_NAME", complianceFlag: true }
     },
     {
         platform: "instagram",
-        author: "Bella Fitness",
-        handle: "@bellafit",
-        avatar: "https://i.pravatar.cc/150?u=c",
-        content: "Gente, amando os resultados do DermGlow! Minha pele nunca esteve tão radiante ✨ #skincare #dermglow",
-        likes: 1205,
-        shares: 56,
-        sentiment: "positive",
-        riskLevel: "low",
-        aiAnalysis: {
-            detectedEvent: "Eficácia Terapêutica",
-            drugMentioned: "DermGlow",
-            complianceFlag: false
-        }
+        author: "Dra. Camila Nutri",
+        handle: "@dracamilanutri",
+        avatar: "https://i.pravatar.cc/150?u=camila3",
+        content: "Vejo muitos pacientes usando DRUG_NAME por conta própria pra emagrecer, sem indicação médica. Isso é perigoso! O medicamento tem indicações específicas e efeitos colaterais sérios. Procurem orientação profissional 🙏",
+        likes: 2340,
+        shares: 189,
+        sentiment: "neutral",
+        riskLevel: "high",
+        aiAnalysis: { detectedEvent: "Uso off-label sem prescrição", drugMentioned: "DRUG_NAME", complianceFlag: true }
     },
     {
         platform: "reclameaqui",
-        author: "Carlos M.",
-        handle: "Cliente",
-        avatar: "https://i.pravatar.cc/150?u=d",
-        content: "Comprei 3 caixas de FlexiJoint e o lote veio com cheiro estranho. Lote CJ8892. Quero troca imediata.",
+        author: "Roberto Santos",
+        handle: "Cliente Verificado",
+        avatar: "https://i.pravatar.cc/150?u=roberto4",
+        content: "Comprei DRUG_NAME na farmácia e quando abri a embalagem o comprimido estava com manchas escuras e cheiro diferente do normal. Lote #BR2024-1847. Já registrei reclamação na ANVISA também. Estou com medo de ter tomado produto adulterado.",
         likes: 0,
         shares: 0,
         sentiment: "negative",
         riskLevel: "critical",
-        aiAnalysis: {
-            detectedEvent: "Desvio de Qualidade",
-            drugMentioned: "FlexiJoint",
-            complianceFlag: true
-        }
+        aiAnalysis: { detectedEvent: "Desvio de qualidade - alteração organoléptica", drugMentioned: "DRUG_NAME", complianceFlag: true }
     },
     {
         platform: "twitter",
-        author: "Dr. João",
-        handle: "@drjoao_med",
-        avatar: "https://i.pravatar.cc/150?u=e",
-        content: "Interessante novo estudo sobre o uso de ImunoBoost em pacientes idosos. Resultados promissores na redução de inflamação.",
-        likes: 89,
-        shares: 32,
+        author: "Dr. Ricardo Endo",
+        handle: "@dr_endo_sp",
+        avatar: "https://i.pravatar.cc/150?u=ricardo5",
+        content: "Novo estudo publicado no NEJM mostra que DRUG_NAME pode ter benefício cardiovascular além da indicação primária. Precisamos acompanhar os dados de longo prazo antes de extrapolar, mas é promissor.",
+        likes: 156,
+        shares: 89,
         sentiment: "positive",
         riskLevel: "low",
-        aiAnalysis: {
-            detectedEvent: "Uso Off-label Potencial",
-            drugMentioned: "ImunoBoost",
-            complianceFlag: false
-        }
-    }
+        aiAnalysis: { detectedEvent: "Benefício cardiovascular potencial (uso off-label)", drugMentioned: "DRUG_NAME", complianceFlag: false }
+    },
+    {
+        platform: "reddit",
+        author: "JuliaHealthBR",
+        handle: "u/julia_health",
+        avatar: "https://i.pravatar.cc/150?u=julia6",
+        content: "3 meses de DRUG_NAME e posso dizer: funciona, mas o preço é a adaptação gastrointestinal nas primeiras semanas. Diarreia, cólica, gases. Depois estabiliza. Minha dica: comece com dose baixa e suba devagar.",
+        likes: 234,
+        shares: 45,
+        sentiment: "neutral",
+        riskLevel: "medium",
+        aiAnalysis: { detectedEvent: "Distúrbios gastrointestinais (diarreia, flatulência)", drugMentioned: "DRUG_NAME", complianceFlag: true }
+    },
+    {
+        platform: "instagram",
+        author: "Pedro Treino",
+        handle: "@pedrotreino",
+        avatar: "https://i.pravatar.cc/150?u=pedro7",
+        content: "Galera da academia me indicou DRUG_NAME pra secar mais rápido kkk já encomendei, chega semana que vem. Bora ficar trincado 💪🔥 #fitness #emagrecimento",
+        likes: 567,
+        shares: 23,
+        sentiment: "positive",
+        riskLevel: "high",
+        aiAnalysis: { detectedEvent: "Uso recreativo/estético sem prescrição", drugMentioned: "DRUG_NAME", complianceFlag: true }
+    },
+    {
+        platform: "reclameaqui",
+        author: "Maria Conceição",
+        handle: "Cliente",
+        avatar: "https://i.pravatar.cc/150?u=maria8",
+        content: "Minha mãe de 72 anos tomou DRUG_NAME e começou a ter episódios de hipoglicemia severa, precisou ir ao pronto-socorro 2 vezes. O médico disse que pode ser interação com outro medicamento que ela toma. A bula não é clara sobre essa interação.",
+        likes: 3,
+        shares: 0,
+        sentiment: "negative",
+        riskLevel: "critical",
+        aiAnalysis: { detectedEvent: "Hipoglicemia severa - interação medicamentosa em idoso", drugMentioned: "DRUG_NAME", complianceFlag: true }
+    },
+    {
+        platform: "twitter",
+        author: "Flávia Costa",
+        handle: "@flavia_cst",
+        avatar: "https://i.pravatar.cc/150?u=flavia9",
+        content: "Estou no segundo mês de DRUG_NAME e finalmente os efeitos colaterais diminuíram. Valeu a persistência! Quem está no início, não desista. Melhora muito depois da adaptação.",
+        likes: 45,
+        shares: 8,
+        sentiment: "positive",
+        riskLevel: "low",
+        aiAnalysis: { detectedEvent: "Adaptação terapêutica positiva", drugMentioned: "DRUG_NAME", complianceFlag: false }
+    },
+    {
+        platform: "reddit",
+        author: "FarmaVigilante",
+        handle: "u/farma_vig",
+        avatar: "https://i.pravatar.cc/150?u=farmav10",
+        content: "PSA: Se vocês estão comprando DRUG_NAME pela internet sem receita, saibam que já foram apreendidos lotes falsificados pela PF. Só comprem em farmácias físicas com nota fiscal. Sério, não arrisquem a saúde.",
+        likes: 890,
+        shares: 234,
+        sentiment: "neutral",
+        riskLevel: "critical",
+        aiAnalysis: { detectedEvent: "Falsificação e venda ilegal", drugMentioned: "DRUG_NAME", complianceFlag: true }
+    },
 ];
 
 export default function SocialVigilanteApp() {
@@ -129,6 +169,7 @@ export default function SocialVigilanteApp() {
     const [activeTerm, setActiveTerm] = useState("");
     const [loading, setLoading] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
+    const postIndexRef = useRef(0);
 
     // Initial Stats
     useEffect(() => {
@@ -140,6 +181,9 @@ export default function SocialVigilanteApp() {
         let interval: NodeJS.Timeout;
 
         if (isSimulating && activeTerm) {
+            // Reset index on new search
+            postIndexRef.current = 0;
+
             const fetchSimulation = async () => {
                 try {
                     const response = await fetch("/api/social-vigilante/stream", {
@@ -150,32 +194,36 @@ export default function SocialVigilanteApp() {
 
                     if (response.ok) {
                         const data = await response.json();
-                        addPosts(data.posts);
-                    } else {
-                        throw new Error("API Failed");
+                        if (data.posts && data.posts.length > 0) {
+                            addPosts(data.posts);
+                            return;
+                        }
                     }
+                    throw new Error("API Failed or empty");
                 } catch (error) {
-                    console.warn("API Error, falling back to local simulation:", error);
-                    // Fallback: Generate local mock post if API fails (e.g. missing API Key on Vercel)
+                    console.warn("API unavailable, using local simulation:", error);
                     simulateLocalPost();
                 }
             };
 
             const simulateLocalPost = () => {
-                const randomPost = MOCK_POSTS_POOL[Math.floor(Math.random() * MOCK_POSTS_POOL.length)];
-                const newPost = {
-                    ...randomPost,
-                    id: `local-${Date.now()}`,
-                    timestamp: new Date().toISOString(),
+                // Pick next post sequentially from pool (cycles through all 10)
+                const idx = postIndexRef.current % MOCK_POSTS_POOL.length;
+                postIndexRef.current += 1;
+                const post = MOCK_POSTS_POOL[idx];
+
+                // Add realistic time variance
+                const minutesAgo = Math.floor(Math.random() * 45) + 1;
+                const newPost: SocialPost = {
+                    ...post,
+                    id: `local-${Date.now()}-${idx}`,
+                    timestamp: new Date(Date.now() - minutesAgo * 60000).toISOString(),
                     status: "new" as const,
-                    // Simple text replacement to make the mock feel responsive to the search term
-                    content: randomPost.content
-                        .replace(/#\w+/g, `#${activeTerm.replace(/\s/g, "")}`)
-                        .replace(/CardioFix|NeuroCalm|DermGlow|FlexiJoint|ImunoBoost/g, activeTerm),
-                    aiAnalysis: randomPost.aiAnalysis ? {
-                        ...randomPost.aiAnalysis,
+                    content: post.content.replace(/DRUG_NAME/g, activeTerm),
+                    aiAnalysis: post.aiAnalysis ? {
+                        ...post.aiAnalysis,
                         drugMentioned: activeTerm
-                    } : undefined
+                    } : undefined,
                 };
                 addPosts([newPost]);
             };
@@ -183,8 +231,8 @@ export default function SocialVigilanteApp() {
             // First fetch immediately
             fetchSimulation();
 
-            // Then every 5 seconds (slightly faster for better demo feel)
-            interval = setInterval(fetchSimulation, 5000);
+            // Then every 4 seconds — one post at a time feels more realistic
+            interval = setInterval(fetchSimulation, 4000);
         }
 
         return () => clearInterval(interval);
@@ -266,11 +314,11 @@ export default function SocialVigilanteApp() {
                 {/* Metrics */}
                 <div className="grid grid-cols-2 gap-3">
                     <div className="glass p-4 rounded-xl border border-white/5">
-                        <div className="text-white/40 text-xs mb-1">Processed</div>
+                        <div className="text-white/40 text-xs mb-1">Processados</div>
                         <div className="text-2xl font-bold font-mono">{stats.processed}</div>
                     </div>
                     <div className="glass p-4 rounded-xl border border-white/5">
-                        <div className="text-white/40 text-xs mb-1">High Risk</div>
+                        <div className="text-white/40 text-xs mb-1">Alto Risco</div>
                         <div className="text-2xl font-bold font-mono text-red-400">{stats.highRisk}</div>
                     </div>
                 </div>
@@ -278,7 +326,7 @@ export default function SocialVigilanteApp() {
                 {/* Active Signals Chart Mockup */}
                 <div className="glass p-4 rounded-xl border border-white/5 flex-1 flex flex-col">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-semibold text-sm">Signal Velocity</h3>
+                        <h3 className="font-semibold text-sm">Velocidade de Sinais</h3>
                         <Activity size={14} className="text-cyan-400" />
                     </div>
                     <div className="flex-1 flex items-end gap-1 h-32 relative">
@@ -304,7 +352,7 @@ export default function SocialVigilanteApp() {
                             type="text"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Enter drug name (e.g. CardioFix, Ozempic)..."
+                            placeholder="Nome do medicamento (ex: Ozempic, Rivotril, Ritalina)..."
                             className="bg-transparent border-none outline-none text-sm w-full placeholder:text-white/20 text-white"
                             onKeyDown={(e) => e.key === 'Enter' && handleStartSimulation()}
                         />
@@ -319,7 +367,7 @@ export default function SocialVigilanteApp() {
                             }`}
                     >
                         {loading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
-                        {isSimulating ? "Stop Stream" : "Start Monitoring"}
+                        {isSimulating ? "Parar" : "Iniciar Monitoramento"}
                     </button>
                 </div>
 
@@ -328,7 +376,7 @@ export default function SocialVigilanteApp() {
                     {!isSimulating && posts.length === 0 && (
                         <div className="flex flex-col items-center justify-center h-full text-white/30">
                             <Globe size={48} className="mb-4 opacity-50" />
-                            <p>Enter a drug name and start monitoring to capture signals.</p>
+                            <p>Digite o nome de um medicamento e inicie o monitoramento para capturar sinais.</p>
                         </div>
                     )}
 
@@ -393,11 +441,11 @@ export default function SocialVigilanteApp() {
                                                 <Zap size={16} className="text-[#00D9FF] shrink-0 mt-0.5" />
                                                 <div className="flex-1">
                                                     <div className="flex gap-4 text-xs mb-1">
-                                                        <span className="text-white/40">Event Detected:</span>
+                                                        <span className="text-white/40">Evento Detectado:</span>
                                                         <span className="text-[#00D9FF] font-medium">{post.aiAnalysis.detectedEvent || "None"}</span>
                                                     </div>
                                                     <div className="flex gap-4 text-xs">
-                                                        <span className="text-white/40">Product:</span>
+                                                        <span className="text-white/40">Medicamento:</span>
                                                         <span className="text-white/80">{post.aiAnalysis.drugMentioned}</span>
                                                     </div>
                                                 </div>
@@ -413,7 +461,7 @@ export default function SocialVigilanteApp() {
 
             {/* Right Panel / Event Detail Placeholer */}
             <div className="w-[300px] bg-[#0A1628]/30 hidden lg:flex flex-col p-6 border-l border-white/5">
-                <h3 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-6">Recent Alerts</h3>
+                <h3 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-6">Alertas Recentes</h3>
 
                 <div className="space-y-4">
                     {/* Placeholder static alerts for visual balance */}
@@ -422,9 +470,9 @@ export default function SocialVigilanteApp() {
                             <AlertTriangle size={14} />
                         </div>
                         <div>
-                            <div className="text-xs font-bold text-white/90">Cluster Detection</div>
-                            <div className="text-[10px] text-white/50 mb-1">Recent spike in negative sentiment</div>
-                            <div className="text-[10px] text-orange-400">High Confidence</div>
+                            <div className="text-xs font-bold text-white/90">Detecção de Cluster</div>
+                            <div className="text-[10px] text-white/50 mb-1">Pico recente de sentimento negativo</div>
+                            <div className="text-[10px] text-orange-400">Alta Confiança</div>
                         </div>
                     </div>
                 </div>

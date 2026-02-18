@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Send, CheckCircle, AlertCircle, Linkedin, Mail, MapPin, Clock } from "lucide-react";
+import { Send, CheckCircle, AlertCircle, Mail, MapPin, Clock } from "lucide-react";
 
 const contactSchema = z.object({
     name: z.string().min(2, "Nome deve ter pelo menos 2 caracteres"),
@@ -55,22 +55,19 @@ export default function ContactPage() {
     return (
         <div className="min-h-screen pt-24">
             {/* Hero */}
-            <section className="py-16 px-6 text-center">
-                <motion.h1
+            <section className="py-20 px-6 text-center">
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-4xl md:text-5xl font-bold mb-4"
                 >
-                    Solicitar <span className="text-gradient-cyan">Acesso</span>
-                </motion.h1>
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-white/60 text-lg max-w-2xl mx-auto"
-                >
-                    Contrate nossa plataforma SaaS ou solicite uma demonstração dos produtos
-                </motion.p>
+                    <p className="label mb-4 text-[#00D9FF]">Contato</p>
+                    <h1 className="heading-lg mb-4">
+                        Solicitar <span className="text-gradient-cyan">Acesso</span>
+                    </h1>
+                    <p className="body-lg max-w-2xl mx-auto">
+                        Contrate nossa plataforma SaaS ou solicite uma demonstração dos produtos
+                    </p>
+                </motion.div>
             </section>
 
             {/* Form + Info */}
@@ -81,16 +78,16 @@ export default function ContactPage() {
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="glass-card rounded-3xl p-8 md:p-10"
+                            className="glass-card rounded-2xl p-8 md:p-10"
                         >
                             {status === "success" ? (
                                 <div className="text-center py-12">
                                     <CheckCircle size={64} className="text-[#10B981] mx-auto mb-4" />
-                                    <h3 className="text-2xl font-bold mb-2">Mensagem Enviada!</h3>
-                                    <p className="text-white/60">Retornaremos em até 24 horas úteis.</p>
+                                    <h3 className="heading-md mb-2">Mensagem Enviada!</h3>
+                                    <p className="text-white/50">Retornaremos em até 24 horas úteis.</p>
                                     <button
                                         onClick={() => setStatus("idle")}
-                                        className="btn-outline px-6 py-3 rounded-lg mt-6"
+                                        className="btn-outline mt-6"
                                     >
                                         Enviar outra mensagem
                                     </button>
@@ -105,7 +102,7 @@ export default function ContactPage() {
                                                 className="form-input"
                                             />
                                             {errors.name && (
-                                                <p className="text-[#EF4444] text-sm mt-1">{errors.name.message}</p>
+                                                <p className="text-red-400 text-sm mt-1">{errors.name.message}</p>
                                             )}
                                         </div>
                                         <div>
@@ -115,7 +112,7 @@ export default function ContactPage() {
                                                 className="form-input"
                                             />
                                             {errors.email && (
-                                                <p className="text-[#EF4444] text-sm mt-1">{errors.email.message}</p>
+                                                <p className="text-red-400 text-sm mt-1">{errors.email.message}</p>
                                             )}
                                         </div>
                                     </div>
@@ -128,7 +125,7 @@ export default function ContactPage() {
                                                 className="form-input"
                                             />
                                             {errors.company && (
-                                                <p className="text-[#EF4444] text-sm mt-1">{errors.company.message}</p>
+                                                <p className="text-red-400 text-sm mt-1">{errors.company.message}</p>
                                             )}
                                         </div>
                                         <div>
@@ -150,7 +147,7 @@ export default function ContactPage() {
                                             <option value="other">Outra Solicitação</option>
                                         </select>
                                         {errors.category && (
-                                            <p className="text-[#EF4444] text-sm mt-1">{errors.category.message}</p>
+                                            <p className="text-red-400 text-sm mt-1">{errors.category.message}</p>
                                         )}
                                     </div>
 
@@ -162,7 +159,7 @@ export default function ContactPage() {
                                             className="form-input resize-none"
                                         />
                                         {errors.message && (
-                                            <p className="text-[#EF4444] text-sm mt-1">{errors.message.message}</p>
+                                            <p className="text-red-400 text-sm mt-1">{errors.message.message}</p>
                                         )}
                                     </div>
 
@@ -173,16 +170,16 @@ export default function ContactPage() {
                                             id="consent"
                                             className="mt-1"
                                         />
-                                        <label htmlFor="consent" className="text-white/60 text-sm">
+                                        <label htmlFor="consent" className="text-white/50 text-sm">
                                             Aceito receber comunicações da Astrivia AI sobre produtos e atualizações. *
                                         </label>
                                     </div>
                                     {errors.consent && (
-                                        <p className="text-[#EF4444] text-sm">{errors.consent.message}</p>
+                                        <p className="text-red-400 text-sm">{errors.consent.message}</p>
                                     )}
 
                                     {status === "error" && (
-                                        <div className="flex items-center gap-2 text-[#EF4444] text-sm">
+                                        <div className="flex items-center gap-2 text-red-400 text-sm">
                                             <AlertCircle size={16} />
                                             Erro ao enviar. Tente novamente.
                                         </div>
@@ -191,7 +188,7 @@ export default function ContactPage() {
                                     <button
                                         type="submit"
                                         disabled={status === "loading"}
-                                        className="w-full btn-primary py-4 rounded-xl text-base disabled:opacity-50"
+                                        className="w-full btn-primary py-4 justify-center disabled:opacity-50"
                                     >
                                         {status === "loading" ? (
                                             "Enviando..."
@@ -217,7 +214,7 @@ export default function ContactPage() {
                             <h3 className="font-bold mb-1">Email</h3>
                             <a
                                 href="mailto:nicollas.braga@astriviaai.tech"
-                                className="text-white/60 hover:text-[#00D9FF] transition-colors"
+                                className="text-white/50 hover:text-[#00D9FF] transition-colors text-sm"
                             >
                                 nicollas.braga@astriviaai.tech
                             </a>
@@ -229,13 +226,17 @@ export default function ContactPage() {
                             transition={{ delay: 0.1 }}
                             className="glass-card rounded-2xl p-6"
                         >
-                            <Linkedin size={24} className="text-[#00D9FF] mb-3" />
+                            <svg className="w-6 h-6 text-[#00D9FF] mb-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+                                <rect width="4" height="12" x="2" y="9" />
+                                <circle cx="4" cy="4" r="2" />
+                            </svg>
                             <h3 className="font-bold mb-1">LinkedIn</h3>
                             <a
                                 href="https://www.linkedin.com/company/astriviaai/"
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-white/60 hover:text-[#00D9FF] transition-colors"
+                                className="text-white/50 hover:text-[#00D9FF] transition-colors text-sm"
                             >
                                 /company/astriviaai
                             </a>
@@ -249,7 +250,7 @@ export default function ContactPage() {
                         >
                             <MapPin size={24} className="text-[#00D9FF] mb-3" />
                             <h3 className="font-bold mb-1">Localização</h3>
-                            <p className="text-white/60">São Paulo, Brasil</p>
+                            <p className="text-white/50 text-sm">São Paulo, Brasil</p>
                         </motion.div>
 
                         <motion.div
@@ -260,7 +261,7 @@ export default function ContactPage() {
                         >
                             <Clock size={24} className="text-[#00D9FF] mb-3" />
                             <h3 className="font-bold mb-1">Horário</h3>
-                            <p className="text-white/60">Segunda a Sexta, 9h-18h BRT</p>
+                            <p className="text-white/50 text-sm">Segunda a Sexta, 9h-18h BRT</p>
                         </motion.div>
                     </div>
                 </div>

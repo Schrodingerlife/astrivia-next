@@ -74,7 +74,7 @@ const defaultContent: SiteContent = {
         { id: "vigilante", title: "Social Vigilante", category: "Pharmacovigilance", badge: "BigQuery ML", description: "Farmacovigilância em escala de terabytes.", benefits: ["Detecção antes dos canais oficiais", "Cobertura 100% das menções públicas"] },
         { id: "medsafe", title: "MedSafe AI", category: "Regulatory Compliance", badge: "Vertex AI Search", description: "Conformidade com zero alucinação.", benefits: ["Redução de 95% no tempo de revisão", "Zero falsos positivos"] },
         { id: "internmatch", title: "InternMatch", category: "Talent Matching", badge: "Vector Search", description: "Recrutamento inteligente para talentos farmacêuticos.", benefits: ["80% menos tempo em triagem", "Candidatos mais qualificados"] },
-        { id: "scigen", title: "SciGen", category: "Content Generation", badge: "Gemini Pro", description: "Transformação de estudos clínicos em conteúdo acessível.", benefits: ["Conteúdo em horas", "100% baseado em evidências"] },
+        { id: "scigen", title: "SciGen", category: "Content Generation", badge: "Gemini 3", description: "Transformação de estudos clínicos em conteúdo acessível.", benefits: ["Conteúdo em horas", "100% baseado em evidências"] },
     ],
     home: {
         heroTitle: "O Primeiro",

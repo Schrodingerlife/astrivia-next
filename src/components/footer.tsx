@@ -1,127 +1,104 @@
 import Link from "next/link";
-import { Linkedin, Mail } from "lucide-react";
 
 const productLinks = [
-    { name: "PharmaRoleplay", href: "/products#pharmaroleplay" },
-    { name: "Social Vigilante", href: "/products#vigilante" },
-    { name: "MedSafe AI", href: "/products#medsafe" },
-    { name: "InternMatch", href: "/products#internmatch" },
-    { name: "SciGen", href: "/products#scigen" },
+    { name: "PharmaRoleplay", href: "/tools/pharmaroleplay" },
+    { name: "Social Vigilante", href: "/tools/social-vigilante" },
+    { name: "MedSafe AI", href: "/tools/medsafe" },
+    { name: "Ver todos", href: "/products" },
 ];
 
 const companyLinks = [
-    { name: "Team", href: "/team" },
-    { name: "Technology", href: "/technology" },
-    { name: "Documentation", href: "/docs" },
+    { name: "Tecnologia", href: "/technology" },
+    { name: "Time", href: "/team" },
+    { name: "Docs", href: "/docs" },
     { name: "Status", href: "/status" },
-    { name: "Contact", href: "/contact" },
+];
+
+const contactLinks = [
+    { name: "Fale Conosco", href: "/contact" },
+    { name: "nicollas.braga@astriviaai.tech", href: "mailto:nicollas.braga@astriviaai.tech", external: true },
+    { name: "LinkedIn", href: "https://www.linkedin.com/company/astriviaai/", external: true },
 ];
 
 export function Footer() {
     return (
-        <footer className="py-16 px-6 border-t border-white/5 bg-[#0A1628]">
+        <footer className="footer py-16 px-6">
             <div className="max-w-7xl mx-auto">
-                <div className="grid md:grid-cols-4 gap-12">
-                    {/* Logo & Description */}
-                    <div className="md:col-span-1">
-                        <Link href="/" className="flex items-center mb-4 group">
-                            <span className="relative h-10 w-auto block">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
-                                    src="/images/astrivia-logo-fixed.png"
-                                    alt="Astrivia AI"
-                                    className="h-full w-auto object-contain opacity-90"
-                                />
-                            </span>
-                        </Link>
-                        <p className="text-white/40 text-sm leading-relaxed">
-                            Intelligence that Cures Inefficiency
-                        </p>
-                        <p className="text-white/30 text-xs mt-6">
-                            © 2025 Astrivia AI. All rights reserved.
+                <div className="grid md:grid-cols-4 gap-12 mb-16">
+                    {/* Brand */}
+                    <div>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src="/images/astrivia-logo-fixed.png"
+                            alt="Astrivia AI"
+                            className="h-8 mb-4 opacity-60"
+                        />
+                        <p className="text-white/30 text-sm leading-relaxed">
+                            Sistema de agentes autônomos para Life Sciences. Powered by Google Cloud.
                         </p>
                     </div>
 
                     {/* Products */}
                     <div>
-                        <h4 className="text-white font-semibold mb-4">Products</h4>
-                        <ul className="space-y-2">
+                        <h4 className="font-semibold text-sm mb-4">Produtos</h4>
+                        <div className="space-y-3">
                             {productLinks.map((link) => (
-                                <li key={link.name}>
-                                    <Link
-                                        href={link.href}
-                                        className="text-white/50 hover:text-[#00D9FF] text-sm transition-colors"
-                                    >
-                                        {link.name}
-                                    </Link>
-                                </li>
+                                <Link key={link.name} href={link.href} className="footer-link block">
+                                    {link.name}
+                                </Link>
                             ))}
-                        </ul>
+                        </div>
                     </div>
 
                     {/* Company */}
                     <div>
-                        <h4 className="text-white font-semibold mb-4">Company</h4>
-                        <ul className="space-y-2">
+                        <h4 className="font-semibold text-sm mb-4">Empresa</h4>
+                        <div className="space-y-3">
                             {companyLinks.map((link) => (
-                                <li key={link.name}>
-                                    <Link
-                                        href={link.href}
-                                        className="text-white/50 hover:text-[#00D9FF] text-sm transition-colors"
-                                    >
-                                        {link.name}
-                                    </Link>
-                                </li>
+                                <Link key={link.name} href={link.href} className="footer-link block">
+                                    {link.name}
+                                </Link>
                             ))}
-                        </ul>
+                        </div>
                     </div>
 
-                    {/* Legal & Social */}
+                    {/* Contact */}
                     <div>
-                        <h4 className="text-white font-semibold mb-4">Connect</h4>
-                        <div className="flex gap-4 mb-6">
-                            <a
-                                href="https://www.linkedin.com/company/astriviaai/"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="w-10 h-10 rounded-full glass flex items-center justify-center text-white/50 hover:text-[#00D9FF] transition-colors"
-                            >
-                                <Linkedin size={18} />
-                            </a>
-                            <a
-                                href="mailto:nicollas.braga@astriviaai.tech"
-                                className="w-10 h-10 rounded-full glass flex items-center justify-center text-white/50 hover:text-[#00D9FF] transition-colors"
-                            >
-                                <Mail size={18} />
-                            </a>
+                        <h4 className="font-semibold text-sm mb-4">Contato</h4>
+                        <div className="space-y-3">
+                            {contactLinks.map((link) =>
+                                link.external ? (
+                                    <a
+                                        key={link.name}
+                                        href={link.href}
+                                        target={link.href.startsWith("mailto:") ? undefined : "_blank"}
+                                        rel={link.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
+                                        className="footer-link block"
+                                    >
+                                        {link.name}
+                                    </a>
+                                ) : (
+                                    <Link key={link.name} href={link.href} className="footer-link block">
+                                        {link.name}
+                                    </Link>
+                                )
+                            )}
                         </div>
-                        <ul className="space-y-2">
-                            <li>
-                                <Link
-                                    href="/privacy"
-                                    className="text-white/40 hover:text-white/60 text-sm transition-colors"
-                                >
-                                    Privacy Policy
-                                </Link>
-                            </li>
-                            <li>
-                                <Link
-                                    href="/terms"
-                                    className="text-white/40 hover:text-white/60 text-sm transition-colors"
-                                >
-                                    Terms of Service
-                                </Link>
-                            </li>
-                        </ul>
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
-                <div className="mt-12 pt-8 border-t border-white/5 text-center">
-                    <p className="text-white/30 text-sm">
-                        Built with dedication by Astrivia Team | Powered by{" "}
-                        <span className="text-[#00D9FF]">Google Cloud</span>
+                <div className="section-divider mb-8" />
+
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p className="text-white/20 text-xs">
+                        © 2025 Astrivia AI. Todos os direitos reservados.
                     </p>
+                    <div className="flex items-center gap-4">
+                        <span className="text-white/20 text-xs flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
+                            Todos os sistemas operacionais
+                        </span>
+                    </div>
                 </div>
             </div>
         </footer>

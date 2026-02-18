@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Linkedin, Loader2 } from "lucide-react";
+import { LinkedinIcon, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -18,32 +18,31 @@ interface TeamMember {
     linkedin: string;
 }
 
-// Dados padrão caso Firestore esteja vazio ou offline
 const defaultTeam: TeamMember[] = [
     {
         name: "Nícollas Braga",
         role: "CEO & Founder",
         image: "/images/team-nicollas.jpg",
-        bio: "Liderança em Marketing de Doenças Raras em Big Pharma. Farmácia-USP. Especialista em estratégias de go-to-market para medicamentos de alto custo e baixa prevalência.",
-        experience: ["Big Pharma", "Doenças Raras", "Marketing", "Farmácia-USP"],
+        bio: "Fundador da Astrivia AI. Profissional de Farmácia com experiência em PMO, Novos Negócios e Pós-Registro. Lidera a visão estratégica e desenvolvimento de soluções de IA para Life Sciences.",
+        experience: ["Founder", "PMO", "Novos Negócios", "Pós-Registro"],
         quote: "A inovação em saúde precisa de velocidade sem comprometer segurança.",
-        linkedin: "https://www.linkedin.com/in/nicollas-souza-788987256/",
+        linkedin: "https://www.linkedin.com/in/nicollas-healthtech/",
     },
     {
         name: "André Guilherme",
-        role: "CSO & Co-Founder",
+        role: "CTO & Co-Founder",
         image: "/images/team-andre.jpg",
-        bio: "Ex-Marketing Sanofi. Estratégia B2B e Finanças. Farmácia-USP. Experiência em construção de modelos de negócio e precificação para mercado farmacêutico.",
-        experience: ["Sanofi", "B2B Strategy", "Finanças", "Farmácia-USP"],
+        bio: "Profissional de Farmácia com experiência em Estratégia B2B e Desenvolvimento de Produto. Responsável pela arquitetura técnica e desenvolvimento de produtos de IA.",
+        experience: ["Estratégia B2B", "Desenvolvimento de Produto", "Tech Lead", "AI Engineering"],
         quote: "Dados e estratégia caminham juntos na indústria farmacêutica.",
         linkedin: "https://www.linkedin.com/in/andretobiasmendes/",
     },
     {
         name: "Gabriel Katakura",
-        role: "CCO & Co-Founder",
+        role: "COO & Co-Founder",
         image: "/images/team/gabriel.jpg?v=2",
-        bio: "Qualidade na Boston Scientific. Validação Regulatória. Farmácia-USP. Background em garantia de qualidade e compliance para dispositivos médicos.",
-        experience: ["Boston Scientific", "Qualidade", "Regulatório", "Farmácia-USP"],
+        bio: "Profissional de Farmácia com experiência em Qualidade MedTech e Validação Regulatória. Responsável por operações, compliance e validação de produtos.",
+        experience: ["Qualidade", "Validação Regulatória", "Compliance", "Operações"],
         quote: "Compliance não é obstáculo, é vantagem competitiva.",
         linkedin: "https://www.linkedin.com/in/gkatakura/",
     },
@@ -85,7 +84,6 @@ export default function TeamPage() {
                 }
             } catch (error) {
                 console.error("Error loading team from Firestore:", error);
-                // Usa dados padrão em caso de erro
             }
             setLoading(false);
         };
@@ -95,22 +93,19 @@ export default function TeamPage() {
     return (
         <div className="min-h-screen pt-24">
             {/* Hero */}
-            <section className="py-16 px-6 text-center">
-                <motion.h1
+            <section className="py-20 px-6 text-center">
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-4xl md:text-5xl font-bold mb-4"
                 >
-                    Nosso <span className="text-gradient-cyan">Time</span>
-                </motion.h1>
-                <motion.p
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                    className="text-white/60 text-lg max-w-2xl mx-auto"
-                >
-                    Nascidos na USP, Forjados na Indústria Farmacêutica
-                </motion.p>
+                    <p className="label mb-4">Liderança</p>
+                    <h1 className="heading-lg mb-4">
+                        Nosso <span className="text-gradient-cyan">Time</span>
+                    </h1>
+                    <p className="body-lg max-w-2xl mx-auto">
+                        Profissionais de Farmácia-USP com experiência em Big Pharma
+                    </p>
+                </motion.div>
             </section>
 
             {/* Team Members */}
@@ -125,13 +120,13 @@ export default function TeamPage() {
                             {team.map((member, index) => (
                                 <motion.div
                                     key={member.name}
-                                    initial={{ opacity: 0, y: 40 }}
+                                    initial={{ opacity: 0, y: 30 }}
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ delay: index * 0.1 }}
-                                    className="glass-card rounded-3xl p-8 text-center group"
+                                    className="glass-card rounded-2xl p-8 text-center group"
                                 >
-                                    <div className="relative w-[160px] h-[160px] mx-auto mb-6 rounded-full overflow-hidden border-4 border-[#00D9FF]/20 group-hover:border-[#00D9FF]/50 transition-colors">
+                                    <div className="relative w-28 h-28 mx-auto mb-5 rounded-full overflow-hidden border border-white/10 group-hover:border-white/20 transition-colors">
                                         <Image
                                             src={member.image}
                                             alt={member.name}
@@ -143,30 +138,30 @@ export default function TeamPage() {
                                     <h3 className="text-xl font-bold mb-1">{member.name}</h3>
                                     <p className="text-[#00D9FF] text-sm font-medium mb-4">{member.role}</p>
 
-                                    <p className="text-white/60 text-sm leading-relaxed mb-4">{member.bio}</p>
+                                    <p className="text-white/50 text-sm leading-relaxed mb-4">{member.bio}</p>
 
                                     <div className="flex flex-wrap justify-center gap-2 mb-4">
                                         {member.experience.map((exp) => (
                                             <span
                                                 key={exp}
-                                                className="text-xs px-2 py-1 rounded-full bg-white/5 text-white/50"
+                                                className="tech-badge !text-[10px] !py-1 !px-2"
                                             >
                                                 {exp}
                                             </span>
                                         ))}
                                     </div>
 
-                                    <blockquote className="text-white/40 text-sm italic mb-4">
-                                        {`"${member.quote}"`}
+                                    <blockquote className="text-white/30 text-sm italic mb-4">
+                                        &ldquo;{member.quote}&rdquo;
                                     </blockquote>
 
                                     <a
                                         href={member.linkedin}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-2 text-white/40 hover:text-[#00D9FF] transition-colors text-sm"
+                                        className="inline-flex items-center gap-2 text-white/30 hover:text-white/60 transition-colors text-xs"
                                     >
-                                        <Linkedin size={16} /> LinkedIn
+                                        <LinkedinIcon size={14} /> LinkedIn ↗
                                     </a>
                                 </motion.div>
                             ))}
@@ -176,16 +171,17 @@ export default function TeamPage() {
             </section>
 
             {/* Values */}
-            <section className="py-24 px-6 bg-[#0D1B2A]">
+            <section className="py-24 px-6 border-t border-white/[0.04]">
                 <div className="max-w-7xl mx-auto">
-                    <motion.h2
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-3xl font-bold text-center mb-12"
+                        className="text-center mb-16"
                     >
-                        Nossos Valores
-                    </motion.h2>
+                        <p className="label mb-4 text-[#A855F7]">Valores</p>
+                        <h2 className="heading-lg">Nossos Valores</h2>
+                    </motion.div>
 
                     <div className="grid md:grid-cols-4 gap-6">
                         {values.map((value, index) => (
@@ -194,11 +190,11 @@ export default function TeamPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
+                                transition={{ delay: index * 0.08 }}
                                 className="glass-card rounded-xl p-6 text-center"
                             >
-                                <h3 className="text-lg font-bold text-[#00D9FF] mb-3">{value.title}</h3>
-                                <p className="text-white/50 text-sm">{value.description}</p>
+                                <h3 className="font-semibold mb-3">{value.title}</h3>
+                                <p className="text-white/40 text-sm">{value.description}</p>
                             </motion.div>
                         ))}
                     </div>
@@ -208,33 +204,29 @@ export default function TeamPage() {
             {/* Partners */}
             <section className="py-24 px-6">
                 <div className="max-w-7xl mx-auto text-center">
-                    <motion.h2
+                    <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-3xl font-bold mb-4"
+                        className="mb-12"
                     >
-                        Parceiros & Tecnologia
-                    </motion.h2>
-                    <motion.p
-                        initial={{ opacity: 0 }}
-                        whileInView={{ opacity: 1 }}
-                        viewport={{ once: true }}
-                        className="text-white/60 mb-12"
-                    >
-                        Construído sobre a infraestrutura de classe mundial do Google Cloud
-                    </motion.p>
+                        <p className="label mb-4 text-[#10B981]">Parceiros</p>
+                        <h2 className="heading-lg mb-4">Parceiros & Tecnologia</h2>
+                        <p className="body-lg max-w-xl mx-auto">
+                            Construído sobre a infraestrutura de classe mundial do Google Cloud
+                        </p>
+                    </motion.div>
 
-                    <div className="flex flex-wrap justify-center items-center gap-12">
+                    <div className="flex flex-wrap justify-center items-center gap-6">
                         {["Google Cloud", "Vertex AI", "USP", "Google for Startups"].map((partner) => (
                             <motion.div
                                 key={partner}
                                 initial={{ opacity: 0 }}
                                 whileInView={{ opacity: 1 }}
                                 viewport={{ once: true }}
-                                className="glass rounded-xl px-8 py-4 partner-logo cursor-pointer"
+                                className="glass-card rounded-xl px-8 py-4 cursor-pointer"
                             >
-                                <span className="text-white/50 font-medium">{partner}</span>
+                                <span className="text-white/40 font-medium text-sm">{partner}</span>
                             </motion.div>
                         ))}
                     </div>
