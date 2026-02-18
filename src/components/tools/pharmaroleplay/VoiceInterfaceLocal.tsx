@@ -28,6 +28,7 @@ interface Feedback {
     tipo: 'success' | 'warning' | 'error';
     mensagem: string;
     categoria: string;
+    pontos: number;
     timestamp: number;
 }
 
@@ -106,51 +107,20 @@ const personasMedico: Record<string, {
 // ANÁLISE DE RESPOSTA (LOCAL)
 // ═══════════════════════════════════════════════════════════════════════
 
-function analisarResposta(texto: string): { feedback: Feedback | null; pontos: number } {
-    const textoLower = texto.toLowerCase();
+// Categories tracked by the Gemini API feedback
+const CATEGORIAS = ['Tom de Voz', 'Argumentação', 'Gestão de Objeções', 'Empatia', 'Conhecimento do Produto', 'Compliance'] as const;
 
-    const palavrasPositivas = ['estudo', 'pesquisa', 'evidência', 'dados', 'pacientes', 'eficácia',
-        'segurança', 'benefício', 'resultado', 'publicação', 'aprovado', 'anvisa'];
-    const palavrasEmpatia = ['entendo', 'compreendo', 'concordo', 'excelente pergunta',
-        'ótima observação', 'você tem razão', 'isso é importante'];
-    const palavrasTecnicas = ['mecanismo', 'ação', 'farmacocinética', 'posologia', 'dose',
-        'concentração', 'absorção', 'metabolismo', 'meia-vida'];
+type CategoriaScores = Record<string, number[]>;
 
-    let pontos = 50;
-    let feedback: Feedback | null = null;
+function calcularMediaCategoria(scores: number[]): number {
+    if (scores.length === 0) return 0;
+    return Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+}
 
-    const temPalavrasPositivas = palavrasPositivas.some(p => textoLower.includes(p));
-    const temEmpatia = palavrasEmpatia.some(p => textoLower.includes(p));
-    const temTecnico = palavrasTecnicas.some(p => textoLower.includes(p));
-    const tamanhoAdequado = texto.length > 50;
-
-    if (temPalavrasPositivas) {
-        pontos += 15;
-        if (!feedback) {
-            feedback = { tipo: 'success', mensagem: 'Bom uso de dados e evidências científicas!', categoria: 'Técnica', timestamp: Date.now() };
-        }
-    }
-
-    if (temEmpatia) {
-        pontos += 10;
-        feedback = { tipo: 'success', mensagem: 'Excelente demonstração de empatia!', categoria: 'Comunicação', timestamp: Date.now() };
-    }
-
-    if (temTecnico) pontos += 10;
-
-    if (!tamanhoAdequado) {
-        pontos -= 10;
-        feedback = { tipo: 'warning', mensagem: 'Tente elaborar mais suas respostas', categoria: 'Comunicação', timestamp: Date.now() };
-    }
-
-    if (texto.includes('?')) {
-        pontos += 5;
-        if (!feedback) {
-            feedback = { tipo: 'success', mensagem: 'Boa técnica - fazer perguntas mostra interesse!', categoria: 'Engajamento', timestamp: Date.now() };
-        }
-    }
-
-    return { feedback, pontos: Math.min(100, Math.max(0, pontos)) };
+function calcularScoreGeral(categoryScores: CategoriaScores): number {
+    const allScores = Object.values(categoryScores).flat();
+    if (allScores.length === 0) return 0;
+    return Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length);
 }
 
 // ═══════════════════════════════════════════════════════════════════════
@@ -170,15 +140,16 @@ export default function VoiceInterfaceLocal({
     const [textoDigitado, setTextoDigitado] = useState('');
     const [modoTexto, setModoTexto] = useState(false);
     const [audioMutado, setAudioMutado] = useState(false);
-    const [pontuacao, setPontuacao] = useState(70);
+    const [pontuacao, setPontuacao] = useState(0);
     const [turno, setTurno] = useState(0);
     const [tempoDecorrido, setTempoDecorrido] = useState(0);
     const [nivelAudio, setNivelAudio] = useState(0);
     const [transcricaoAtual, setTranscricaoAtual] = useState('');
+    const [categoryScores, setCategoryScores] = useState<CategoriaScores>({});
     const [suportaVoz, setSuportaVoz] = useState(true);
 
     const recognitionRef = useRef<any>(null);
-    const synthesisRef = useRef<SpeechSynthesisUtterance | null>(null);
+    const audioRef = useRef<HTMLAudioElement | null>(null);
     const transcricaoRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -257,27 +228,65 @@ export default function VoiceInterfaceLocal({
     }, []);
 
     // ═══════════════════════════════════════════════════════════════════════
-    // SÍNTESE DE VOZ (TTS)
+    // SÍNTESE DE VOZ (Google Cloud TTS → browser fallback)
     // ═══════════════════════════════════════════════════════════════════════
 
-    const falarTexto = (texto: string) => {
-        if (audioMutado || !('speechSynthesis' in window)) return;
+    const falarTexto = async (texto: string) => {
+        if (audioMutado) return;
 
-        window.speechSynthesis.cancel();
+        // Stop any currently playing audio
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+        }
+        window.speechSynthesis?.cancel();
 
+        setIsFalando(true);
+
+        try {
+            // Try Google Cloud TTS API first (natural neural voice)
+            const response = await fetch('/api/tts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: texto }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.audioContent) {
+                    const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
+                    audioRef.current = audio;
+                    audio.onended = () => setIsFalando(false);
+                    audio.onerror = () => {
+                        setIsFalando(false);
+                        // Fallback to browser TTS on audio error
+                        falarComBrowser(texto);
+                    };
+                    await audio.play();
+                    return;
+                }
+            }
+            // API returned error, fallback
+            falarComBrowser(texto);
+        } catch {
+            // Network error, fallback to browser TTS
+            falarComBrowser(texto);
+        }
+    };
+
+    const falarComBrowser = (texto: string) => {
+        if (!('speechSynthesis' in window)) {
+            setIsFalando(false);
+            return;
+        }
         const utterance = new SpeechSynthesisUtterance(texto);
         utterance.lang = 'pt-BR';
-        utterance.rate = 0.9;
-        utterance.pitch = 0.9;
-
+        utterance.rate = 0.85;
         const vozes = window.speechSynthesis.getVoices();
-        const vozBrasileira = vozes.find(v => v.lang.includes('pt-BR'));
-        if (vozBrasileira) utterance.voice = vozBrasileira;
-
-        utterance.onstart = () => setIsFalando(true);
+        const voz = vozes.find(v => v.lang.includes('pt-BR') && v.name.toLowerCase().includes('google'))
+            || vozes.find(v => v.lang.includes('pt-BR'));
+        if (voz) utterance.voice = voz;
         utterance.onend = () => setIsFalando(false);
-
-        synthesisRef.current = utterance;
         window.speechSynthesis.speak(utterance);
     };
 
@@ -285,39 +294,90 @@ export default function VoiceInterfaceLocal({
     // ENVIAR MENSAGEM
     // ═══════════════════════════════════════════════════════════════════════
 
-    const enviarMensagem = (texto: string) => {
+    const enviarMensagem = async (texto: string) => {
         if (!texto.trim()) return;
 
         const mensagemUsuario: Mensagem = { role: 'user', content: texto, timestamp: Date.now() };
         setMensagens(prev => [...prev, mensagemUsuario]);
-
-        const { feedback, pontos } = analisarResposta(texto);
-        if (feedback) setFeedbacks(prev => [feedback, ...prev].slice(0, 5));
-        setPontuacao(prev => Math.round((prev + pontos) / 2));
-
-        setTimeout(() => {
-            const novoTurno = turno + 1;
-            setTurno(novoTurno);
-
-            let respostaMedico: string;
-
-            if (novoTurno >= medicoAtual.respostas.length) {
-                respostaMedico = 'Ok, agradeço a visita. Vou analisar o material e, se tiver interesse, entro em contato. Tenha um bom dia!';
-            } else {
-                respostaMedico = medicoAtual.respostas[novoTurno - 1];
-            }
-
-            const mensagemMedico: Mensagem = { role: 'assistant', content: respostaMedico, timestamp: Date.now() };
-            setMensagens(prev => [...prev, mensagemMedico]);
-
-            if (!audioMutado) falarTexto(respostaMedico);
-
-            setTimeout(() => {
-                transcricaoRef.current?.scrollTo({ top: transcricaoRef.current.scrollHeight, behavior: 'smooth' });
-            }, 100);
-        }, 1500);
-
         setTextoDigitado('');
+
+        try {
+            // Call Gemini API for contextual doctor response + real feedback
+            const allMsgs = [...mensagens, mensagemUsuario];
+            const response = await fetch('/api/pharmaroleplay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cenario,
+                    cenarioNome,
+                    mensagens: allMsgs.map(m => ({ role: m.role, content: m.content })),
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                const novoTurno = turno + 1;
+                setTurno(novoTurno);
+
+                // Use real Gemini feedback for scoring
+                if (data.feedback) {
+                    const fbPontos = typeof data.feedback.pontos === 'number' ? data.feedback.pontos : 50;
+                    const fbCategoria = data.feedback.categoria || 'Geral';
+                    const fb: Feedback = {
+                        tipo: data.feedback.tipo || 'success',
+                        mensagem: data.feedback.mensagem || 'Feedback da IA',
+                        categoria: fbCategoria,
+                        pontos: fbPontos,
+                        timestamp: Date.now(),
+                    };
+                    setFeedbacks(prev => [fb, ...prev].slice(0, 8));
+
+                    // Track per-category scores from real API data
+                    setCategoryScores(prev => {
+                        const updated = { ...prev };
+                        if (!updated[fbCategoria]) updated[fbCategoria] = [];
+                        updated[fbCategoria] = [...updated[fbCategoria], fbPontos];
+                        // Recalculate overall score from all real data
+                        const newScore = calcularScoreGeral(updated);
+                        setPontuacao(newScore);
+                        return updated;
+                    });
+                }
+
+                const mensagemMedico: Mensagem = { role: 'assistant', content: data.resposta, timestamp: Date.now() };
+                setMensagens(prev => [...prev, mensagemMedico]);
+                if (!audioMutado) falarTexto(data.resposta);
+
+                setTimeout(() => {
+                    transcricaoRef.current?.scrollTo({ top: transcricaoRef.current.scrollHeight, behavior: 'smooth' });
+                }, 100);
+                return;
+            }
+            throw new Error('API failed');
+        } catch (error) {
+            console.warn('PharmaRoleplay API unavailable, using local fallback:', error);
+
+            // Fallback to local scripted responses (no fake scores)
+            setTimeout(() => {
+                const novoTurno = turno + 1;
+                setTurno(novoTurno);
+
+                let respostaMedico: string;
+                if (novoTurno >= medicoAtual.respostas.length) {
+                    respostaMedico = 'Ok, agradeço a visita. Vou analisar o material e, se tiver interesse, entro em contato. Tenha um bom dia!';
+                } else {
+                    respostaMedico = medicoAtual.respostas[novoTurno - 1];
+                }
+
+                const mensagemMedico: Mensagem = { role: 'assistant', content: respostaMedico, timestamp: Date.now() };
+                setMensagens(prev => [...prev, mensagemMedico]);
+                if (!audioMutado) falarTexto(respostaMedico);
+
+                setTimeout(() => {
+                    transcricaoRef.current?.scrollTo({ top: transcricaoRef.current.scrollHeight, behavior: 'smooth' });
+                }, 100);
+            }, 1500);
+        }
     };
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -349,29 +409,81 @@ export default function VoiceInterfaceLocal({
     // ENCERRAR SESSÃO
     // ═══════════════════════════════════════════════════════════════════════
 
-    const encerrarSessao = () => {
+    const encerrarSessao = async () => {
         window.speechSynthesis?.cancel();
+        if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
         recognitionRef.current?.stop();
 
-        // Generate full report
+        // Calculate real scores from tracked Gemini feedback
         const positivos = feedbacks.filter(f => f.tipo === 'success').length;
         const alertas = feedbacks.filter(f => f.tipo === 'warning').length;
         const negativos = feedbacks.filter(f => f.tipo === 'error').length;
         const palavras = mensagens.filter(m => m.role === 'user').reduce((acc, m) => acc + m.content.split(' ').length, 0);
+        const userMsgCount = mensagens.filter(m => m.role === 'user').length;
+
+        // Build real per-category scores from accumulated data
+        const realScores = {
+            tom: calcularMediaCategoria(categoryScores['Tom de Voz'] || categoryScores['Comunicação'] || []),
+            argumentacao: calcularMediaCategoria(categoryScores['Argumentação'] || categoryScores['Técnica de Vendas'] || categoryScores['Conhecimento do Produto'] || []),
+            objecoes: calcularMediaCategoria(categoryScores['Gestão de Objeções'] || categoryScores['Compliance'] || []),
+            empatia: calcularMediaCategoria(categoryScores['Empatia'] || categoryScores['Engajamento'] || []),
+        };
+
+        // Overall score from real data only
+        const scoreGeral = pontuacao;
+
+        // Require minimum interaction for approval
+        const aprovado = scoreGeral >= 70 && userMsgCount >= 3;
+
+        // Try to get personalized suggestions from Gemini
+        let sugestoes: string[] = [];
+        try {
+            const transcricao = mensagens.map(m => `${m.role === 'user' ? 'Representante' : 'Médico'}: ${m.content}`).join('\n');
+            const res = await fetch('/api/pharmaroleplay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cenario,
+                    cenarioNome,
+                    mensagens: [{
+                        role: 'user', content: `[SISTEMA - GERAR RELATÓRIO FINAL]
+
+Transcrição completa:
+${transcricao}
+
+Score geral: ${scoreGeral}/100
+Turnos: ${userMsgCount}
+
+Gere exatamente 3-4 sugestões personalizadas de melhoria baseadas nesta conversa específica. Responda APENAS com um JSON array de strings em pt-BR, exemplo: ["sugestão 1", "sugestão 2"]` }],
+                }),
+            });
+            if (res.ok) {
+                const data = await res.json();
+                const text = data.resposta || '';
+                const match = text.match(/\[[\s\S]*\]/);
+                if (match) sugestoes = JSON.parse(match[0]);
+            }
+        } catch {
+            // Fallback suggestions
+        }
+
+        if (sugestoes.length === 0) {
+            sugestoes = [
+                userMsgCount < 3 ? 'Interaja mais com o médico — sessões curtas de mais limitam a avaliação' : null,
+                scoreGeral < 70 ? 'Fundamente suas respostas com dados de estudos clínicos' : null,
+                scoreGeral < 60 ? 'Demonstre mais empatia ao ouvir as preocupações do médico' : null,
+                'Pratique diferentes cenários para desenvolver versatilidade',
+            ].filter(Boolean) as string[];
+        }
 
         const relatorio = {
-            scoreGeral: pontuacao,
-            scores: {
-                tom: Math.min(100, pontuacao + Math.floor(Math.random() * 10 - 5)),
-                argumentacao: Math.min(100, pontuacao + Math.floor(Math.random() * 15 - 8)),
-                objecoes: Math.min(100, pontuacao + Math.floor(Math.random() * 12 - 6)),
-                empatia: Math.min(100, pontuacao + Math.floor(Math.random() * 10 - 3)),
-            },
-            aprovado: pontuacao >= 70,
-            certificadoDisponivel: pontuacao >= 80,
+            scoreGeral,
+            scores: realScores,
+            aprovado,
+            certificadoDisponivel: aprovado && scoreGeral >= 80,
             resumo: {
                 totalMensagens: mensagens.length,
-                mensagensUsuario: mensagens.filter(m => m.role === 'user').length,
+                mensagensUsuario: userMsgCount,
                 feedbacksPositivos: positivos,
                 feedbacksAlerta: alertas,
                 feedbacksNegativos: negativos,
@@ -379,12 +491,7 @@ export default function VoiceInterfaceLocal({
                 palavrasFaladas: palavras,
                 tempoSessao: tempoDecorrido,
             },
-            sugestoes: [
-                pontuacao < 80 ? 'Use mais referências a estudos clínicos' : null,
-                pontuacao < 70 ? 'Tente demonstrar mais empatia ao médico' : null,
-                'Continue praticando para melhorar fluência',
-                'Explore diferentes cenários para competência completa'
-            ].filter(Boolean) as string[],
+            sugestoes,
             cenario: cenarioNome,
             dificuldade: 'Média',
             transcricaoCompleta: mensagens.map(m => ({
@@ -422,7 +529,7 @@ export default function VoiceInterfaceLocal({
                             <p className="text-xs text-white/30">Tempo</p>
                         </div>
                         <div className="text-center">
-                            <p className="text-2xl font-bold text-[#00D9FF]">{pontuacao}</p>
+                            <p className="text-2xl font-bold text-[#00D9FF]">{turno > 0 ? pontuacao : '—'}</p>
                             <p className="text-xs text-white/30">Score</p>
                         </div>
                         <div className="text-center">
@@ -451,8 +558,8 @@ export default function VoiceInterfaceLocal({
                                 >
                                     <div
                                         className={`max-w-[80%] p-4 rounded-2xl ${msg.role === 'user'
-                                                ? 'bg-gradient-to-r from-[#00D9FF]/20 to-purple-500/20 border border-[#00D9FF]/30'
-                                                : 'bg-white/5 border border-white/10'
+                                            ? 'bg-gradient-to-r from-[#00D9FF]/20 to-purple-500/20 border border-[#00D9FF]/30'
+                                            : 'bg-white/5 border border-white/10'
                                             }`}
                                     >
                                         <p className="text-sm font-medium mb-1 text-white/40">
@@ -520,8 +627,8 @@ export default function VoiceInterfaceLocal({
                                     disabled={isFalando}
                                     whileTap={{ scale: 0.95 }}
                                     className={`w-20 h-20 rounded-full flex items-center justify-center transition-all ${isGravando
-                                            ? 'bg-red-500 shadow-lg shadow-red-500/50 animate-pulse'
-                                            : 'bg-gradient-to-r from-[#00D9FF] to-purple-500 hover:shadow-lg hover:shadow-[#00D9FF]/30'
+                                        ? 'bg-red-500 shadow-lg shadow-red-500/50 animate-pulse'
+                                        : 'bg-gradient-to-r from-[#00D9FF] to-purple-500 hover:shadow-lg hover:shadow-[#00D9FF]/30'
                                         } ${isFalando ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 >
                                     {isGravando ? <MicOff className="w-8 h-8 text-white" /> : <Mic className="w-8 h-8 text-white" />}
@@ -575,7 +682,7 @@ export default function VoiceInterfaceLocal({
                                 </defs>
                             </svg>
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-3xl font-bold text-white">{pontuacao}</span>
+                                <span className="text-3xl font-bold text-white">{turno > 0 ? pontuacao : '—'}</span>
                             </div>
                         </div>
                     </div>
