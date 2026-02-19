@@ -27,9 +27,15 @@ function sanitizeSnippet(value: string): string {
 
 function pickSnippet(document: any): string {
     const derived = document?.derivedStructData || {};
+
     const snippetFromSnippets = derived?.snippets?.[0]?.snippet;
     if (typeof snippetFromSnippets === "string" && snippetFromSnippets.trim()) {
         return sanitizeSnippet(snippetFromSnippets);
+    }
+
+    const extractiveAnswer = derived?.extractive_answers?.[0]?.content || derived?.extractiveAnswers?.[0]?.content;
+    if (typeof extractiveAnswer === "string" && extractiveAnswer.trim()) {
+        return sanitizeSnippet(extractiveAnswer);
     }
 
     const extractiveSegment = derived?.extractive_segments?.[0]?.content || derived?.extractiveSegments?.[0]?.content;
@@ -52,7 +58,7 @@ export async function queryVertexSearch(options: VertexSearchOptions): Promise<V
 
     const accessToken = await getGoogleAccessToken([CLOUD_PLATFORM_SCOPE]);
     if (!accessToken) {
-        throw new Error("Google service account is not configured for Vertex Search");
+        throw new Error("Google credentials are not configured for Vertex Search");
     }
     const quotaProject = getGoogleQuotaProject();
 

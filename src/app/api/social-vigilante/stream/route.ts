@@ -8,7 +8,7 @@ const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
 
 const SOCIAL_SERVING_CONFIG =
-    process.env.VERTEX_SOCIAL_SERVING_CONFIG || process.env.VERTEX_SOCIAL_RAG_SERVING_CONFIG || "";
+    (process.env.VERTEX_SOCIAL_SERVING_CONFIG || process.env.VERTEX_SOCIAL_RAG_SERVING_CONFIG || "").trim();
 
 type Platform = "twitter" | "facebook" | "instagram" | "reddit" | "reclameaqui";
 type Sentiment = "negative" | "neutral" | "positive";
@@ -237,7 +237,7 @@ export async function POST(req: Request) {
         const message = error instanceof Error ? error.message : "Unknown error";
         console.error("Social Vigilante API error:", message);
         return NextResponse.json(
-            { error: "Falha no monitoramento. Verifique se GOOGLE_API_KEY está configurada.", details: message },
+            { error: "Falha no monitoramento em tempo real", details: message },
             { status: 500 }
         );
     }
