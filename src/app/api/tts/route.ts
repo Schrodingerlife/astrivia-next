@@ -38,38 +38,49 @@ function buildPrompt(text: string): string {
 async function generateGeminiTts(prompt: string, model: string): Promise<Buffer> {
     const ttsUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
 
-    const response = await fetch(ttsUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: {
-                responseModalities: ["AUDIO"],
-                speechConfig: {
-                    voiceConfig: {
-                        prebuiltVoiceConfig: {
-                            voiceName: "Orus"
-                        }
-                    }
-                }
-            },
-        }),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7000);
 
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Gemini TTS (${model}) failed: ${response.status} ${errorText.slice(0, 240)}`);
+    try {
+        const response = await fetch(ttsUrl, {
+            method: "POST",
+            signal: controller.signal,
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }],
+                generationConfig: {
+                    responseModalities: ["AUDIO"],
+                    speechConfig: {
+                        voiceConfig: {
+                            prebuiltVoiceConfig: {
+                                voiceName: "Orus",
+                            },
+                        },
+                    },
+                },
+            }),
+        });
+
+        clearTimeout(timeout);
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Gemini TTS (${model}) failed: ${response.status} ${errorText.slice(0, 240)}`);
+        }
+
+        const data = await response.json();
+        const audioData = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+        if (!audioData) {
+            throw new Error(`Gemini TTS (${model}) returned no audio`);
+        }
+
+        const pcmBuffer = Buffer.from(audioData, "base64");
+        const wavHeader = createWavHeader(pcmBuffer.length);
+        return Buffer.concat([wavHeader, pcmBuffer]);
+    } catch (err) {
+        clearTimeout(timeout);
+        throw err;
     }
-
-    const data = await response.json();
-    const audioData = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    if (!audioData) {
-        throw new Error(`Gemini TTS (${model}) returned no audio`);
-    }
-
-    const pcmBuffer = Buffer.from(audioData, "base64");
-    const wavHeader = createWavHeader(pcmBuffer.length);
-    return Buffer.concat([wavHeader, pcmBuffer]);
 }
 
 async function generateGoogleCloudFallback(text: string): Promise<Buffer> {
