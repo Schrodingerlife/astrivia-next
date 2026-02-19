@@ -24,7 +24,7 @@ export async function POST(req: Request) {
             sessionId
         );
 
-        return NextResponse.json({ success: true, id: result?.id ?? sessionId });
+        return NextResponse.json({ success: true, id: result.id });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : "Unknown error";
         console.error("Save session error:", message);

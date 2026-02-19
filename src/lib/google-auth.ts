@@ -94,9 +94,16 @@ export function getGoogleProjectId(): string | null {
     if (envProject) return envProject;
 
     const credentials = parseGoogleCredentials();
-    if (credentials && isServiceAccount(credentials)) {
+    if (!credentials) return null;
+
+    if (isServiceAccount(credentials)) {
         const projectId = credentials.project_id?.trim();
         return projectId || null;
+    }
+
+    if (isAuthorizedUser(credentials)) {
+        const quotaProject = credentials.quota_project_id?.trim();
+        return quotaProject || null;
     }
 
     return null;

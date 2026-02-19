@@ -585,7 +585,10 @@ Identifique 2-4 momentos específicos onde o representante errou ou poderia ter 
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(relatorio),
-        }).catch(() => null);
+        })
+            .then(r => r.json())
+            .then(d => { if (!d.success) console.error('[PharmaRoleplay] Save failed:', d.error); })
+            .catch(e => console.error('[PharmaRoleplay] Save network error:', e));
 
         onEncerrar(relatorio);
     };

@@ -80,12 +80,12 @@ export async function writeFirestoreDocument(
     collection: string,
     data: Record<string, unknown>,
     documentId?: string
-): Promise<{ id: string } | null> {
+): Promise<{ id: string }> {
     const projectId = getGoogleProjectId();
-    if (!projectId) return null;
+    if (!projectId) throw new Error("Google project ID not configured (set GOOGLE_CLOUD_PROJECT or include project_id in credentials)");
 
     const token = await getGoogleAccessToken([CLOUD_PLATFORM_SCOPE]);
-    if (!token) return null;
+    if (!token) throw new Error("Failed to obtain Google access token — check GOOGLE_SERVICE_ACCOUNT_JSON credentials");
     const quotaProject = getGoogleQuotaProject();
 
     const id = documentId || crypto.randomUUID();
@@ -120,10 +120,10 @@ export async function listFirestoreDocuments(
     options: { limit?: number; orderBy?: string } = {}
 ): Promise<Array<{ id: string; data: Record<string, unknown> }>> {
     const projectId = getGoogleProjectId();
-    if (!projectId) return [];
+    if (!projectId) throw new Error("Google project ID not configured (set GOOGLE_CLOUD_PROJECT or include project_id in credentials)");
 
     const token = await getGoogleAccessToken([CLOUD_PLATFORM_SCOPE]);
-    if (!token) return [];
+    if (!token) throw new Error("Failed to obtain Google access token — check GOOGLE_SERVICE_ACCOUNT_JSON credentials");
 
     const quotaProject = getGoogleQuotaProject();
     const { limit = 20, orderBy = "createdAt" } = options;

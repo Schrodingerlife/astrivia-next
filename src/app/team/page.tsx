@@ -103,7 +103,7 @@ export default function TeamPage() {
                         Nosso <span className="text-gradient-cyan">Time</span>
                     </h1>
                     <p className="body-lg max-w-2xl mx-auto">
-                        Formados na USP, forjados na indústria farmacêutica
+                        Da operação ao regulatório — founders que viveram cada elo da cadeia
                     </p>
                 </motion.div>
             </section>

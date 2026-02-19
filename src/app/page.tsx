@@ -77,8 +77,8 @@ const mainProducts = [
     id: "pharmaroleplay",
     icon: <PharmaRoleplayLogo size={40} />,
     title: "PharmaRoleplay",
-    headline: "Treine vendas por voz com um Médico IA",
-    description: "Simulador de conversas que treina representantes farmacêuticos com feedback em tempo real sobre tom, argumentação e eficácia. Como um sparring partner que nunca cansa.",
+    headline: "Treine seu time para a conversa que muda a adesão do paciente",
+    description: "Antes de um paciente decidir aderir ao tratamento, existe uma conversa no consultório. O PharmaRoleplay treina representantes para que essa conversa seja clara, objetiva e responsável — com feedback de IA em tempo real sobre tom, manejo de objeções e argumentação clínica.",
     badge: "Google Cloud TPU",
     category: "Treinamento por Voz",
     demoUrl: "/tools/pharmaroleplay/demo",
@@ -90,8 +90,8 @@ const mainProducts = [
     id: "vigilante",
     icon: <SocialVigilanteLogo size={40} />,
     title: "Social Vigilante",
-    headline: "Detecte eventos adversos antes dos reportes oficiais",
-    description: "Monitoramento contínuo de redes sociais, fóruns e Reclame Aqui que capta sinais precoces de farmacovigilância. Alertas em tempo real para sua equipe de segurança.",
+    headline: "Escute o paciente antes do reporte formal",
+    description: "O paciente não desabafa nos canais oficiais — ele vai ao Twitter, ao Reclame Aqui, ao fórum de pacientes. O Social Vigilante captura esses sinais em tempo real, antes que virem notificações formais, transformando pós-mercado reativo em vigilância preditiva.",
     badge: "BigQuery ML",
     category: "Vigilância Pós-Mercado",
     demoUrl: "/tools/social-vigilante/demo",
@@ -103,8 +103,8 @@ const mainProducts = [
     id: "medsafe",
     icon: <MedSafeLogo size={40} />,
     title: "MedSafe AI",
-    headline: "Audite materiais promocionais em segundos",
-    description: "IA auditora treinada na RDC 96 que analisa peças de marketing linha por linha, identifica claims não suportados e sugere correções — tudo com 100% de rastreabilidade.",
+    headline: "Proteja o paciente da promessa errada — e sua empresa do risco regulatório",
+    description: "Uma promessa exagerada cria expectativa irreal, que vira frustração, descontinuação e risco. O MedSafe AI audita seus materiais contra a RDC 96 linha por linha, com grounding em norma e rastreabilidade total — para que a linguagem que chega ao paciente seja segura e auditável.",
     badge: "Vertex AI",
     category: "Compliance Regulatório",
     demoUrl: "/tools/medsafe/demo",
@@ -222,8 +222,8 @@ function HeroSection() {
           transition={{ duration: 0.8, delay: 0.3 }}
           className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto mb-12 leading-relaxed"
         >
-          Agentes autônomos de IA para Life Sciences.
-          Treine times, audite compliance, monitore reações adversas.
+          A plataforma de agentes de IA para Life Sciences.
+          Velocidade de campo com segurança regulatória — rastreável, auditável, escalável.
         </motion.p>
 
         <motion.div
@@ -486,9 +486,9 @@ function AnimatedStat({ stat, delay }: { stat: typeof impactStats[number]; delay
 /* ============== STEPS ============== */
 function StepsSection() {
   const steps = [
-    { num: "01", title: "Escolha sua ferramenta", desc: "PharmaRoleplay, Social Vigilante ou MedSafe — cada uma resolve um problema diferente na cadeia." },
-    { num: "02", title: "Teste direto no navegador", desc: "Sem instalação, sem conta. Acesse a demo e veja o resultado em tempo real." },
-    { num: "03", title: "Integre ao seu workflow", desc: "APIs prontas, infraestrutura Google Cloud, e suporte para deploy na sua organização." },
+    { num: "01", title: "Escolha o elo que quer resolver", desc: "PharmaRoleplay, Social Vigilante ou MedSafe — cada agente atua em um ponto crítico da jornada do paciente." },
+    { num: "02", title: "Teste direto no navegador", desc: "Sem instalação, sem conta. Acesse a demo e veja o agente em ação com seus próprios dados em tempo real." },
+    { num: "03", title: "Implante no seu workflow", desc: "APIs documentadas, infraestrutura Google Cloud, e suporte para integração com seus sistemas e processos existentes." },
   ];
 
   return (
@@ -580,7 +580,7 @@ function TeamSection() {
         >
           <p className="label mb-4">Liderança</p>
           <h2 className="heading-lg">
-            Formados na USP, forjados<br className="hidden md:block" /> na indústria farmacêutica
+            Da operação ao regulatório —<br className="hidden md:block" /> founders que viveram cada elo da cadeia
           </h2>
         </motion.div>
 
@@ -638,7 +638,7 @@ function CTASection() {
           viewport={{ once: true }}
           className="heading-lg mb-8"
         >
-          Construa uma cadeia mais segura para o paciente
+          A infraestrutura invisível que faz<br className="hidden md:block" /> a história do paciente chegar ao desfecho certo
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}
@@ -646,8 +646,8 @@ function CTASection() {
           viewport={{ once: true }}
           className="text-xl text-white/45 mb-12 leading-relaxed"
         >
-          Descubra como agentes de IA auditáveis podem
-          transformar suas operações em Life Sciences.
+          Time bem treinado. Linguagem segura. Vigilância ativa.
+          Com rastreabilidade em cada etapa — porque quando a estrutura falha, quem paga é o paciente.
         </motion.p>
         <motion.div
           initial={{ opacity: 0, y: 20 }}
