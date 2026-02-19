@@ -74,6 +74,8 @@ export default function PharmaRoleplayApp() {
     const transcricaoRef = useRef<HTMLDivElement>(null);
     const tempoIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const animFrameRef = useRef<number | null>(null);
+    const audioQueueRef = useRef<string[]>([]);
+    const isPlayingRef = useRef(false);
 
     const BACKEND_URL = 'pharmaroleplay-backend-759156439718.us-central1.run.app';
 
@@ -287,13 +289,27 @@ export default function PharmaRoleplayApp() {
     // REPRODUÇÃO DE ÁUDIO
     // ═══════════════════════════════════════════════════════════════════════
 
-    const reproduzirAudio = (base64Audio: string) => {
+    const playNextInQueue = useCallback(() => {
+        if (audioQueueRef.current.length === 0) {
+            isPlayingRef.current = false;
+            setIsIaFalando(false);
+            return;
+        }
+        isPlayingRef.current = true;
         setIsIaFalando(true);
+        const base64Audio = audioQueueRef.current.shift()!;
         const audio = new Audio(`data:audio/mp3;base64,${base64Audio}`);
-        audio.onended = () => setIsIaFalando(false);
-        audio.onerror = () => setIsIaFalando(false);
-        audio.play().catch(() => setIsIaFalando(false));
-    };
+        audio.onended = () => playNextInQueue();
+        audio.onerror = () => playNextInQueue();
+        audio.play().catch(() => playNextInQueue());
+    }, []);
+
+    const reproduzirAudio = useCallback((base64Audio: string) => {
+        audioQueueRef.current.push(base64Audio);
+        if (!isPlayingRef.current) {
+            playNextInQueue();
+        }
+    }, [playNextInQueue]);
 
     // ═══════════════════════════════════════════════════════════════════════
     // TEXTO (fallback)
