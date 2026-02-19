@@ -147,6 +147,7 @@ export default function VoiceInterfaceLocal({
     const [transcricaoAtual, setTranscricaoAtual] = useState('');
     const [categoryScores, setCategoryScores] = useState<CategoriaScores>({});
     const [suportaVoz, setSuportaVoz] = useState(true);
+    const [mouthOpen, setMouthOpen] = useState(false);
 
     const recognitionRef = useRef<any>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -233,6 +234,13 @@ export default function VoiceInterfaceLocal({
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    // Animate mouth when doctor is speaking
+    useEffect(() => {
+        if (!isFalando) { setMouthOpen(false); return; }
+        const interval = setInterval(() => setMouthOpen(prev => !prev), 160);
+        return () => clearInterval(interval);
+    }, [isFalando]);
 
     useEffect(() => {
         if (!audioMutado) return;
@@ -483,10 +491,15 @@ export default function VoiceInterfaceLocal({
         // Require minimum interaction for approval
         const aprovado = scoreGeral >= 70 && userMsgCount >= 3;
 
-        // Try to get personalized suggestions from Gemini
+        // Get personalized analysis from Gemini
         let sugestoes: string[] = [];
+        let analiseDetalhada: Array<{ frase_usuario: string; problema: string; exemplo_melhor: string }> = [];
+
         try {
-            const transcricao = mensagens.map(m => `${m.role === 'user' ? 'Representante' : 'Médico'}: ${m.content}`).join('\n');
+            const transcricao = mensagens.map((m, i) =>
+                `[${i + 1}] ${m.role === 'user' ? 'Representante' : 'Médico'}: ${m.content}`
+            ).join('\n');
+
             const res = await fetch('/api/pharmaroleplay', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -494,30 +507,46 @@ export default function VoiceInterfaceLocal({
                     cenario,
                     cenarioNome,
                     mensagens: [{
-                        role: 'user', content: `[SISTEMA - GERAR RELATÓRIO FINAL]
+                        role: 'user', content: `[SISTEMA - RELATÓRIO FINAL]
 
 Transcrição completa:
 ${transcricao}
 
-Score geral: ${scoreGeral}/100
-Turnos: ${userMsgCount}
+Score: ${scoreGeral}/100 | Turnos: ${userMsgCount}
 
-Gere exatamente 3-4 sugestões personalizadas de melhoria baseadas nesta conversa específica. Responda APENAS com um JSON array de strings em pt-BR, exemplo: ["sugestão 1", "sugestão 2"]` }],
+Analise esta simulação e retorne APENAS o JSON abaixo (sem markdown):
+{
+  "sugestoes": ["sugestão geral 1", "sugestão geral 2", "sugestão geral 3"],
+  "analise": [
+    {
+      "frase_usuario": "trecho exato do que o representante disse (máx 80 chars)",
+      "problema": "descrição clara do erro ou ponto fraco (1-2 frases)",
+      "exemplo_melhor": "como deveria ter dito — exemplo concreto com dados ou técnica (1-2 frases)"
+    }
+  ]
+}
+
+Identifique 2-4 momentos específicos onde o representante errou ou poderia ter ido muito melhor. Seja específico e cite o que foi dito.` }],
                 }),
             });
+
             if (res.ok) {
                 const data = await res.json();
                 const text = data.resposta || '';
-                const match = text.match(/\[[\s\S]*\]/);
-                if (match) sugestoes = JSON.parse(match[0]);
+                const jsonMatch = text.replace(/```json\s*/gi, '').replace(/```\s*/g, '').match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    const parsed = JSON.parse(jsonMatch[0]);
+                    if (Array.isArray(parsed.sugestoes)) sugestoes = parsed.sugestoes;
+                    if (Array.isArray(parsed.analise)) analiseDetalhada = parsed.analise;
+                }
             }
         } catch {
-            // Fallback suggestions
+            // Fallback below
         }
 
         if (sugestoes.length === 0) {
             sugestoes = [
-                userMsgCount < 3 ? 'Interaja mais com o médico — sessões curtas de mais limitam a avaliação' : null,
+                userMsgCount < 3 ? 'Interaja mais com o médico — sessões curtas limitam a avaliação' : null,
                 scoreGeral < 70 ? 'Fundamente suas respostas com dados de estudos clínicos' : null,
                 scoreGeral < 60 ? 'Demonstre mais empatia ao ouvir as preocupações do médico' : null,
                 'Pratique diferentes cenários para desenvolver versatilidade',
@@ -525,6 +554,7 @@ Gere exatamente 3-4 sugestões personalizadas de melhoria baseadas nesta convers
         }
 
         const relatorio = {
+            sessaoId,
             scoreGeral,
             scores: realScores,
             aprovado,
@@ -540,6 +570,7 @@ Gere exatamente 3-4 sugestões personalizadas de melhoria baseadas nesta convers
                 tempoSessao: tempoDecorrido,
             },
             sugestoes,
+            analiseDetalhada,
             cenario: cenarioNome,
             dificuldade: 'Média',
             transcricaoCompleta: mensagens.map(m => ({
@@ -548,6 +579,13 @@ Gere exatamente 3-4 sugestões personalizadas de melhoria baseadas nesta convers
                 timestamp: m.timestamp
             }))
         };
+
+        // Save session to Firestore (best-effort, don't block UI)
+        fetch('/api/pharmaroleplay/save', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(relatorio),
+        }).catch(() => null);
 
         onEncerrar(relatorio);
     };
@@ -706,19 +744,93 @@ Gere exatamente 3-4 sugestões personalizadas de melhoria baseadas nesta convers
 
                 {/* Painel lateral - Feedbacks */}
                 <div className="w-80 glass-card rounded-xl p-4 flex flex-col hidden md:flex">
-                    <h3 className="text-lg font-bold text-white mb-4">📊 Feedback em Tempo Real</h3>
+                    {/* Doctor Avatar */}
+                    <div className="flex flex-col items-center mb-4 pb-4 border-b border-white/10">
+                        <style>{`
+                            @keyframes docBlink {
+                                0%, 88%, 100% { transform: scaleY(1); }
+                                94% { transform: scaleY(0.08); }
+                            }
+                            .eye-l { animation: docBlink 3.5s infinite; transform-box: fill-box; transform-origin: center; }
+                            .eye-r { animation: docBlink 3.5s 0.6s infinite; transform-box: fill-box; transform-origin: center; }
+                        `}</style>
+                        <div className="relative">
+                            <svg viewBox="0 0 120 130" width="88" height="88">
+                                {/* Lab coat base */}
+                                <ellipse cx="60" cy="126" rx="44" ry="16" fill="#e8eeff" opacity="0.95"/>
+                                <rect x="30" y="105" width="60" height="24" rx="6" fill="#e8eeff" opacity="0.95"/>
+                                {/* Collar */}
+                                <polygon points="60,105 42,130 60,120" fill="#c8d0f0"/>
+                                <polygon points="60,105 78,130 60,120" fill="#c8d0f0"/>
+                                {/* Tie/stethoscope line */}
+                                <path d="M60 108 Q55 120 50 128" stroke="#6366f1" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+                                <circle cx="50" cy="130" r="4" fill="none" stroke="#6366f1" strokeWidth="2"/>
+                                {/* Neck */}
+                                <rect x="52" y="99" width="16" height="12" rx="3" fill="#f5c89a"/>
+                                {/* Head */}
+                                <ellipse cx="60" cy="64" rx="36" ry="42" fill="#f5c89a"/>
+                                {/* Hair */}
+                                <path d="M24 50 Q24 16 60 16 Q96 16 96 50 Q93 22 60 22 Q27 22 24 50Z" fill="#1a0f00"/>
+                                <rect x="24" y="44" width="72" height="8" fill="#1a0f00"/>
+                                {/* Ears */}
+                                <ellipse cx="24" cy="66" rx="6" ry="9" fill="#f0b882"/>
+                                <ellipse cx="96" cy="66" rx="6" ry="9" fill="#f0b882"/>
+                                {/* Eyebrows */}
+                                <path d="M37 50 Q46 45 55 50" stroke="#1a0f00" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+                                <path d="M65 50 Q74 45 83 50" stroke="#1a0f00" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+                                {/* Left eye */}
+                                <g className="eye-l">
+                                    <ellipse cx="46" cy="63" rx="8" ry="9" fill="white"/>
+                                    <ellipse cx="46" cy="64" rx="4.5" ry="5" fill="#1a2a4a"/>
+                                    <ellipse cx="48" cy="62" rx="1.5" ry="1.5" fill="white"/>
+                                </g>
+                                {/* Right eye */}
+                                <g className="eye-r">
+                                    <ellipse cx="74" cy="63" rx="8" ry="9" fill="white"/>
+                                    <ellipse cx="74" cy="64" rx="4.5" ry="5" fill="#1a2a4a"/>
+                                    <ellipse cx="76" cy="62" rx="1.5" ry="1.5" fill="white"/>
+                                </g>
+                                {/* Nose */}
+                                <path d="M56 78 Q60 84 64 78" stroke="#d4956a" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
+                                {/* Mouth */}
+                                {mouthOpen ? (
+                                    <>
+                                        <ellipse cx="60" cy="91" rx="11" ry="7" fill="#7a2e2e"/>
+                                        <ellipse cx="60" cy="89" rx="10" ry="3" fill="#f5c89a"/>
+                                        <rect x="51" y="88" width="18" height="5" rx="2.5" fill="white" opacity="0.85"/>
+                                    </>
+                                ) : (
+                                    <path d="M50 90 Q60 97 70 90" stroke="#c06060" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+                                )}
+                            </svg>
+                            {isFalando && (
+                                <span className="absolute -right-1 top-0 flex h-4 w-4">
+                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#00D9FF] opacity-75"/>
+                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-[#00D9FF]"/>
+                                </span>
+                            )}
+                        </div>
+                        <p className="text-xs font-medium text-white/60 mt-1 text-center leading-tight">
+                            {isFalando ? '🗣 Falando...' : medicoAtual.nome.split(' - ')[0]}
+                        </p>
+                        {!isFalando && (
+                            <p className="text-xs text-white/30 text-center">{medicoAtual.nome.split(' - ')[1] || ''}</p>
+                        )}
+                    </div>
+
+                    <h3 className="text-sm font-bold text-white mb-3">📊 Feedback em Tempo Real</h3>
 
                     {/* Score visual */}
-                    <div className="mb-6 text-center">
-                        <div className="relative w-32 h-32 mx-auto">
+                    <div className="mb-3 flex items-center justify-between px-2">
+                        <div className="relative w-20 h-20">
                             <svg className="w-full h-full transform -rotate-90">
-                                <circle cx="64" cy="64" r="56" stroke="currentColor" strokeWidth="8" fill="none" className="text-white/10" />
+                                <circle cx="40" cy="40" r="34" stroke="currentColor" strokeWidth="6" fill="none" className="text-white/10" />
                                 <circle
-                                    cx="64" cy="64" r="56"
+                                    cx="40" cy="40" r="34"
                                     stroke="url(#gradient-live)"
-                                    strokeWidth="8"
+                                    strokeWidth="6"
                                     fill="none"
-                                    strokeDasharray={`${pontuacao * 3.52} 352`}
+                                    strokeDasharray={`${pontuacao * 2.136} 213.6`}
                                     strokeLinecap="round"
                                     className="transition-all duration-500"
                                 />
@@ -730,8 +842,12 @@ Gere exatamente 3-4 sugestões personalizadas de melhoria baseadas nesta convers
                                 </defs>
                             </svg>
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <span className="text-3xl font-bold text-white">{turno > 0 ? pontuacao : '—'}</span>
+                                <span className="text-xl font-bold text-white">{turno > 0 ? pontuacao : '—'}</span>
                             </div>
+                        </div>
+                        <div className="text-right">
+                            <p className="text-white/30 text-xs">Score</p>
+                            <p className="text-white text-xs mt-1">Turno <span className="font-bold text-purple-400">{turno}</span></p>
                         </div>
                     </div>
 
