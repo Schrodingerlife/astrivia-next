@@ -24,6 +24,11 @@ import {
   SciGenLogo,
   HeroBackgroundSVG,
 } from "@/components/product-logos";
+import {
+  MolecularNetworkSVG,
+  DNAHelixSVG,
+  HexagonGridSVG,
+} from "@/components/home/SectionBackgrounds";
 
 /* ============== PRODUCT ILLUSTRATIONS (Image-based) ============== */
 function PharmaRoleplayVisual() {
@@ -429,11 +434,13 @@ function ComingSoonSection() {
 function StatsSection() {
   return (
     <section className="relative py-32 px-6 overflow-hidden">
-      {/* Elevated section with gradient background */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00D9FF]/15 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-b from-[#0e1117] via-[#0d0f14] to-[#0a0a0a]" />
-      <div className="absolute inset-0 bg-grid-pattern opacity-25" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse,rgba(0,217,255,0.04),transparent_70%)]" />
+      {/* Hexagonal molecular lattice */}
+      <HexagonGridSVG className="absolute inset-0 w-full h-full object-cover opacity-100 pointer-events-none" />
+      {/* Central radial glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse,rgba(0,217,255,0.06),transparent_70%)]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[200px] bg-[radial-gradient(ellipse,rgba(168,85,247,0.05),transparent_70%)]" />
       <div className="relative z-10 max-w-6xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
           {impactStats.map((stat, i) => (
@@ -495,6 +502,10 @@ function StepsSection() {
     <section className="relative py-32 px-6 overflow-hidden">
       <div className="absolute inset-0 bg-mesh-gradient" />
       <div className="absolute bottom-0 left-[10%] w-[500px] h-[500px] gradient-orb gradient-orb-green opacity-15" />
+      {/* Molecular network — decorative, right side */}
+      <MolecularNetworkSVG className="absolute right-0 top-1/2 -translate-y-1/2 w-[480px] h-[480px] opacity-30 pointer-events-none" style={{ animationDelay: "0s" } as React.CSSProperties} />
+      {/* Secondary network — left side, mirrored & smaller */}
+      <MolecularNetworkSVG className="absolute left-0 bottom-0 w-[280px] h-[280px] opacity-15 pointer-events-none scale-x-[-1]" />
       <div className="relative z-10 max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -571,6 +582,10 @@ function TeamSection() {
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
       <div className="absolute inset-0 bg-dot-pattern opacity-20" />
       <div className="absolute top-[20%] right-0 w-[400px] h-[400px] gradient-orb gradient-orb-cyan opacity-10" />
+      {/* DNA helix — left decorative */}
+      <DNAHelixSVG className="absolute left-8 top-1/2 -translate-y-1/2 h-[520px] w-[120px] opacity-40 pointer-events-none" style={{ animation: "svgBreathe 4s ease-in-out infinite" } as React.CSSProperties} />
+      {/* DNA helix — right, offset */}
+      <DNAHelixSVG className="absolute right-8 top-[10%] h-[400px] w-[120px] opacity-25 pointer-events-none" style={{ animation: "svgBreathe 5s ease-in-out infinite 1s" } as React.CSSProperties} />
       <div className="relative z-10 max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -624,13 +639,16 @@ function TeamSection() {
 function CTASection() {
   return (
     <section className="relative py-40 px-6 overflow-hidden">
-      {/* Rich CTA background */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a0e18] to-[#0a0a0a]" />
       <div className="absolute inset-0 bg-grid-pattern opacity-20" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse,rgba(0,217,255,0.06),transparent_60%)]" />
-      <div className="absolute top-0 left-0 w-[400px] h-[400px] gradient-orb gradient-orb-purple opacity-15" />
-      <div className="absolute bottom-0 right-0 w-[400px] h-[400px] gradient-orb gradient-orb-cyan opacity-15" />
-      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/15 to-transparent" />
+      {/* Molecular networks framing the CTA */}
+      <MolecularNetworkSVG className="absolute left-0 top-0 w-[400px] h-[400px] opacity-20 pointer-events-none" />
+      <MolecularNetworkSVG className="absolute right-0 bottom-0 w-[400px] h-[400px] opacity-20 pointer-events-none scale-x-[-1] scale-y-[-1]" />
+      {/* Central glow intensified */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse,rgba(0,217,255,0.08),transparent_60%)]" />
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] gradient-orb gradient-orb-purple opacity-20" />
+      <div className="absolute bottom-0 right-0 w-[500px] h-[500px] gradient-orb gradient-orb-cyan opacity-20" />
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
       <div className="relative z-10 max-w-3xl mx-auto text-center">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
@@ -672,6 +690,8 @@ function ManifestoSection() {
   return (
     <section className="py-24 px-6 relative overflow-hidden bg-[#0A1628]">
       <div className="absolute inset-0 bg-gradient-to-b from-[#0A1628] via-[#0D1B2A] to-[#0A1628]" />
+      {/* Subtle molecular decoration — top right */}
+      <MolecularNetworkSVG className="absolute right-0 top-0 w-[320px] h-[320px] opacity-15 pointer-events-none" />
       <div className="max-w-4xl mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

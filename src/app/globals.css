@@ -670,15 +670,30 @@ select.form-input option {
 
 /* ---------- ANIMATIONS ---------- */
 @keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-12px); }
+}
 
-  0%,
-  100% {
-    transform: translateY(0);
-  }
+/* Molecular node gentle drift */
+@keyframes molFloat {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(2px, -4px); }
+  50%  { transform: translate(0, -7px); }
+  75%  { transform: translate(-2px, -3px); }
+  100% { transform: translate(0, 0); }
+}
+.mol-node-float { animation: molFloat 6s ease-in-out infinite; }
 
-  50% {
-    transform: translateY(-12px);
-  }
+/* Hex cell pulse */
+@keyframes hexPulse {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+/* Slow SVG breath */
+@keyframes svgBreathe {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 0.80; }
 }
 
 @keyframes fadeInUp {
