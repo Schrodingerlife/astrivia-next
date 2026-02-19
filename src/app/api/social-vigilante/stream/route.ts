@@ -1,14 +1,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { GEMINI_TEXT_MODEL } from "@/lib/ai-models";
-import { queryVertexSearch } from "@/lib/vertex-search";
 import { writeFirestoreDocument } from "@/lib/firestore-admin";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
-
-const SOCIAL_SERVING_CONFIG =
-    (process.env.VERTEX_SOCIAL_SERVING_CONFIG || process.env.VERTEX_SOCIAL_RAG_SERVING_CONFIG || "").trim();
 
 type Platform = "twitter" | "facebook" | "instagram" | "reddit" | "reclameaqui";
 type Sentiment = "negative" | "neutral" | "positive";
@@ -47,23 +43,73 @@ function normalizeRisk(value: unknown): RiskLevel {
 
 function heuristicSentiment(text: string): Sentiment {
     const lower = text.toLowerCase();
-    if (/dor|náusea|nausea|grave|reação|reacao|hospital|evento adverso|efeito colateral/.test(lower)) return "negative";
-    if (/melhora|estável|estavel|positivo|controle/.test(lower)) return "positive";
+    if (/pain|nausea|náusea|grave|reaction|reação|hospital|adverse event|side effect|efeito colateral/.test(lower)) return "negative";
+    if (/improvement|melhora|stable|estável|positive|positivo|control|controle/.test(lower)) return "positive";
     return "neutral";
 }
 
 function heuristicRisk(text: string): RiskLevel {
     const lower = text.toLowerCase();
-    if (/uti|hospital|grave|urgência|urgencia|óbito|obito|sangramento/.test(lower)) return "critical";
-    if (/evento adverso|efeito colateral|desvio de qualidade|interação medicamentosa|interacao/.test(lower)) return "high";
-    if (/desconforto|náusea|nausea|dor|tontura/.test(lower)) return "medium";
+    if (/icu|uti|hospital|serious|grave|urgent|urgência|death|óbito|bleeding|sangramento/.test(lower)) return "critical";
+    if (/adverse event|evento adverso|side effect|efeito colateral|quality deviation|drug interaction/.test(lower)) return "high";
+    if (/discomfort|desconforto|nausea|náusea|pain|dor|dizziness|tontura/.test(lower)) return "medium";
     return "low";
 }
 
 function parseTimestamp(value: unknown): string {
     if (!value) return new Date().toISOString();
+    // Reddit uses Unix timestamps
+    if (typeof value === "number") return new Date(value * 1000).toISOString();
     const parsed = new Date(String(value));
     return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
+}
+
+interface RedditPost {
+    id: string;
+    title: string;
+    selftext: string;
+    author: string;
+    subreddit: string;
+    permalink: string;
+    score: number;
+    num_comments: number;
+    created_utc: number;
+    url: string;
+}
+
+async function fetchRedditPosts(term: string): Promise<RedditPost[]> {
+    const encoded = encodeURIComponent(term);
+    const url = `https://www.reddit.com/search.json?q=${encoded}&sort=new&limit=20&type=link`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    try {
+        const response = await fetch(url, {
+            signal: controller.signal,
+            headers: {
+                "User-Agent": "AstriviaAI/1.0 (pharmacovigilance monitoring; contact: contact@astriviaai.tech)",
+                "Accept": "application/json",
+            },
+        });
+
+        clearTimeout(timeout);
+
+        if (!response.ok) {
+            throw new Error(`Reddit API returned ${response.status}`);
+        }
+
+        const data = await response.json();
+        const children = data?.data?.children;
+        if (!Array.isArray(children)) return [];
+
+        return children
+            .map((child: { data: RedditPost }) => child.data)
+            .filter((post: RedditPost) => post && post.title);
+    } catch {
+        clearTimeout(timeout);
+        return [];
+    }
 }
 
 interface GeminiPost {
@@ -102,6 +148,52 @@ Retorne APENAS JSON array:
     return parsed;
 }
 
+interface ClassifiedPost {
+    index: number;
+    sentiment: string;
+    riskLevel: string;
+    event: string;
+    relevant: boolean;
+}
+
+async function classifyRedditPosts(posts: RedditPost[], term: string): Promise<ClassifiedPost[]> {
+    const items = posts.slice(0, 15).map((post, i) => {
+        const text = [post.title, post.selftext].filter(Boolean).join(" ").slice(0, 300);
+        return `- index: ${i}\n  text: ${text}`;
+    }).join("\n");
+
+    const prompt = `Você é um especialista em farmacovigilância. Analise estes posts do Reddit relacionados a "${term}" e classifique cada um.
+
+Posts:
+${items}
+
+Para cada post, determine:
+- Se é RELEVANTE para farmacovigilância (eventos adversos, efeitos colaterais, queixas de eficácia, uso clínico)
+- Sentimento: negative|neutral|positive
+- Nível de risco: critical|high|medium|low
+- Evento detectado (descrição curta em português)
+
+Retorne APENAS JSON array:
+[
+  {
+    "index": 0,
+    "relevant": true,
+    "sentiment": "negative|neutral|positive",
+    "riskLevel": "critical|high|medium|low",
+    "event": "descrição do evento"
+  }
+]`;
+
+    try {
+        const gen = await model.generateContent(prompt);
+        const classified = JSON.parse(extractJsonArray(gen.response.text()));
+        if (!Array.isArray(classified)) return [];
+        return classified;
+    } catch {
+        return [];
+    }
+}
+
 export async function POST(req: Request) {
     try {
         const body = await req.json();
@@ -112,72 +204,65 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Informe um termo para monitoramento." }, { status: 400 });
         }
 
-        // Try RAG with Vertex Search if configured
-        let useRag = false;
-        let ragPosts: any[] = [];
+        let posts: unknown[] = [];
+        let source = "gemini-generated";
 
-        if (SOCIAL_SERVING_CONFIG) {
-            try {
-                const references = await queryVertexSearch({
-                    servingConfig: SOCIAL_SERVING_CONFIG,
-                    query: term,
-                    pageSize: 12,
-                });
+        // Try real Reddit search first
+        const redditRaw = await fetchRedditPosts(term);
 
-                if (references.length > 0) {
-                    useRag = true;
+        if (redditRaw.length > 0) {
+            source = "reddit-live";
 
-                    // Classify with Gemini
-                    const classifyPrompt = `Classifique sinais de farmacovigilância para "${term}".\n\nItens:\n${references.map((item) => `- id: ${item.id}\ntexto: ${item.snippet.slice(0, 260)}`).join("\n")}\n\nRetorne APENAS JSON array com:\n[\n  {\n    "id": "id original",\n    "platform": "twitter|facebook|instagram|reddit|reclameaqui",\n    "sentiment": "negative|neutral|positive",\n    "riskLevel": "critical|high|medium|low",\n    "event": "evento detectado",\n    "author": "autor se identificável"\n  }\n]`;
+            // Classify with Gemini for pharmavigilance relevance
+            const classified = await classifyRedditPosts(redditRaw, term);
+            const byIndex = new Map(classified.map((c) => [c.index, c]));
 
-                    let classified: any[] = [];
-                    try {
-                        const gen = await model.generateContent(classifyPrompt);
-                        classified = JSON.parse(extractJsonArray(gen.response.text()));
-                    } catch { /* use heuristics */ }
+            const mappedPosts = redditRaw.slice(0, 15).map((post, index) => {
+                const meta = byIndex.get(index);
+                const text = [post.title, post.selftext].filter(Boolean).join(" ");
+                const sentiment = meta?.sentiment ? normalizeSentiment(meta.sentiment) : heuristicSentiment(text);
+                const riskLevel = meta?.riskLevel ? normalizeRisk(meta.riskLevel) : heuristicRisk(text);
+                const content = post.selftext?.trim()
+                    ? post.selftext.slice(0, 190)
+                    : post.title.slice(0, 190);
 
-                    const byId = new Map(classified.map((item: any) => [item.id, item]));
+                return {
+                    id: `reddit-${post.id}`,
+                    platform: "reddit" as Platform,
+                    author: post.author || "reddit_user",
+                    handle: `u/${post.author || "reddit_user"}`,
+                    avatar: `https://i.pravatar.cc/150?u=reddit-${post.id}`,
+                    content,
+                    timestamp: parseTimestamp(post.created_utc),
+                    likes: post.score || 0,
+                    shares: post.num_comments || 0,
+                    sentiment,
+                    riskLevel,
+                    sourceUrl: `https://reddit.com${post.permalink}`,
+                    subreddit: post.subreddit,
+                    aiAnalysis: {
+                        detectedEvent: meta?.event || "Sinal detectado",
+                        drugMentioned: term,
+                        complianceFlag: riskLevel === "critical" || riskLevel === "high",
+                        confidence: meta?.relevant ? 0.88 : 0.62,
+                    },
+                    status: "new",
+                };
+            });
 
-                    ragPosts = references.slice(0, 10).map((doc, index) => {
-                        const meta = doc.metadata || {};
-                        const predicted = byId.get(doc.id);
-                        const sentiment = predicted?.sentiment ? normalizeSentiment(predicted.sentiment) : heuristicSentiment(doc.snippet);
-                        const riskLevel = predicted?.riskLevel ? normalizeRisk(predicted.riskLevel) : heuristicRisk(doc.snippet);
-
-                        return {
-                            id: doc.id || `doc-${index}`,
-                            platform: normalizePlatform(predicted?.platform || (meta as Record<string, unknown>).platform),
-                            author: predicted?.author || String((meta as Record<string, unknown>).author || "").trim() || "Fonte indexada",
-                            handle: "@monitoring",
-                            avatar: `https://i.pravatar.cc/150?u=${encodeURIComponent(doc.id)}`,
-                            content: doc.snippet,
-                            timestamp: parseTimestamp(predicted?.timestamp || (meta as Record<string, unknown>).timestamp),
-                            likes: 0,
-                            shares: 0,
-                            sentiment,
-                            riskLevel,
-                            aiAnalysis: {
-                                detectedEvent: predicted?.event || "Sinal detectado",
-                                drugMentioned: term,
-                                complianceFlag: riskLevel === "critical" || riskLevel === "high",
-                                confidence: 0.84,
-                            },
-                            status: "new",
-                        };
-                    });
-                }
-            } catch (ragError) {
-                console.warn("Vertex Search unavailable, using Gemini generation:", ragError instanceof Error ? ragError.message : ragError);
-            }
+            // Keep only relevant posts, or all if none classified as relevant
+            const relevant = mappedPosts.filter((_, i) => byIndex.get(i)?.relevant !== false);
+            posts = relevant.length > 0 ? relevant : mappedPosts.slice(0, 8);
         }
 
         // Fallback: generate synthetic posts with Gemini
-        if (!useRag) {
+        if (posts.length === 0) {
+            source = "gemini-generated";
             try {
                 const syntheticPosts = await generateSyntheticPosts(term);
                 const now = Date.now();
 
-                ragPosts = syntheticPosts.map((post, index) => {
+                posts = syntheticPosts.map((post, index) => {
                     const platform = normalizePlatform(post.platform);
                     const sentiment = normalizeSentiment(post.sentiment);
                     const riskLevel = normalizeRisk(post.riskLevel);
@@ -214,22 +299,24 @@ export async function POST(req: Request) {
             }
         }
 
-        const posts = ragPosts;
-        const highRiskCount = posts.filter((post: any) => post.riskLevel === "critical" || post.riskLevel === "high").length;
+        const highRiskCount = posts.filter((post: unknown) => {
+            const p = post as { riskLevel: string };
+            return p.riskLevel === "critical" || p.riskLevel === "high";
+        }).length;
 
         await writeFirestoreDocument("social_vigilante_runs", {
             term,
             retrievalCount: posts.length,
             postCount: posts.length,
             highRiskCount,
-            source: useRag ? "vertex-search" : "gemini-generated",
+            source,
             model: GEMINI_TEXT_MODEL,
             createdAt: new Date().toISOString(),
         }).catch(() => null);
 
         return NextResponse.json({
             posts,
-            source: useRag ? "vertex-search" : "gemini-generated",
+            source,
             retrievalCount: posts.length,
             highRiskCount,
         });
