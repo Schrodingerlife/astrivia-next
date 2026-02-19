@@ -150,6 +150,8 @@ export default function VoiceInterfaceLocal({
 
     const recognitionRef = useRef<any>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
+    const ttsAbortRef = useRef<AbortController | null>(null);
+    const ttsRequestIdRef = useRef(0);
     const transcricaoRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -222,53 +224,96 @@ export default function VoiceInterfaceLocal({
         return () => {
             clearInterval(interval);
             if (recognitionRef.current) recognitionRef.current.stop();
+            if (ttsAbortRef.current) ttsAbortRef.current.abort();
+            if (audioRef.current) {
+                audioRef.current.pause();
+                audioRef.current = null;
+            }
             window.speechSynthesis?.cancel();
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    useEffect(() => {
+        if (!audioMutado) return;
+        if (ttsAbortRef.current) ttsAbortRef.current.abort();
+        if (audioRef.current) {
+            audioRef.current.pause();
+            audioRef.current = null;
+        }
+        window.speechSynthesis?.cancel();
+        setIsFalando(false);
+    }, [audioMutado]);
 
     // ═══════════════════════════════════════════════════════════════════════
     // SÍNTESE DE VOZ (Google Cloud TTS → browser fallback)
     // ═══════════════════════════════════════════════════════════════════════
 
     const falarTexto = async (texto: string) => {
-        if (audioMutado) return;
+        if (audioMutado || !texto.trim()) return;
+
+        ttsRequestIdRef.current += 1;
+        const requestId = ttsRequestIdRef.current;
 
         // Stop any currently playing audio
+        if (ttsAbortRef.current) ttsAbortRef.current.abort();
         if (audioRef.current) {
             audioRef.current.pause();
             audioRef.current = null;
         }
         window.speechSynthesis?.cancel();
 
+        const controller = new AbortController();
+        ttsAbortRef.current = controller;
+
         setIsFalando(true);
 
         try {
-            // Try Google Cloud TTS API first (natural neural voice)
+            // Try Gemini TTS API first (natural LLM-based voice)
             const response = await fetch('/api/tts', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text: texto }),
+                signal: controller.signal,
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                if (data.audioContent) {
-                    const audio = new Audio(`data:audio/mp3;base64,${data.audioContent}`);
-                    audioRef.current = audio;
-                    audio.onended = () => setIsFalando(false);
-                    audio.onerror = () => {
-                        setIsFalando(false);
-                        // Fallback to browser TTS on audio error
-                        falarComBrowser(texto);
-                    };
-                    await audio.play();
+            if (requestId !== ttsRequestIdRef.current) {
+                return;
+            }
+
+            if (response.ok && response.headers.get('content-type')?.includes('audio')) {
+                const blob = await response.blob();
+                if (requestId !== ttsRequestIdRef.current) {
                     return;
                 }
+                const url = URL.createObjectURL(blob);
+                const audio = new Audio(url);
+                audioRef.current = audio;
+                audio.onended = () => {
+                    if (requestId !== ttsRequestIdRef.current) return;
+                    setIsFalando(false);
+                    URL.revokeObjectURL(url);
+                };
+                audio.onerror = () => {
+                    if (requestId !== ttsRequestIdRef.current) return;
+                    setIsFalando(false);
+                    URL.revokeObjectURL(url);
+                    falarComBrowser(texto);
+                };
+                await audio.play();
+                return;
             }
+
+            if (response.status !== 200) {
+                console.warn("TTS route returned non-audio response, using browser fallback.");
+            }
+
             // API returned error, fallback
             falarComBrowser(texto);
-        } catch {
+        } catch (error: unknown) {
+            if (error instanceof DOMException && error.name === "AbortError") {
+                return;
+            }
             // Network error, fallback to browser TTS
             falarComBrowser(texto);
         }
@@ -281,12 +326,15 @@ export default function VoiceInterfaceLocal({
         }
         const utterance = new SpeechSynthesisUtterance(texto);
         utterance.lang = 'pt-BR';
-        utterance.rate = 0.85;
+        utterance.rate = 0.93;
+        utterance.pitch = 0.95;
         const vozes = window.speechSynthesis.getVoices();
-        const voz = vozes.find(v => v.lang.includes('pt-BR') && v.name.toLowerCase().includes('google'))
+        const voz = vozes.find(v => v.lang.includes('pt-BR') && /(google|neural|natural|microsoft)/i.test(v.name))
+            || vozes.find(v => v.lang.includes('pt-BR') && /(male|mascul|homem)/i.test(v.name))
             || vozes.find(v => v.lang.includes('pt-BR'));
         if (voz) utterance.voice = voz;
         utterance.onend = () => setIsFalando(false);
+        utterance.onerror = () => setIsFalando(false);
         window.speechSynthesis.speak(utterance);
     };
 

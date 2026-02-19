@@ -1,33 +1,31 @@
 "use client";
 
 import MedSafeApp from "@/components/tools/medsafe/MedSafeApp";
-import { Shield } from "lucide-react";
+import ToolShowcaseHero from "@/components/tools/ToolShowcaseHero";
+import { ShieldCheck } from "lucide-react";
 
 export default function MedSafePage() {
     return (
-        <div className="min-h-screen pt-20 pb-8">
-                {/* Header */}
-                <section className="px-6 mb-4">
-                    <div className="max-w-6xl mx-auto">
-                        <div className="flex items-center gap-3 mb-2">
-                            <div className="w-9 h-9 rounded-xl bg-[#00D9FF]/10 border border-[#00D9FF]/20 flex items-center justify-center text-[#00D9FF]">
-                                <Shield size={18} />
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <h1 className="text-xl font-bold">MedSafe AI</h1>
-                                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-500/20 text-green-400 border border-green-500/30">
-                                        Live
-                                    </span>
-                                </div>
-                                <p className="text-white/40 text-xs">Powered by Vertex AI Search & Gemini 3</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+        <div className="min-h-screen pt-20 pb-10">
+            <ToolShowcaseHero
+                badge="Compliance Regulatório"
+                title="Audite materiais promocionais em segundos"
+                description="IA auditora treinada na RDC 96 que analisa peças de marketing linha por linha, identifica claims não suportados e sugere correções — tudo com 100% de rastreabilidade."
+                metrics={["90% menos tempo de revisão", "Zero falsos positivos", "Auditoria completa"]}
+                ctaHref="#medsafe-demo"
+                ctaLabel="Testar Demo"
+                imageSrc="/images/product-medsafe.png"
+                imageAlt="MedSafe AI - painel de auditoria regulatória"
+                accentColor="#10B981"
+                icon={<ShieldCheck size={18} />}
+                imageFirst
+            />
 
-                {/* Native App */}
-                <MedSafeApp />
-            </div>
+            <section id="medsafe-demo" className="px-6">
+                <div className="max-w-7xl mx-auto">
+                    <MedSafeApp />
+                </div>
+            </section>
+        </div>
     );
 }

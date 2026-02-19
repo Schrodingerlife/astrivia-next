@@ -161,7 +161,11 @@ const MOCK_POSTS_POOL: Omit<SocialPost, "id" | "timestamp" | "status">[] = [
     },
 ];
 
-export default function SocialVigilanteApp() {
+interface SocialVigilanteAppProps {
+    embedded?: boolean;
+}
+
+export default function SocialVigilanteApp({ embedded = false }: SocialVigilanteAppProps) {
     const [posts, setPosts] = useState<SocialPost[]>([]);
     const [stats, setStats] = useState({ highRisk: 0, processed: 0, sources: 0 });
     const [isSimulating, setIsSimulating] = useState(false);
@@ -286,7 +290,7 @@ export default function SocialVigilanteApp() {
     };
 
     return (
-        <div className="flex h-[calc(100vh-80px)] bg-[#050B14] text-white overflow-hidden font-sans">
+        <div className={`flex ${embedded ? "h-full min-h-[720px]" : "h-[calc(100vh-80px)]"} bg-[#050B14] text-white overflow-hidden font-sans`}>
             {/* Sidebar / Stats */}
             <div className="w-80 bg-[#0A1628]/50 border-r border-white/5 p-6 flex flex-col gap-6 hidden md:flex">
                 <div className="flex items-center gap-3 mb-4">
@@ -437,12 +441,12 @@ export default function SocialVigilanteApp() {
 
                                         {/* AI Analysis Box */}
                                         {post.aiAnalysis && (
-                                            <div className="bg-[#00D9FF]/5 border border-[#00D9FF]/10 rounded-lg p-3 mb-3 flex items-start gap-3">
-                                                <Zap size={16} className="text-[#00D9FF] shrink-0 mt-0.5" />
+                                            <div className="bg-[#A855F7]/5 border border-[#A855F7]/10 rounded-lg p-3 mb-3 flex items-start gap-3">
+                                                <Zap size={16} className="text-[#A855F7] shrink-0 mt-0.5" />
                                                 <div className="flex-1">
                                                     <div className="flex gap-4 text-xs mb-1">
                                                         <span className="text-white/40">Evento Detectado:</span>
-                                                        <span className="text-[#00D9FF] font-medium">{post.aiAnalysis.detectedEvent || "None"}</span>
+                                                        <span className="text-[#A855F7] font-medium">{post.aiAnalysis.detectedEvent || "None"}</span>
                                                     </div>
                                                     <div className="flex gap-4 text-xs">
                                                         <span className="text-white/40">Medicamento:</span>
