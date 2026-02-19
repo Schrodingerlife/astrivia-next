@@ -37,11 +37,12 @@ export default function ToolHero({
     const textOrderClass = imageFirst ? "lg:order-2" : "lg:order-1";
 
     return (
-        <section className="relative py-14 md:py-20 px-6 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-[#071332] via-[#060B1D] to-[#050B16]" />
-            <div className="absolute inset-0 bg-grid-pattern opacity-25" />
+        <section className="relative py-10 md:py-16 px-6 overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-b from-[#081838] via-[#070D22] to-[#050B16]" />
+            <div className="absolute inset-0 bg-grid-pattern opacity-30" />
+            <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-[#050B16] to-transparent" />
 
-            <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-8 lg:gap-14 items-center">
                 <motion.div
                     initial={{ opacity: 0, y: 22 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -73,7 +74,7 @@ export default function ToolHero({
                     className={textOrderClass}
                 >
                     <div
-                        className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-[0.16em] border mb-6"
+                        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[14px] text-xs font-semibold uppercase tracking-[0.18em] border mb-6"
                         style={{
                             color: accentColor,
                             background: `${accentColor}14`,
@@ -89,15 +90,15 @@ export default function ToolHero({
                         {badge}
                     </div>
 
-                    <h1 className="text-4xl md:text-6xl font-bold leading-[1.02] text-white mb-5">{title}</h1>
+                    <h1 className="text-[clamp(2.4rem,5.4vw,4.5rem)] font-bold leading-[1.04] text-white mb-5">{title}</h1>
 
-                    <p className="text-2xl md:text-[1.9rem] text-white/56 max-w-2xl leading-[1.35] mb-8">{description}</p>
+                    <p className="text-[clamp(1.2rem,1.95vw,2rem)] text-white/60 max-w-2xl leading-[1.35] mb-8">{description}</p>
 
                     <div className="flex flex-wrap gap-3 mb-10">
                         {chips.map((chip) => (
                             <span
                                 key={chip}
-                                className="px-5 py-2.5 rounded-full text-[1.05rem] bg-white/[0.03] border border-white/[0.08] text-white/75"
+                                className="px-5 py-2.5 rounded-full text-[1.05rem] bg-white/[0.03] border border-white/[0.09] text-white/80"
                             >
                                 {chip}
                             </span>

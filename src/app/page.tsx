@@ -81,7 +81,7 @@ const mainProducts = [
     description: "Simulador de conversas que treina representantes farmacêuticos com feedback em tempo real sobre tom, argumentação e eficácia. Como um sparring partner que nunca cansa.",
     badge: "Google Cloud TPU",
     category: "Treinamento por Voz",
-    demoUrl: "/tools/pharmaroleplay",
+    demoUrl: "/tools/pharmaroleplay/demo",
     color: "#00D9FF",
     visual: <PharmaRoleplayVisual />,
     metrics: ["Ramp-up 50% mais rápido", "<200ms latência", "24/7 disponível"],
@@ -94,7 +94,7 @@ const mainProducts = [
     description: "Monitoramento contínuo de redes sociais, fóruns e Reclame Aqui que capta sinais precoces de farmacovigilância. Alertas em tempo real para sua equipe de segurança.",
     badge: "BigQuery ML",
     category: "Vigilância Pós-Mercado",
-    demoUrl: "/tools/social-vigilante",
+    demoUrl: "/tools/social-vigilante/demo",
     color: "#A855F7",
     visual: <SocialVigilanteVisual />,
     metrics: ["100% cobertura pública", "Terabytes/dia", "Alertas em tempo real"],
@@ -107,7 +107,7 @@ const mainProducts = [
     description: "IA auditora treinada na RDC 96 que analisa peças de marketing linha por linha, identifica claims não suportados e sugere correções — tudo com 100% de rastreabilidade.",
     badge: "Vertex AI",
     category: "Compliance Regulatório",
-    demoUrl: "/tools/medsafe",
+    demoUrl: "/tools/medsafe/demo",
     color: "#10B981",
     visual: <MedSafeVisual />,
     metrics: ["90% menos tempo de revisão", "Zero falsos positivos", "Auditoria completa"],
@@ -147,6 +147,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       <HeroSection />
+      <ManifestoSection />
       <TrustedBySection />
       <ProductShowcase />
       <ComingSoonSection />
@@ -231,7 +232,7 @@ function HeroSection() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <Link href="/tools/social-vigilante" className="btn-primary text-base px-8 py-4">
+          <Link href="/tools/social-vigilante/demo" className="btn-primary text-base px-8 py-4">
             Testar Demo Grátis <ArrowRight size={18} />
           </Link>
           <Link href="/contact" className="btn-outline text-base px-8 py-4">
@@ -530,7 +531,7 @@ function StepsSection() {
           viewport={{ once: true }}
           className="mt-20 text-center"
         >
-          <Link href="/tools/social-vigilante" className="btn-primary text-base px-8 py-4">
+          <Link href="/tools/social-vigilante/demo" className="btn-primary text-base px-8 py-4">
             Comece agora <ArrowRight size={18} />
           </Link>
         </motion.div>
@@ -657,9 +658,72 @@ function CTASection() {
           <Link href="/contact" className="btn-primary text-base px-8 py-4">
             Agendar Demonstração <ArrowRight size={18} />
           </Link>
-          <Link href="/tools/social-vigilante" className="btn-outline text-base px-8 py-4">
+          <Link href="/tools/social-vigilante/demo" className="btn-outline text-base px-8 py-4">
             <Play size={16} /> Testar Demo Grátis
           </Link>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ============== MANIFESTO ============== */
+function ManifestoSection() {
+  return (
+    <section className="py-24 px-6 relative overflow-hidden bg-[#0A1628]">
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0A1628] via-[#0D1B2A] to-[#0A1628]" />
+      <div className="max-w-4xl mx-auto relative z-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-10"
+        >
+          <p className="text-[#00D9FF] text-sm font-semibold uppercase tracking-widest mb-4">
+            Por que existimos
+          </p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-2 text-white">
+            Cada paciente tem uma história
+          </h2>
+        </motion.div>
+
+        <motion.blockquote
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.15 }}
+          className="relative bg-white/[0.03] backdrop-blur-sm rounded-2xl p-8 md:p-12 border-l-4 border-[#00D9FF]"
+        >
+          <p className="text-white/80 text-lg md:text-2xl leading-relaxed italic font-light">
+            &ldquo;Alguém precisa explicar bem. Alguém precisa comunicar sem exageros.
+            Alguém precisa treinar o time para lidar com dúvidas. E alguém precisa
+            escutar sinais de risco no mundo real.&rdquo;
+          </p>
+          <p className="text-white/50 text-base md:text-lg mt-8 not-italic">
+            A Astrivia constrói essa cadeia para ser rápida, segura e auditável — porque
+            eficiência em Life Sciences não é economia: <span className="text-white font-medium">é cuidado.</span>
+          </p>
+        </motion.blockquote>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3 }}
+          className="grid md:grid-cols-3 gap-4 mt-10"
+        >
+          <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5 text-center hover:bg-white/[0.05] transition-colors">
+            <Mic size={24} className="text-[#00D9FF] mx-auto mb-3" />
+            <p className="text-white/70 text-sm">Campo treinado para conversas difíceis</p>
+          </div>
+          <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5 text-center hover:bg-white/[0.05] transition-colors">
+            <Shield size={24} className="text-[#10B981] mx-auto mb-3" />
+            <p className="text-white/70 text-sm">Marketing que comunica com segurança</p>
+          </div>
+          <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5 text-center hover:bg-white/[0.05] transition-colors">
+            <Globe size={24} className="text-[#A855F7] mx-auto mb-3" />
+            <p className="text-white/70 text-sm">Pós-mercado que escuta sinais antes</p>
+          </div>
         </motion.div>
       </div>
     </section>

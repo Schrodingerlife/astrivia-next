@@ -16,7 +16,7 @@ export default function MedSafePage() {
                 description={tool.description}
                 chips={tool.chips}
                 ctaHref={tool.demoHref}
-                ctaLabel="Iniciar Demo"
+                ctaLabel="Testar Demo"
                 imageSrc={tool.heroImage}
                 imageAlt="MedSafe - compliance regulatório"
                 accentColor={tool.accent}

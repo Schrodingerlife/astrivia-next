@@ -16,7 +16,7 @@ export default function PharmaRoleplayPage() {
                 description={tool.description}
                 chips={tool.chips}
                 ctaHref={tool.demoHref}
-                ctaLabel="Iniciar Demo"
+                ctaLabel="Testar Demo"
                 imageSrc={tool.heroImage}
                 imageAlt="PharmaRoleplay - treinamento por voz"
                 accentColor={tool.accent}

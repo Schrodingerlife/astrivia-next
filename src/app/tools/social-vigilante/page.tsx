@@ -16,7 +16,7 @@ export default function SocialVigilantePage() {
                 description={tool.description}
                 chips={tool.chips}
                 ctaHref={tool.demoHref}
-                ctaLabel="Iniciar Demo"
+                ctaLabel="Testar Demo"
                 imageSrc={tool.heroImage}
                 imageAlt="Social Vigilante - monitoramento pós-mercado"
                 accentColor={tool.accent}

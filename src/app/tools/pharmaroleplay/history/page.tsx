@@ -50,7 +50,7 @@ export default function HistoryPage() {
                         className="flex items-center justify-between mb-8"
                     >
                         <div className="flex items-center gap-4">
-                            <Link href="/tools/pharmaroleplay" className="text-white/30 hover:text-white transition-colors">
+                            <Link href="/tools/pharmaroleplay/dashboard" className="text-white/30 hover:text-white transition-colors">
                                 <ArrowLeft className="w-5 h-5" />
                             </Link>
                             <div>

@@ -29,10 +29,10 @@ export const toolsConfig: ToolConfig[] = [
     {
         slug: "pharmaroleplay",
         name: "PharmaRoleplay",
-        categoryLabel: "Treinamento por Voz",
-        headline: "Treine vendas por voz com um Medico IA",
+        categoryLabel: "TREINAMENTO POR VOZ",
+        headline: "Treine vendas por voz com um Médico IA",
         description:
-            "Simulador de conversas que treina representantes farmacêuticos com feedback em tempo real sobre tom, argumentação e eficácia.",
+            "Simulador de conversas que treina representantes farmacêuticos com feedback em tempo real sobre tom, argumentação e eficácia. Como um sparring partner que nunca cansa.",
         chips: ["Ramp-up 50% mais rápido", "<200ms latência", "24/7 disponível"],
         heroImage: "/images/product-pharmaroleplay.png",
         accent: "#00D9FF",
@@ -53,10 +53,10 @@ export const toolsConfig: ToolConfig[] = [
     {
         slug: "social-vigilante",
         name: "Social Vigilante",
-        categoryLabel: "Vigilância Pós-Mercado",
+        categoryLabel: "VIGILÂNCIA PÓS-MERCADO",
         headline: "Detecte eventos adversos antes dos reportes oficiais",
         description:
-            "Monitoramento contínuo de redes sociais, fóruns e canais públicos para antecipar sinais de farmacovigilância.",
+            "Monitoramento contínuo de redes sociais, fóruns e Reclame Aqui que capta sinais precoces de farmacovigilância. Alertas em tempo real para sua equipe de segurança.",
         chips: ["100% cobertura pública", "Terabytes/dia", "Alertas em tempo real"],
         heroImage: "/images/product-socialvigilante.png",
         accent: "#A855F7",
@@ -77,10 +77,10 @@ export const toolsConfig: ToolConfig[] = [
     {
         slug: "medsafe",
         name: "MedSafe",
-        categoryLabel: "Compliance Regulatório",
+        categoryLabel: "COMPLIANCE REGULATÓRIO",
         headline: "Audite materiais promocionais em segundos",
         description:
-            "IA auditora treinada na RDC 96 que analisa peças de marketing linha por linha, identifica claims não suportados e sugere correções.",
+            "IA auditora treinada na RDC 96 que analisa peças de marketing linha por linha, identifica claims não suportados e sugere correções — tudo com 100% de rastreabilidade.",
         chips: ["90% menos tempo de revisão", "Zero falsos positivos", "Auditoria completa"],
         heroImage: "/images/product-medsafe.png",
         accent: "#10B981",

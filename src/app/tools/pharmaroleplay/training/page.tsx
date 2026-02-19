@@ -53,7 +53,7 @@ export default function TrainingPage() {
                         animate={{ opacity: 1, y: 0 }}
                         className="flex items-center gap-4 mb-8"
                     >
-                        <Link href="/tools/pharmaroleplay" className="text-white/30 hover:text-white transition-colors">
+                        <Link href="/tools/pharmaroleplay/dashboard" className="text-white/30 hover:text-white transition-colors">
                             <ArrowLeft className="w-5 h-5" />
                         </Link>
                         <div>

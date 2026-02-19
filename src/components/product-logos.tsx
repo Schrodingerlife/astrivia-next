@@ -1,5 +1,36 @@
 "use client";
 
+/* ============== BRAND LOGO ============== */
+
+export function AstriviaSymbol({ size = 36 }: { size?: number }) {
+    return (
+        <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="as-main" x1="8" y1="6" x2="40" y2="44" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#00F0FF" />
+                    <stop offset="0.5" stopColor="#00D9FF" />
+                    <stop offset="1" stopColor="#00B8D4" />
+                </linearGradient>
+                <linearGradient id="as-glow" x1="24" y1="4" x2="24" y2="44" gradientUnits="userSpaceOnUse">
+                    <stop stopColor="#00F0FF" stopOpacity="0.6" />
+                    <stop offset="1" stopColor="#00D9FF" stopOpacity="0" />
+                </linearGradient>
+                <filter id="as-blur">
+                    <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" />
+                </filter>
+            </defs>
+            {/* Glow layer */}
+            <path d="M24 6L8 38H18L24 26L30 38H40L24 6Z" fill="url(#as-glow)" filter="url(#as-blur)" />
+            {/* Main triangle "A" shape */}
+            <path d="M24 8L10 37H17.5L24 23.5L30.5 37H38L24 8Z" fill="url(#as-main)" />
+            {/* Inner crossbar */}
+            <rect x="16" y="30" width="16" height="2.5" rx="1.25" fill="url(#as-main)" opacity="0.7" />
+            {/* Shine highlight */}
+            <path d="M24 8L18 20L24 14L30 20L24 8Z" fill="white" opacity="0.25" />
+        </svg>
+    );
+}
+
 /* ============== 3D-STYLE PRODUCT LOGOS ============== */
 /* Premium SVG logos with gradients, shadows, and 3D effects */
 

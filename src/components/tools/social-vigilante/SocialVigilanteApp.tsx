@@ -1,601 +1,229 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-    Activity,
-    AlertTriangle,
-    Search,
-    Filter,
-    BarChart3,
-    Share2,
-    MessageSquare,
-    ThumbsUp,
-    MoreHorizontal,
-    Globe,
-    Zap,
-    Loader2
-} from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { AlertTriangle, Globe, Loader2, Search, ShieldAlert, Sparkles, Zap } from "lucide-react";
 
-// Mock Data Types
+type Platform = "twitter" | "facebook" | "instagram" | "reddit" | "reclameaqui";
+type Risk = "critical" | "high" | "medium" | "low";
+type Sentiment = "negative" | "neutral" | "positive";
+type ViewMode = "feed" | "heatmap" | "sentiment";
+
 interface SocialPost {
     id: string;
-    platform: "twitter" | "instagram" | "reddit" | "reclameaqui";
+    platform: Platform;
     author: string;
-    handle: string;
-    avatar: string;
     content: string;
-    timestamp: string;
-    likes: number;
-    shares: number;
-    sentiment: "positive" | "neutral" | "negative";
-    riskLevel: "low" | "medium" | "high" | "critical";
-    aiAnalysis?: {
-        detectedEvent?: string;
-        drugMentioned?: string;
-        complianceFlag?: boolean;
-    };
-    status: "new" | "reviewing" | "resolved";
+    risk: Risk;
+    sentiment: Sentiment;
+    event: string;
+    createdAt: string;
 }
 
-const MOCK_POSTS_POOL: Omit<SocialPost, "id" | "timestamp" | "status">[] = [
-    {
-        platform: "twitter",
-        author: "Ana Paula Ferreira",
-        handle: "@anapaula_fer",
-        avatar: "https://i.pravatar.cc/150?u=anapaula1",
-        content: "Gente, comecei a tomar DRUG_NAME faz 3 semanas e estou com uma náusea constante que não passa. Meu médico disse pra continuar, mas tá difícil. Alguém mais passou por isso no início? 😰",
-        likes: 23,
-        shares: 7,
-        sentiment: "negative",
-        riskLevel: "high",
-        aiAnalysis: { detectedEvent: "Náusea persistente (SOC: Distúrbios gastrointestinais)", drugMentioned: "DRUG_NAME", complianceFlag: true }
+const platformMeta: Record<Platform, { short: string; label: string; className: string }> = {
+    twitter: { short: "X", label: "Twitter", className: "bg-black text-white border border-white/15" },
+    facebook: { short: "f", label: "Facebook", className: "bg-[#1877F2] text-white border border-[#60A5FA]/50" },
+    instagram: {
+        short: "IG",
+        label: "Instagram",
+        className: "bg-gradient-to-br from-[#F58529] via-[#DD2A7B] to-[#8134AF] text-white border border-[#E879F9]/40",
     },
-    {
-        platform: "reddit",
-        author: "MarcosFarma",
-        handle: "u/marcos_farma",
-        avatar: "https://i.pravatar.cc/150?u=marcos2",
-        content: "Alguém que toma DRUG_NAME notou alteração nos exames de função hepática? Minhas transaminases subiram bastante na última coleta e meu hepato pediu pra investigar. Estou preocupado se pode ser do medicamento.",
-        likes: 67,
-        shares: 12,
-        sentiment: "negative",
-        riskLevel: "critical",
-        aiAnalysis: { detectedEvent: "Hepatotoxicidade (elevação de ALT/AST)", drugMentioned: "DRUG_NAME", complianceFlag: true }
-    },
-    {
-        platform: "instagram",
-        author: "Dra. Camila Nutri",
-        handle: "@dracamilanutri",
-        avatar: "https://i.pravatar.cc/150?u=camila3",
-        content: "Vejo muitos pacientes usando DRUG_NAME por conta própria pra emagrecer, sem indicação médica. Isso é perigoso! O medicamento tem indicações específicas e efeitos colaterais sérios. Procurem orientação profissional 🙏",
-        likes: 2340,
-        shares: 189,
-        sentiment: "neutral",
-        riskLevel: "high",
-        aiAnalysis: { detectedEvent: "Uso off-label sem prescrição", drugMentioned: "DRUG_NAME", complianceFlag: true }
-    },
-    {
-        platform: "reclameaqui",
-        author: "Roberto Santos",
-        handle: "Cliente Verificado",
-        avatar: "https://i.pravatar.cc/150?u=roberto4",
-        content: "Comprei DRUG_NAME na farmácia e quando abri a embalagem o comprimido estava com manchas escuras e cheiro diferente do normal. Lote #BR2024-1847. Já registrei reclamação na ANVISA também. Estou com medo de ter tomado produto adulterado.",
-        likes: 0,
-        shares: 0,
-        sentiment: "negative",
-        riskLevel: "critical",
-        aiAnalysis: { detectedEvent: "Desvio de qualidade - alteração organoléptica", drugMentioned: "DRUG_NAME", complianceFlag: true }
-    },
-    {
-        platform: "twitter",
-        author: "Dr. Ricardo Endo",
-        handle: "@dr_endo_sp",
-        avatar: "https://i.pravatar.cc/150?u=ricardo5",
-        content: "Novo estudo publicado no NEJM mostra que DRUG_NAME pode ter benefício cardiovascular além da indicação primária. Precisamos acompanhar os dados de longo prazo antes de extrapolar, mas é promissor.",
-        likes: 156,
-        shares: 89,
-        sentiment: "positive",
-        riskLevel: "low",
-        aiAnalysis: { detectedEvent: "Benefício cardiovascular potencial (uso off-label)", drugMentioned: "DRUG_NAME", complianceFlag: false }
-    },
-    {
-        platform: "reddit",
-        author: "JuliaHealthBR",
-        handle: "u/julia_health",
-        avatar: "https://i.pravatar.cc/150?u=julia6",
-        content: "3 meses de DRUG_NAME e posso dizer: funciona, mas o preço é a adaptação gastrointestinal nas primeiras semanas. Diarreia, cólica, gases. Depois estabiliza. Minha dica: comece com dose baixa e suba devagar.",
-        likes: 234,
-        shares: 45,
-        sentiment: "neutral",
-        riskLevel: "medium",
-        aiAnalysis: { detectedEvent: "Distúrbios gastrointestinais (diarreia, flatulência)", drugMentioned: "DRUG_NAME", complianceFlag: true }
-    },
-    {
-        platform: "instagram",
-        author: "Pedro Treino",
-        handle: "@pedrotreino",
-        avatar: "https://i.pravatar.cc/150?u=pedro7",
-        content: "Galera da academia me indicou DRUG_NAME pra secar mais rápido kkk já encomendei, chega semana que vem. Bora ficar trincado 💪🔥 #fitness #emagrecimento",
-        likes: 567,
-        shares: 23,
-        sentiment: "positive",
-        riskLevel: "high",
-        aiAnalysis: { detectedEvent: "Uso recreativo/estético sem prescrição", drugMentioned: "DRUG_NAME", complianceFlag: true }
-    },
-    {
-        platform: "reclameaqui",
-        author: "Maria Conceição",
-        handle: "Cliente",
-        avatar: "https://i.pravatar.cc/150?u=maria8",
-        content: "Minha mãe de 72 anos tomou DRUG_NAME e começou a ter episódios de hipoglicemia severa, precisou ir ao pronto-socorro 2 vezes. O médico disse que pode ser interação com outro medicamento que ela toma. A bula não é clara sobre essa interação.",
-        likes: 3,
-        shares: 0,
-        sentiment: "negative",
-        riskLevel: "critical",
-        aiAnalysis: { detectedEvent: "Hipoglicemia severa - interação medicamentosa em idoso", drugMentioned: "DRUG_NAME", complianceFlag: true }
-    },
-    {
-        platform: "twitter",
-        author: "Flávia Costa",
-        handle: "@flavia_cst",
-        avatar: "https://i.pravatar.cc/150?u=flavia9",
-        content: "Estou no segundo mês de DRUG_NAME e finalmente os efeitos colaterais diminuíram. Valeu a persistência! Quem está no início, não desista. Melhora muito depois da adaptação.",
-        likes: 45,
-        shares: 8,
-        sentiment: "positive",
-        riskLevel: "low",
-        aiAnalysis: { detectedEvent: "Adaptação terapêutica positiva", drugMentioned: "DRUG_NAME", complianceFlag: false }
-    },
-    {
-        platform: "reddit",
-        author: "FarmaVigilante",
-        handle: "u/farma_vig",
-        avatar: "https://i.pravatar.cc/150?u=farmav10",
-        content: "PSA: Se vocês estão comprando DRUG_NAME pela internet sem receita, saibam que já foram apreendidos lotes falsificados pela PF. Só comprem em farmácias físicas com nota fiscal. Sério, não arrisquem a saúde.",
-        likes: 890,
-        shares: 234,
-        sentiment: "neutral",
-        riskLevel: "critical",
-        aiAnalysis: { detectedEvent: "Falsificação e venda ilegal", drugMentioned: "DRUG_NAME", complianceFlag: true }
-    },
-];
+    reddit: { short: "R", label: "Reddit", className: "bg-[#FF4500] text-white border border-[#FB923C]/45" },
+    reclameaqui: { short: "RA", label: "Reclame Aqui", className: "bg-[#2563EB] text-white border border-[#60A5FA]/45" },
+};
+
+const riskMeta: Record<Risk, { label: string; color: string; gauge: number }> = {
+    critical: { label: "Crítico", color: "text-red-300", gauge: 92 },
+    high: { label: "Alto", color: "text-orange-300", gauge: 78 },
+    medium: { label: "Médio", color: "text-cyan-300", gauge: 56 },
+    low: { label: "Baixo", color: "text-emerald-300", gauge: 34 },
+};
 
 interface SocialVigilanteAppProps {
     embedded?: boolean;
 }
 
+function badge(platform: Platform) {
+    const meta = platformMeta[platform];
+    return <span className={`inline-flex h-6 min-w-6 items-center justify-center rounded-md px-1.5 text-[10px] font-bold ${meta.className}`}>{meta.short}</span>;
+}
+
+function gaugeStyle(value: number) {
+    return { background: `conic-gradient(#A855F7 ${Math.max(8, value)}%, rgba(255,255,255,0.1) 0)` };
+}
+
+function hoursAgo(timestamp: string) {
+    const diff = Date.now() - new Date(timestamp).getTime();
+    return `${Math.max(1, Math.round(diff / 3600000))} horas atrás`;
+}
+
 export default function SocialVigilanteApp({ embedded = false }: SocialVigilanteAppProps) {
     const [posts, setPosts] = useState<SocialPost[]>([]);
-    const [stats, setStats] = useState({ highRisk: 0, processed: 0, sources: 0 });
-    const [isSimulating, setIsSimulating] = useState(false);
     const [searchTerm, setSearchTerm] = useState("Ozempic");
     const [activeTerm, setActiveTerm] = useState("");
-    const [activeView, setActiveView] = useState<"feed" | "heatmap" | "sentiment">("feed");
-    const [loading, setLoading] = useState(false);
-    const scrollRef = useRef<HTMLDivElement>(null);
-    const postIndexRef = useRef(0);
+    const [isMonitoring, setIsMonitoring] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [viewMode, setViewMode] = useState<ViewMode>("feed");
+    const [processed, setProcessed] = useState(0);
+    const [bars, setBars] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
-    // Initial Stats
-    useEffect(() => {
-        setStats({ highRisk: 12, processed: 1450, sources: 4 });
+    const highRisk = useMemo(() => posts.filter((post) => post.risk === "high" || post.risk === "critical").length, [posts]);
+    const critical = useMemo(() => posts.filter((post) => post.risk === "critical").length, [posts]);
+    const sentiment = useMemo(
+        () =>
+            posts.reduce(
+                (acc, post) => {
+                    acc[post.sentiment] += 1;
+                    return acc;
+                },
+                { negative: 0, neutral: 0, positive: 0 }
+            ),
+        [posts]
+    );
+    const alerts = useMemo(() => posts.filter((post) => post.risk === "critical" || post.risk === "high").slice(0, 4), [posts]);
+    const sources = useMemo(() => new Set(posts.map((post) => post.platform)).size, [posts]);
+    const formatNumber = (value: number) => new Intl.NumberFormat("pt-BR").format(value);
+
+    const addPosts = useCallback((incoming: SocialPost[]) => {
+        setPosts((prev) => [...incoming, ...prev].slice(0, 24));
+        setProcessed((prev) => prev + incoming.length);
+        setBars((prev) =>
+            prev.map((value) => {
+                const next = value + Math.floor((Math.random() - 0.45) * 20);
+                return Math.max(24, Math.min(95, next));
+            })
+        );
     }, []);
 
-    // Simulation Loop
-    useEffect(() => {
-        let interval: NodeJS.Timeout;
-
-        if (isSimulating && activeTerm) {
-            // Reset index on new search
-            postIndexRef.current = 0;
-
-            const fetchSimulation = async () => {
-                try {
-                    const response = await fetch("/api/social-vigilante/stream", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ keyword: activeTerm }),
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.posts && data.posts.length > 0) {
-                            addPosts(data.posts);
-                            return;
-                        }
-                    }
-                    throw new Error("API Failed or empty");
-                } catch (error) {
-                    console.warn("API unavailable, using local simulation:", error);
-                    simulateLocalPost();
-                }
-            };
-
-            const simulateLocalPost = () => {
-                // Pick next post sequentially from pool (cycles through all 10)
-                const idx = postIndexRef.current % MOCK_POSTS_POOL.length;
-                postIndexRef.current += 1;
-                const post = MOCK_POSTS_POOL[idx];
-
-                // Add realistic time variance
-                const minutesAgo = Math.floor(Math.random() * 45) + 1;
-                const newPost: SocialPost = {
-                    ...post,
-                    id: `local-${Date.now()}-${idx}`,
-                    timestamp: new Date(Date.now() - minutesAgo * 60000).toISOString(),
-                    status: "new" as const,
-                    content: post.content.replace(/DRUG_NAME/g, activeTerm),
-                    aiAnalysis: post.aiAnalysis ? {
-                        ...post.aiAnalysis,
-                        drugMentioned: activeTerm
-                    } : undefined,
-                };
-                addPosts([newPost]);
-            };
-
-            // First fetch immediately
-            fetchSimulation();
-
-            // Then every 4 seconds — one post at a time feels more realistic
-            interval = setInterval(fetchSimulation, 4000);
-        }
-
-        return () => clearInterval(interval);
-    }, [isSimulating, activeTerm]);
-
-    const addPosts = (newPosts: SocialPost[]) => {
-        setPosts(prev => {
-            const combined = [...newPosts, ...prev].slice(0, 50);
-            return combined;
-        });
-
-        // Update stats based on new batch
-        const newHighRisk = newPosts.filter(p => p.riskLevel === "high" || p.riskLevel === "critical").length;
-        setStats(prev => ({
-            processed: prev.processed + newPosts.length,
-            highRisk: prev.highRisk + newHighRisk,
-            sources: 4
-        }));
-    };
-
-    const handleStartSimulation = () => {
-        if (!searchTerm) return;
-        setPosts([]); // Clear previous
-        setActiveTerm(searchTerm);
-        setIsSimulating(true);
-        setLoading(true);
-        setTimeout(() => setLoading(false), 2000); // Fake logic loading for UI feel
-    };
-
-    const handleStopSimulation = () => {
-        setIsSimulating(false);
-    };
-
-    const getRiskColor = (level: string) => {
-        switch (level) {
-            case "critical": return "text-red-500 bg-red-500/10 border-red-500/20";
-            case "high": return "text-orange-500 bg-orange-500/10 border-orange-500/20";
-            case "medium": return "text-yellow-500 bg-yellow-500/10 border-yellow-500/20";
-            default: return "text-emerald-500 bg-emerald-500/10 border-emerald-500/20";
-        }
-    };
-
-    const getPlatformIcon = (platform: string) => {
-        switch (platform) {
-            case "twitter": return "🐦";
-            case "instagram": return "📷";
-            case "reddit": return "👽";
-            case "reclameaqui": return "📢";
-            default: return "🌐";
-        }
-    };
-
-    const sentimentBreakdown = posts.reduce(
-        (acc, post) => {
-            acc[post.sentiment] += 1;
-            return acc;
-        },
-        { positive: 0, neutral: 0, negative: 0 }
-    );
-
-    const recentAlerts = posts
-        .filter((post) => post.riskLevel === "critical" || post.riskLevel === "high")
-        .slice(0, 6);
-
-    const formatTimestamp = (isoDate: string) => {
+    const stream = useCallback(async (term: string) => {
         try {
-            return new Date(isoDate).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
-        } catch {
-            return "Agora";
+            const response = await fetch("/api/social-vigilante/stream", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ keyword: term }),
+            });
+            if (!response.ok) {
+                const payload = await response.json().catch(() => ({}));
+                throw new Error(payload?.error || "Falha no stream de monitoramento");
+            }
+            const data = await response.json();
+            if (!Array.isArray(data.posts)) throw new Error("Resposta inválida do stream");
+            const normalized = data.posts.slice(0, 3).map((post: any, idx: number): SocialPost => {
+                const platform = String(post.platform || "twitter").toLowerCase() as Platform;
+                return {
+                    id: post.id || `api-${Date.now()}-${idx}`,
+                    platform: platformMeta[platform] ? platform : "twitter",
+                    author: post.author || "@monitoring",
+                    content: String(post.content || "").slice(0, 190),
+                    risk: (post.riskLevel || "medium") as Risk,
+                    sentiment: (post.sentiment || "neutral") as Sentiment,
+                    event: post.aiAnalysis?.detectedEvent || "Evento em análise",
+                    createdAt: post.timestamp || new Date().toISOString(),
+                };
+            });
+            setError(null);
+            addPosts(normalized);
+        } catch (streamError) {
+            const message = streamError instanceof Error ? streamError.message : "Falha no monitoramento";
+            setError(message);
+            setIsMonitoring(false);
+            setIsLoading(false);
         }
+    }, [addPosts]);
+
+    useEffect(() => {
+        if (!isMonitoring || !activeTerm) return;
+        let mounted = true;
+        stream(activeTerm).finally(() => mounted && setIsLoading(false));
+        const timer = setInterval(() => stream(activeTerm), 4200);
+        return () => {
+            mounted = false;
+            clearInterval(timer);
+        };
+    }, [isMonitoring, activeTerm, stream]);
+
+    const start = () => {
+        if (!searchTerm.trim()) return;
+        setPosts([]);
+        setProcessed(0);
+        setBars([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+        setError(null);
+        setActiveTerm(searchTerm.trim());
+        setIsMonitoring(true);
+        setIsLoading(true);
     };
 
     return (
-        <div className={`flex ${embedded ? "h-full min-h-[720px]" : "h-[calc(100vh-80px)]"} bg-[#050B14] text-white overflow-hidden font-sans`}>
-            {/* Sidebar / Stats */}
-            <div className="w-80 bg-[#0A1628]/50 border-r border-white/5 p-6 flex flex-col gap-6 hidden md:flex">
-                <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400">
-                        <Globe size={20} />
-                    </div>
+        <div className={`flex overflow-hidden text-white ${embedded ? "h-full min-h-[760px]" : "h-[calc(100vh-82px)]"} bg-[radial-gradient(circle_at_20%_0%,#22103f_0%,#0b1330_36%,#050913_78%)]`}>
+            <aside className="hidden md:flex w-[320px] shrink-0 border-r border-white/10 bg-[#090f24]/80 backdrop-blur-xl p-6 flex-col gap-5">
+                <header className="flex items-center gap-3">
+                    <div className="h-11 w-11 rounded-xl bg-[#2a1a4f] border border-[#8b5cf6]/35 text-[#c4b5fd] grid place-items-center"><Globe size={19} /></div>
                     <div>
-                        <h2 className="font-bold text-lg leading-tight">Social Vigilante</h2>
-                        <span className="text-xs text-white/40 flex items-center gap-1">
-                            {isSimulating ? (
-                                <>
-                                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                                    Monitoring: <span className="text-white ml-1">{activeTerm}</span>
-                                </>
-                            ) : (
-                                <>
-                                    <span className="w-2 h-2 rounded-full bg-gray-500" />
-                                    Offline
-                                </>
-                            )}
-                        </span>
+                        <p className="text-2xl font-semibold leading-none">Social Vigilante</p>
+                        <p className="mt-1 text-sm text-white/60">{isMonitoring ? `Monitorando: ${activeTerm}` : "Offline"}</p>
+                        {error ? <p className="mt-1 text-[11px] text-rose-300">{error}</p> : null}
                     </div>
+                </header>
+                <div className="grid grid-cols-3 gap-2.5">
+                    <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><p className="text-xs text-white/55">Processados</p><p className="text-4xl font-semibold leading-tight mt-1">{formatNumber(processed)}</p></div>
+                    <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><p className="text-xs text-white/55">Alto Risco</p><p className="text-4xl font-semibold leading-tight mt-1 text-[#FB7185]">{formatNumber(highRisk)}</p></div>
+                    <div className="rounded-2xl border border-white/10 bg-black/25 p-3"><p className="text-xs text-white/55">Fontes</p><p className="text-4xl font-semibold leading-tight mt-1 text-[#A78BFA]">{formatNumber(sources)}</p></div>
                 </div>
+                <section className="flex-1 rounded-2xl border border-white/10 bg-black/25 p-4">
+                    <div className="flex items-center justify-between mb-3"><p className="text-xl font-semibold">Velocidade de Sinais</p><Zap size={15} className="text-cyan-300" /></div>
+                    <div className="h-[320px] flex items-end gap-2">{bars.map((h, i) => <div key={`${h}-${i}`} className="flex-1 rounded-t-md bg-gradient-to-t from-[#1f5562] to-[#2dd4bf]" style={{ height: `${Math.max(4, h)}%` }} />)}</div>
+                </section>
+            </aside>
 
-                {/* Metrics */}
-                <div className="grid grid-cols-3 gap-3">
-                    <div className="glass p-4 rounded-xl border border-white/5">
-                        <div className="text-white/40 text-xs mb-1">Processados</div>
-                        <div className="text-2xl font-bold font-mono">{stats.processed}</div>
-                    </div>
-                    <div className="glass p-4 rounded-xl border border-white/5">
-                        <div className="text-white/40 text-xs mb-1">Alto Risco</div>
-                        <div className="text-2xl font-bold font-mono text-red-400">{stats.highRisk}</div>
-                    </div>
-                    <div className="glass p-4 rounded-xl border border-white/5">
-                        <div className="text-white/40 text-xs mb-1">Fontes</div>
-                        <div className="text-2xl font-bold font-mono text-cyan-300">{stats.sources}</div>
-                    </div>
+            <main className="flex-1 flex flex-col border-r border-white/10 min-w-0">
+                <div className="h-[78px] border-b border-white/10 bg-[#0b1633]/65 px-6 flex items-center gap-3">
+                    <div className="h-11 flex-1 rounded-xl border border-white/15 bg-[#0a152d] px-4 flex items-center gap-3"><Search size={16} className="text-white/45" /><input value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} onKeyDown={(e) => e.key === "Enter" && start()} placeholder="Ozempic" className="w-full bg-transparent border-none outline-none text-base text-white placeholder:text-white/35" /></div>
+                    <button onClick={isMonitoring ? () => setIsMonitoring(false) : start} disabled={isLoading} className={`h-11 px-5 rounded-xl text-sm font-semibold border inline-flex items-center gap-2 ${isMonitoring ? "border-rose-400/40 bg-rose-500/15 text-rose-200" : "border-cyan-400/45 bg-cyan-500/15 text-cyan-200"}`}>{isLoading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}{isMonitoring ? "Parar Monitoramento" : "Iniciar Monitoramento"}</button>
                 </div>
-
-                {/* Active Signals Chart Mockup */}
-                <div className="glass p-4 rounded-xl border border-white/5 flex-1 flex flex-col">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-semibold text-sm">Velocidade de Sinais</h3>
-                        <Activity size={14} className="text-cyan-400" />
-                    </div>
-                    <div className="flex-1 flex items-end gap-1 h-32 relative">
-                        {/* Fake Bar Chart */}
-                        {[40, 65, 30, 80, 55, 90, 45, 60, 75, 50].map((h, i) => (
-                            <div
-                                key={i}
-                                className="flex-1 bg-gradient-to-t from-cyan-500/20 to-cyan-400/80 rounded-t-sm transition-all duration-500"
-                                style={{ height: `${isSimulating ? Math.random() * 100 : h}%` }}
-                            />
-                        ))}
-                    </div>
-                </div>
-            </div>
-
-            {/* Main Feed */}
-            <div className="flex-1 flex flex-col max-w-4xl border-r border-white/5">
-                {/* Header */}
-                <div className="h-20 border-b border-white/5 flex items-center justify-between px-6 bg-[#0A1628]/30 backdrop-blur-md sticky top-0 z-10">
-                    <div className="flex items-center gap-4 bg-white/5 rounded-lg px-4 py-2 w-96 border border-white/10 focus-within:border-cyan-500/50 transition-colors">
-                        <Search size={16} className="text-white/40" />
-                        <input
-                            type="text"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            placeholder="Nome do medicamento (ex: Ozempic, Rivotril, Ritalina)..."
-                            className="bg-transparent border-none outline-none text-sm w-full placeholder:text-white/20 text-white"
-                            onKeyDown={(e) => e.key === 'Enter' && handleStartSimulation()}
-                        />
-                    </div>
-
-                    <button
-                        onClick={isSimulating ? handleStopSimulation : handleStartSimulation}
-                        disabled={loading}
-                        className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 ${isSimulating
-                            ? "bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20"
-                            : "bg-cyan-500/10 text-cyan-400 hover:bg-cyan-500/20 border border-cyan-500/20"
-                            }`}
-                    >
-                        {loading ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
-                        {isSimulating ? "Parar" : "Iniciar Monitoramento"}
-                    </button>
-                </div>
-
-                <div className="px-6 py-3 border-b border-white/5 bg-[#0A1628]/20 flex items-center gap-2">
-                    {[
-                        { id: "feed", label: "Feed ao Vivo" },
-                        { id: "heatmap", label: "Mapa de Calor" },
-                        { id: "sentiment", label: "Sentimento" },
-                    ].map((view) => (
-                        <button
-                            key={view.id}
-                            type="button"
-                            onClick={() => setActiveView(view.id as "feed" | "heatmap" | "sentiment")}
-                            className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${activeView === view.id
-                                ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-200"
-                                : "border-white/10 bg-white/[0.02] text-white/55 hover:text-white/80"
-                                }`}
-                        >
-                            {view.label}
+                <div className="h-[58px] border-b border-white/10 px-6 flex items-center gap-2 bg-[#0b1330]/60">
+                    {(["feed", "heatmap", "sentiment"] as ViewMode[]).map((tab) => (
+                        <button key={tab} onClick={() => setViewMode(tab)} className={`px-3 py-1.5 rounded-lg text-xs border ${viewMode === tab ? "border-[#8B5CF6]/55 bg-[#7C3AED]/20 text-[#DDD6FE]" : "border-white/10 text-white/60"}`}>
+                            {tab === "feed" ? "Feed ao Vivo" : tab === "heatmap" ? "Mapa de Calor" : "Sentimento"}
                         </button>
                     ))}
                 </div>
 
-                {/* Feed List */}
-                <div className="flex-1 overflow-y-auto p-6 scrollbar-hide space-y-4 relative" ref={scrollRef}>
-                    {activeView === "heatmap" && (
-                        <div className="h-full rounded-2xl border border-white/10 bg-gradient-to-br from-[#171E30] via-[#0E1524] to-[#171126] p-4 relative overflow-hidden">
-                            <p className="text-sm text-white/70 mb-3">Mapa Global de Menções</p>
-                            {[{ x: "15%", y: "45%" }, { x: "51%", y: "34%" }, { x: "65%", y: "48%" }, { x: "82%", y: "60%" }, { x: "42%", y: "66%" }].map((dot, idx) => (
-                                <span key={idx} className="absolute h-7 w-7 rounded-full bg-[#A855F7]/60 blur-[2px]" style={{ left: dot.x, top: dot.y }} />
-                            ))}
-                            <div className="absolute bottom-4 left-4 right-4 grid grid-cols-3 gap-2 text-xs">
-                                <div className="rounded-lg border border-white/10 bg-black/30 p-2 text-white/70">Clusters: {recentAlerts.length}</div>
-                                <div className="rounded-lg border border-white/10 bg-black/30 p-2 text-white/70">Termo: {activeTerm || searchTerm}</div>
-                                <div className="rounded-lg border border-white/10 bg-black/30 p-2 text-white/70">Atualização: agora</div>
-                            </div>
+                <div className="flex-1 overflow-y-auto p-5">
+                    {!isMonitoring && posts.length === 0 ? (
+                        <div className="h-full rounded-3xl border border-white/10 bg-black/20 flex items-center justify-center text-center px-6"><div><Globe size={42} className="mx-auto mb-3 text-white/40" /><p className="text-white/60">Digite o nome de um medicamento e inicie o monitoramento para capturar sinais.</p></div></div>
+                    ) : null}
+
+                    {(isMonitoring || posts.length > 0) && viewMode === "feed" ? (
+                        <div className="grid xl:grid-cols-[1.1fr_0.9fr] gap-4 min-h-[620px]">
+                            <section className="rounded-2xl border border-white/10 bg-[#0b1227]/80 p-3"><p className="text-xs text-white/65 mb-2">Feed de Mídias Sociais em Tempo Real</p><div className="space-y-2 max-h-[640px] overflow-y-auto pr-1">{posts.map((post) => <article key={post.id} className="rounded-xl border border-white/10 bg-white/[0.03] p-3"><div className="flex items-start gap-2">{badge(post.platform)}<div className="min-w-0 flex-1"><div className="flex items-center justify-between gap-2 mb-1"><p className="text-xs font-semibold text-white/90 truncate">{post.author}</p><p className="text-[10px] text-white/45">{hoursAgo(post.createdAt)}</p></div><p className="text-[11px] text-white/70 leading-relaxed line-clamp-2">{post.content}</p><p className="mt-1 text-[10px] text-white/45 truncate">{activeTerm}: {post.event}</p></div><div className="w-12 shrink-0"><div className="h-9 w-9 rounded-full p-1.5 ml-auto" style={gaugeStyle(riskMeta[post.risk].gauge)}><div className="h-full w-full rounded-full bg-[#101935] grid place-items-center text-[9px] text-white/80">{riskMeta[post.risk].gauge}</div></div><p className={`mt-1 text-[10px] text-right ${riskMeta[post.risk].color}`}>{riskMeta[post.risk].label}</p></div></div></article>)}</div></section>
+                            <section className="grid grid-rows-[1.05fr_auto_auto] gap-4">
+                                <article className="rounded-2xl border border-white/10 bg-[#101629] p-3 relative overflow-hidden"><p className="text-xs text-white/65 mb-2">Mapa de Calor de Menções</p><div className="absolute inset-0 opacity-65 bg-[radial-gradient(circle_at_20%_30%,rgba(168,85,247,0.2),transparent_35%),radial-gradient(circle_at_80%_45%,rgba(236,72,153,0.16),transparent_32%),radial-gradient(circle_at_55%_70%,rgba(59,130,246,0.13),transparent_36%)]" /><div className="absolute inset-x-4 top-10 bottom-6 rounded-xl border border-white/10 bg-[#101827]/75">{[{ l: "17%", t: "36%", s: 16 }, { l: "24%", t: "53%", s: 13 }, { l: "47%", t: "34%", s: 18 }, { l: "66%", t: "49%", s: 15 }, { l: "81%", t: "65%", s: 11 }].map((p, i) => <span key={`${p.l}-${i}`} className="absolute rounded-full bg-[#C084FC]/65 shadow-[0_0_18px_rgba(192,132,252,0.8)]" style={{ left: p.l, top: p.t, width: p.s, height: p.s }} />)}</div></article>
+                                <div className="grid sm:grid-cols-2 gap-4">
+                                    <article className="rounded-2xl border border-white/10 bg-[#101629] p-4"><p className="text-xs text-white/65 mb-3">Análise de Sentimento Geral</p><div className="h-[100px] w-[100px] rounded-full mx-auto p-2" style={gaugeStyle(Math.min(98, 58 + sentiment.negative * 5))}><div className="h-full w-full rounded-full bg-[#101935] grid place-items-center"><span className="text-xl font-semibold text-white">{Math.min(99, 55 + sentiment.negative * 2)}%</span></div></div><div className="mt-3 grid grid-cols-3 gap-2 text-[11px] text-center"><p className="text-red-300">Neg {sentiment.negative}</p><p className="text-white/70">Neu {sentiment.neutral}</p><p className="text-emerald-300">Pos {sentiment.positive}</p></div></article>
+                                    <article className="rounded-2xl border border-white/10 bg-[#101629] p-4"><p className="text-xs text-white/65 mb-3">Reações Adversas Detectadas</p><div className="space-y-2 text-[11px]">{alerts.slice(0, 3).map((post) => <div key={post.id} className="rounded-lg border border-white/10 bg-white/[0.03] p-2"><p className="text-white/85 truncate">{post.event}</p><div className="mt-1 flex items-center justify-between text-white/50"><span>{platformMeta[post.platform].label}</span><span className={riskMeta[post.risk].color}>{riskMeta[post.risk].label}</span></div></div>)}{alerts.length === 0 ? <p className="text-white/45">Sem alertas críticos no momento.</p> : null}</div></article>
+                                </div>
+                                <article className="rounded-2xl border border-white/10 bg-[#101629] p-4"><p className="text-xs text-white/65 mb-3">Tendências de Volume</p><div className="h-[120px] grid grid-cols-10 gap-1.5 items-end">{[18, 42, 33, 64, 41, 71, 39, 58, 49, 67].map((v, i) => <div key={`${v}-${i}`} className="rounded-t bg-gradient-to-t from-[#4C1D95] via-[#7C3AED] to-[#C084FC]" style={{ height: `${v}%` }} />)}</div></article>
+                            </section>
                         </div>
-                    )}
+                    ) : null}
 
-                    {activeView === "sentiment" && (
-                        <div className="grid md:grid-cols-2 gap-4">
-                            <div className="rounded-2xl border border-white/10 bg-[#0A1628]/45 p-5">
-                                <p className="text-sm font-semibold text-white/80 mb-4">Distribuição de Sentimento</p>
-                                <div className="space-y-3">
-                                    {[
-                                        { label: "Negativo", value: sentimentBreakdown.negative, color: "from-red-500/70 to-red-300/60" },
-                                        { label: "Neutro", value: sentimentBreakdown.neutral, color: "from-yellow-500/70 to-yellow-300/60" },
-                                        { label: "Positivo", value: sentimentBreakdown.positive, color: "from-emerald-500/70 to-emerald-300/60" },
-                                    ].map((item) => (
-                                        <div key={item.label}>
-                                            <div className="flex items-center justify-between text-xs text-white/60 mb-1">
-                                                <span>{item.label}</span>
-                                                <span>{item.value}</span>
-                                            </div>
-                                            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
-                                                <div className={`h-full bg-gradient-to-r ${item.color}`} style={{ width: `${posts.length === 0 ? 0 : Math.max(8, (item.value / posts.length) * 100)}%` }} />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="rounded-2xl border border-white/10 bg-[#0A1628]/45 p-5">
-                                <p className="text-sm font-semibold text-white/80 mb-4">Volume por Janela</p>
-                                <div className="h-[230px] flex items-end gap-2">
-                                    {[14, 22, 18, 29, 35, 21, 27, 31, 24, 19].map((n, idx) => (
-                                        <div key={idx} className="flex-1 rounded-t-md bg-gradient-to-t from-[#00D9FF]/25 to-[#00D9FF]/75" style={{ height: `${n * 2.2}%` }} />
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeView === "feed" && (
-                        <>
-                            {!isSimulating && posts.length === 0 && (
-                                <div className="flex flex-col items-center justify-center h-full text-white/30">
-                                    <Globe size={48} className="mb-4 opacity-50" />
-                                    <p>Digite o nome de um medicamento e inicie o monitoramento para capturar sinais.</p>
-                                </div>
-                            )}
-
-                            <AnimatePresence initial={false}>
-                                {posts.map((post) => (
-                                    <motion.div
-                                        key={post.id}
-                                        layout
-                                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, scale: 0.9 }}
-                                        transition={{ duration: 0.3 }}
-                                        className={`relative group rounded-2xl p-5 border transition-all hover:border-white/10 ${post.status === "new" ? "bg-[#0F1C2E]/60 border-[#00D9FF]/20" : "bg-[#0A1628]/40 border-white/5"
-                                            }`}
-                                    >
-                                        {post.riskLevel === "critical" || post.riskLevel === "high" ? (
-                                            <div className="absolute -top-2 -right-2">
-                                                <span className="relative flex h-4 w-4">
-                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
-                                                </span>
-                                            </div>
-                                        ) : null}
-
-                                        <div className="flex gap-4">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img src={post.avatar} alt={post.author} className="w-12 h-12 rounded-full border border-white/10" />
-
-                                            <div className="flex-1">
-                                                <div className="flex items-center justify-between mb-2">
-                                                    <div className="flex items-center gap-2">
-                                                        <span className="font-bold text-sm">{post.author}</span>
-                                                        <span className="text-white/40 text-xs">{post.handle}</span>
-                                                        <span className="text-lg leading-none opacity-80" title={post.platform}>
-                                                            {getPlatformIcon(post.platform)}
-                                                        </span>
-                                                    </div>
-                                                    <div className="flex items-center gap-2">
-                                                        <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded border ${getRiskColor(post.riskLevel)}`}>
-                                                            {post.riskLevel} Risk
-                                                        </span>
-                                                        <span className="text-white/25 text-xs">{formatTimestamp(post.timestamp)}</span>
-                                                    </div>
-                                                </div>
-
-                                                <p className="text-white/80 text-sm leading-relaxed mb-4">{post.content}</p>
-
-                                                {post.aiAnalysis && (
-                                                    <div className="bg-[#A855F7]/5 border border-[#A855F7]/10 rounded-lg p-3 mb-3 flex items-start gap-3">
-                                                        <Zap size={16} className="text-[#A855F7] shrink-0 mt-0.5" />
-                                                        <div className="flex-1">
-                                                            <div className="flex gap-4 text-xs mb-1">
-                                                                <span className="text-white/40">Evento Detectado:</span>
-                                                                <span className="text-[#A855F7] font-medium">{post.aiAnalysis.detectedEvent || "None"}</span>
-                                                            </div>
-                                                            <div className="flex gap-4 text-xs">
-                                                                <span className="text-white/40">Medicamento:</span>
-                                                                <span className="text-white/80">{post.aiAnalysis.drugMentioned}</span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                <div className="flex items-center justify-between">
-                                                    <div className="flex items-center gap-3 text-xs text-white/40">
-                                                        <span className="inline-flex items-center gap-1"><ThumbsUp size={12} />{post.likes}</span>
-                                                        <span className="inline-flex items-center gap-1"><Share2 size={12} />{post.shares}</span>
-                                                        <span className="inline-flex items-center gap-1"><MessageSquare size={12} />Discussão</span>
-                                                    </div>
-                                                    <button className="text-white/35 hover:text-white/75">
-                                                        <MoreHorizontal size={14} />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </AnimatePresence>
-                        </>
-                    )}
+                    {viewMode === "heatmap" ? <article className="rounded-3xl border border-white/10 bg-[#0f1833] p-6 min-h-[620px] relative overflow-hidden"><p className="text-sm text-white/75">Mapa global de clusters para {activeTerm || searchTerm}</p><div className="absolute inset-6 rounded-2xl border border-white/10 bg-[#121c39]" /></article> : null}
+                    {viewMode === "sentiment" ? <section className="grid lg:grid-cols-2 gap-4 min-h-[620px]"><article className="rounded-2xl border border-white/10 bg-[#101629] p-6"><p className="text-sm text-white/75 mb-5">Distribuição de sentimento</p><div className="space-y-4">{(["negative", "neutral", "positive"] as Sentiment[]).map((key) => { const total = Math.max(1, posts.length); const count = sentiment[key]; const width = Math.max(8, Math.round((count / total) * 100)); const color = key === "negative" ? "from-red-500 to-rose-300" : key === "neutral" ? "from-slate-500 to-slate-300" : "from-emerald-500 to-emerald-300"; return <div key={key}><div className="mb-1 flex items-center justify-between text-xs text-white/70"><span>{key === "negative" ? "Negativo" : key === "neutral" ? "Neutro" : "Positivo"}</span><span>{count}</span></div><div className="h-2.5 rounded-full bg-white/10 overflow-hidden"><div className={`h-full bg-gradient-to-r ${color}`} style={{ width: `${width}%` }} /></div></div>; })}</div></article><article className="rounded-2xl border border-white/10 bg-[#101629] p-6"><p className="text-sm text-white/75 mb-5">Reações adversas por severidade</p><div className="space-y-3">{(["critical", "high", "medium", "low"] as Risk[]).map((risk) => <div key={risk} className="rounded-lg border border-white/10 bg-white/[0.02] p-3 flex items-center justify-between"><p className={`text-sm ${riskMeta[risk].color}`}>{riskMeta[risk].label}</p><p className="text-sm font-semibold text-white">{posts.filter((post) => post.risk === risk).length}</p></div>)}</div></article></section> : null}
                 </div>
-            </div>
+            </main>
 
-            {/* Right Panel */}
-            <div className="w-[320px] bg-[#0A1628]/30 hidden lg:flex flex-col p-6 border-l border-white/5">
-                <h3 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-6">Alertas Recentes</h3>
-
+            <aside className="hidden xl:flex w-[300px] shrink-0 bg-[#091229]/80 border-l border-white/10 p-5 flex-col">
+                <h3 className="text-sm uppercase tracking-[0.14em] text-white/70 mb-4">Alertas Recentes</h3>
                 <div className="grid grid-cols-2 gap-2 mb-4">
-                    <div className="rounded-lg border border-white/10 bg-white/[0.02] p-2.5">
-                        <p className="text-[11px] text-white/45">Negativo</p>
-                        <p className="text-lg font-semibold text-red-300">{sentimentBreakdown.negative}</p>
-                    </div>
-                    <div className="rounded-lg border border-white/10 bg-white/[0.02] p-2.5">
-                        <p className="text-[11px] text-white/45">Crítico/Alto</p>
-                        <p className="text-lg font-semibold text-orange-300">{recentAlerts.length}</p>
-                    </div>
+                    <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5"><p className="text-[11px] text-white/50">Negativo</p><p className="text-3xl font-semibold text-red-300">{formatNumber(sentiment.negative)}</p></div>
+                    <div className="rounded-lg border border-white/10 bg-white/[0.03] p-2.5"><p className="text-[11px] text-white/50">Crítico/Alto</p><p className="text-3xl font-semibold text-orange-300">{formatNumber(critical + alerts.length)}</p></div>
                 </div>
-
-                <div className="space-y-3 overflow-y-auto pr-1">
-                    {recentAlerts.length === 0 && (
-                        <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-xs text-white/45">
-                            Nenhum alerta crítico no momento.
-                        </div>
-                    )}
-
-                    {recentAlerts.map((post) => (
-                        <div key={`alert-${post.id}`} className="flex gap-3 items-start p-3 rounded-lg bg-white/[0.02] border border-white/10">
-                            <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">
-                                <AlertTriangle size={14} />
-                            </div>
-                            <div>
-                                <div className="text-xs font-bold text-white/90">
-                                    {post.aiAnalysis?.detectedEvent || "Sinal de risco detectado"}
-                                </div>
-                                <div className="text-[10px] text-white/50 mb-1">{post.author} • {formatTimestamp(post.timestamp)}</div>
-                                <div className="text-[10px] text-orange-400 uppercase">{post.riskLevel}</div>
-                            </div>
-                        </div>
-                    ))}
+                <div className="space-y-2 overflow-y-auto pr-1">
+                    {alerts.length === 0 ? <div className="rounded-lg border border-white/10 bg-white/[0.03] p-3 text-xs text-white/45">Nenhum alerta crítico no momento.</div> : null}
+                    {alerts.map((post) => <article key={`alert-${post.id}`} className="rounded-xl border border-white/10 bg-white/[0.03] p-3"><div className="flex items-start gap-2"><div className="h-7 w-7 rounded-full bg-[#7c2d12]/45 text-orange-300 grid place-items-center shrink-0"><AlertTriangle size={13} /></div><div className="min-w-0"><p className="text-xs font-semibold text-white/90 line-clamp-2">{post.event}</p><p className="text-[10px] text-white/50 mt-1">{post.author} • {hoursAgo(post.createdAt)}</p><div className="mt-1 flex items-center gap-2">{badge(post.platform)}<span className={`text-[10px] ${riskMeta[post.risk].color}`}>{riskMeta[post.risk].label}</span></div></div></div></article>)}
                 </div>
-            </div>
+                <div className="mt-3 rounded-lg border border-[#7c3aed]/40 bg-[#6d28d9]/15 px-3 py-2 text-[11px] text-[#ddd6fe]"><ShieldAlert size={13} className="inline mr-1" />Detecção de cluster ativo para {activeTerm || searchTerm}.</div>
+            </aside>
         </div>
     );
 }
