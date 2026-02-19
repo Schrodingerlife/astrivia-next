@@ -171,6 +171,7 @@ export default function SocialVigilanteApp({ embedded = false }: SocialVigilante
     const [isSimulating, setIsSimulating] = useState(false);
     const [searchTerm, setSearchTerm] = useState("Ozempic");
     const [activeTerm, setActiveTerm] = useState("");
+    const [activeView, setActiveView] = useState<"feed" | "heatmap" | "sentiment">("feed");
     const [loading, setLoading] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
     const postIndexRef = useRef(0);
@@ -289,6 +290,26 @@ export default function SocialVigilanteApp({ embedded = false }: SocialVigilante
         }
     };
 
+    const sentimentBreakdown = posts.reduce(
+        (acc, post) => {
+            acc[post.sentiment] += 1;
+            return acc;
+        },
+        { positive: 0, neutral: 0, negative: 0 }
+    );
+
+    const recentAlerts = posts
+        .filter((post) => post.riskLevel === "critical" || post.riskLevel === "high")
+        .slice(0, 6);
+
+    const formatTimestamp = (isoDate: string) => {
+        try {
+            return new Date(isoDate).toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+        } catch {
+            return "Agora";
+        }
+    };
+
     return (
         <div className={`flex ${embedded ? "h-full min-h-[720px]" : "h-[calc(100vh-80px)]"} bg-[#050B14] text-white overflow-hidden font-sans`}>
             {/* Sidebar / Stats */}
@@ -316,7 +337,7 @@ export default function SocialVigilanteApp({ embedded = false }: SocialVigilante
                 </div>
 
                 {/* Metrics */}
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-3 gap-3">
                     <div className="glass p-4 rounded-xl border border-white/5">
                         <div className="text-white/40 text-xs mb-1">Processados</div>
                         <div className="text-2xl font-bold font-mono">{stats.processed}</div>
@@ -324,6 +345,10 @@ export default function SocialVigilanteApp({ embedded = false }: SocialVigilante
                     <div className="glass p-4 rounded-xl border border-white/5">
                         <div className="text-white/40 text-xs mb-1">Alto Risco</div>
                         <div className="text-2xl font-bold font-mono text-red-400">{stats.highRisk}</div>
+                    </div>
+                    <div className="glass p-4 rounded-xl border border-white/5">
+                        <div className="text-white/40 text-xs mb-1">Fontes</div>
+                        <div className="text-2xl font-bold font-mono text-cyan-300">{stats.sources}</div>
                     </div>
                 </div>
 
@@ -375,110 +400,200 @@ export default function SocialVigilanteApp({ embedded = false }: SocialVigilante
                     </button>
                 </div>
 
+                <div className="px-6 py-3 border-b border-white/5 bg-[#0A1628]/20 flex items-center gap-2">
+                    {[
+                        { id: "feed", label: "Feed ao Vivo" },
+                        { id: "heatmap", label: "Mapa de Calor" },
+                        { id: "sentiment", label: "Sentimento" },
+                    ].map((view) => (
+                        <button
+                            key={view.id}
+                            type="button"
+                            onClick={() => setActiveView(view.id as "feed" | "heatmap" | "sentiment")}
+                            className={`px-3 py-1.5 rounded-lg text-xs border transition-colors ${activeView === view.id
+                                ? "border-cyan-500/40 bg-cyan-500/15 text-cyan-200"
+                                : "border-white/10 bg-white/[0.02] text-white/55 hover:text-white/80"
+                                }`}
+                        >
+                            {view.label}
+                        </button>
+                    ))}
+                </div>
+
                 {/* Feed List */}
                 <div className="flex-1 overflow-y-auto p-6 scrollbar-hide space-y-4 relative" ref={scrollRef}>
-                    {!isSimulating && posts.length === 0 && (
-                        <div className="flex flex-col items-center justify-center h-full text-white/30">
-                            <Globe size={48} className="mb-4 opacity-50" />
-                            <p>Digite o nome de um medicamento e inicie o monitoramento para capturar sinais.</p>
+                    {activeView === "heatmap" && (
+                        <div className="h-full rounded-2xl border border-white/10 bg-gradient-to-br from-[#171E30] via-[#0E1524] to-[#171126] p-4 relative overflow-hidden">
+                            <p className="text-sm text-white/70 mb-3">Mapa Global de Menções</p>
+                            {[{ x: "15%", y: "45%" }, { x: "51%", y: "34%" }, { x: "65%", y: "48%" }, { x: "82%", y: "60%" }, { x: "42%", y: "66%" }].map((dot, idx) => (
+                                <span key={idx} className="absolute h-7 w-7 rounded-full bg-[#A855F7]/60 blur-[2px]" style={{ left: dot.x, top: dot.y }} />
+                            ))}
+                            <div className="absolute bottom-4 left-4 right-4 grid grid-cols-3 gap-2 text-xs">
+                                <div className="rounded-lg border border-white/10 bg-black/30 p-2 text-white/70">Clusters: {recentAlerts.length}</div>
+                                <div className="rounded-lg border border-white/10 bg-black/30 p-2 text-white/70">Termo: {activeTerm || searchTerm}</div>
+                                <div className="rounded-lg border border-white/10 bg-black/30 p-2 text-white/70">Atualização: agora</div>
+                            </div>
                         </div>
                     )}
 
-                    <AnimatePresence initial={false}>
-                        {posts.map((post) => (
-                            <motion.div
-                                key={post.id}
-                                layout
-                                initial={{ opacity: 0, y: -20, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0.9 }}
-                                transition={{ duration: 0.3 }}
-                                className={`relative group rounded-2xl p-5 border transition-all hover:border-white/10 ${post.status === "new" ? "bg-[#0F1C2E]/60 border-[#00D9FF]/20" : "bg-[#0A1628]/40 border-white/5"
-                                    }`}
-                            >
-                                {/* Compliance Tag if High Risk */}
-                                {post.riskLevel === "critical" || post.riskLevel === "high" ? (
-                                    <div className="absolute -top-2 -right-2">
-                                        <span className="relative flex h-4 w-4">
-                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                                            <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
-                                        </span>
-                                    </div>
-                                ) : null}
-
-                                <div className="flex gap-4">
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
-                                        src={post.avatar}
-                                        alt={post.author}
-                                        className="w-12 h-12 rounded-full border border-white/10"
-                                    />
-
-                                    <div className="flex-1">
-                                        {/* Post Header */}
-                                        <div className="flex items-center justify-between mb-2">
-                                            <div className="flex items-center gap-2">
-                                                <span className="font-bold text-sm">{post.author}</span>
-                                                <span className="text-white/40 text-xs">{post.handle}</span>
-                                                <span className="text-lg leading-none opacity-80" title={post.platform}>
-                                                    {getPlatformIcon(post.platform)}
-                                                </span>
+                    {activeView === "sentiment" && (
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className="rounded-2xl border border-white/10 bg-[#0A1628]/45 p-5">
+                                <p className="text-sm font-semibold text-white/80 mb-4">Distribuição de Sentimento</p>
+                                <div className="space-y-3">
+                                    {[
+                                        { label: "Negativo", value: sentimentBreakdown.negative, color: "from-red-500/70 to-red-300/60" },
+                                        { label: "Neutro", value: sentimentBreakdown.neutral, color: "from-yellow-500/70 to-yellow-300/60" },
+                                        { label: "Positivo", value: sentimentBreakdown.positive, color: "from-emerald-500/70 to-emerald-300/60" },
+                                    ].map((item) => (
+                                        <div key={item.label}>
+                                            <div className="flex items-center justify-between text-xs text-white/60 mb-1">
+                                                <span>{item.label}</span>
+                                                <span>{item.value}</span>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded border ${getRiskColor(post.riskLevel)}`}>
-                                                    {post.riskLevel} Risk
-                                                </span>
-                                                <span className="text-white/20 text-xs">
-                                                    Now
-                                                </span>
+                                            <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                                                <div className={`h-full bg-gradient-to-r ${item.color}`} style={{ width: `${posts.length === 0 ? 0 : Math.max(8, (item.value / posts.length) * 100)}%` }} />
                                             </div>
                                         </div>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="rounded-2xl border border-white/10 bg-[#0A1628]/45 p-5">
+                                <p className="text-sm font-semibold text-white/80 mb-4">Volume por Janela</p>
+                                <div className="h-[230px] flex items-end gap-2">
+                                    {[14, 22, 18, 29, 35, 21, 27, 31, 24, 19].map((n, idx) => (
+                                        <div key={idx} className="flex-1 rounded-t-md bg-gradient-to-t from-[#00D9FF]/25 to-[#00D9FF]/75" style={{ height: `${n * 2.2}%` }} />
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
-                                        {/* Content */}
-                                        <p className="text-white/80 text-sm leading-relaxed mb-4">
-                                            {post.content}
-                                        </p>
+                    {activeView === "feed" && (
+                        <>
+                            {!isSimulating && posts.length === 0 && (
+                                <div className="flex flex-col items-center justify-center h-full text-white/30">
+                                    <Globe size={48} className="mb-4 opacity-50" />
+                                    <p>Digite o nome de um medicamento e inicie o monitoramento para capturar sinais.</p>
+                                </div>
+                            )}
 
-                                        {/* AI Analysis Box */}
-                                        {post.aiAnalysis && (
-                                            <div className="bg-[#A855F7]/5 border border-[#A855F7]/10 rounded-lg p-3 mb-3 flex items-start gap-3">
-                                                <Zap size={16} className="text-[#A855F7] shrink-0 mt-0.5" />
-                                                <div className="flex-1">
-                                                    <div className="flex gap-4 text-xs mb-1">
-                                                        <span className="text-white/40">Evento Detectado:</span>
-                                                        <span className="text-[#A855F7] font-medium">{post.aiAnalysis.detectedEvent || "None"}</span>
+                            <AnimatePresence initial={false}>
+                                {posts.map((post) => (
+                                    <motion.div
+                                        key={post.id}
+                                        layout
+                                        initial={{ opacity: 0, y: -20, scale: 0.95 }}
+                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.9 }}
+                                        transition={{ duration: 0.3 }}
+                                        className={`relative group rounded-2xl p-5 border transition-all hover:border-white/10 ${post.status === "new" ? "bg-[#0F1C2E]/60 border-[#00D9FF]/20" : "bg-[#0A1628]/40 border-white/5"
+                                            }`}
+                                    >
+                                        {post.riskLevel === "critical" || post.riskLevel === "high" ? (
+                                            <div className="absolute -top-2 -right-2">
+                                                <span className="relative flex h-4 w-4">
+                                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                                                    <span className="relative inline-flex rounded-full h-4 w-4 bg-red-500"></span>
+                                                </span>
+                                            </div>
+                                        ) : null}
+
+                                        <div className="flex gap-4">
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={post.avatar} alt={post.author} className="w-12 h-12 rounded-full border border-white/10" />
+
+                                            <div className="flex-1">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-sm">{post.author}</span>
+                                                        <span className="text-white/40 text-xs">{post.handle}</span>
+                                                        <span className="text-lg leading-none opacity-80" title={post.platform}>
+                                                            {getPlatformIcon(post.platform)}
+                                                        </span>
                                                     </div>
-                                                    <div className="flex gap-4 text-xs">
-                                                        <span className="text-white/40">Medicamento:</span>
-                                                        <span className="text-white/80">{post.aiAnalysis.drugMentioned}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded border ${getRiskColor(post.riskLevel)}`}>
+                                                            {post.riskLevel} Risk
+                                                        </span>
+                                                        <span className="text-white/25 text-xs">{formatTimestamp(post.timestamp)}</span>
                                                     </div>
                                                 </div>
+
+                                                <p className="text-white/80 text-sm leading-relaxed mb-4">{post.content}</p>
+
+                                                {post.aiAnalysis && (
+                                                    <div className="bg-[#A855F7]/5 border border-[#A855F7]/10 rounded-lg p-3 mb-3 flex items-start gap-3">
+                                                        <Zap size={16} className="text-[#A855F7] shrink-0 mt-0.5" />
+                                                        <div className="flex-1">
+                                                            <div className="flex gap-4 text-xs mb-1">
+                                                                <span className="text-white/40">Evento Detectado:</span>
+                                                                <span className="text-[#A855F7] font-medium">{post.aiAnalysis.detectedEvent || "None"}</span>
+                                                            </div>
+                                                            <div className="flex gap-4 text-xs">
+                                                                <span className="text-white/40">Medicamento:</span>
+                                                                <span className="text-white/80">{post.aiAnalysis.drugMentioned}</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-3 text-xs text-white/40">
+                                                        <span className="inline-flex items-center gap-1"><ThumbsUp size={12} />{post.likes}</span>
+                                                        <span className="inline-flex items-center gap-1"><Share2 size={12} />{post.shares}</span>
+                                                        <span className="inline-flex items-center gap-1"><MessageSquare size={12} />Discussão</span>
+                                                    </div>
+                                                    <button className="text-white/35 hover:text-white/75">
+                                                        <MoreHorizontal size={14} />
+                                                    </button>
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
+                        </>
+                    )}
                 </div>
             </div>
 
-            {/* Right Panel / Event Detail Placeholer */}
-            <div className="w-[300px] bg-[#0A1628]/30 hidden lg:flex flex-col p-6 border-l border-white/5">
+            {/* Right Panel */}
+            <div className="w-[320px] bg-[#0A1628]/30 hidden lg:flex flex-col p-6 border-l border-white/5">
                 <h3 className="text-sm font-bold text-white/60 uppercase tracking-wider mb-6">Alertas Recentes</h3>
 
-                <div className="space-y-4">
-                    {/* Placeholder static alerts for visual balance */}
-                    <div className="flex gap-3 items-start p-3 rounded-lg hover:bg-white/5 transition-colors cursor-pointer border border-transparent hover:border-white/5">
-                        <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">
-                            <AlertTriangle size={14} />
-                        </div>
-                        <div>
-                            <div className="text-xs font-bold text-white/90">Detecção de Cluster</div>
-                            <div className="text-[10px] text-white/50 mb-1">Pico recente de sentimento negativo</div>
-                            <div className="text-[10px] text-orange-400">Alta Confiança</div>
-                        </div>
+                <div className="grid grid-cols-2 gap-2 mb-4">
+                    <div className="rounded-lg border border-white/10 bg-white/[0.02] p-2.5">
+                        <p className="text-[11px] text-white/45">Negativo</p>
+                        <p className="text-lg font-semibold text-red-300">{sentimentBreakdown.negative}</p>
                     </div>
+                    <div className="rounded-lg border border-white/10 bg-white/[0.02] p-2.5">
+                        <p className="text-[11px] text-white/45">Crítico/Alto</p>
+                        <p className="text-lg font-semibold text-orange-300">{recentAlerts.length}</p>
+                    </div>
+                </div>
+
+                <div className="space-y-3 overflow-y-auto pr-1">
+                    {recentAlerts.length === 0 && (
+                        <div className="rounded-lg border border-white/10 bg-white/[0.02] p-3 text-xs text-white/45">
+                            Nenhum alerta crítico no momento.
+                        </div>
+                    )}
+
+                    {recentAlerts.map((post) => (
+                        <div key={`alert-${post.id}`} className="flex gap-3 items-start p-3 rounded-lg bg-white/[0.02] border border-white/10">
+                            <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center shrink-0">
+                                <AlertTriangle size={14} />
+                            </div>
+                            <div>
+                                <div className="text-xs font-bold text-white/90">
+                                    {post.aiAnalysis?.detectedEvent || "Sinal de risco detectado"}
+                                </div>
+                                <div className="text-[10px] text-white/50 mb-1">{post.author} • {formatTimestamp(post.timestamp)}</div>
+                                <div className="text-[10px] text-orange-400 uppercase">{post.riskLevel}</div>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

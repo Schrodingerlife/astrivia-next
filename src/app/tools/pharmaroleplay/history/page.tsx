@@ -1,6 +1,5 @@
 'use client';
 
-import { Navbar } from "@/components/navbar";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -42,10 +41,8 @@ export default function HistoryPage() {
     const scoreMedio = Math.round(historico.reduce((acc, s) => acc + s.score, 0) / historico.length);
 
     return (
-        <>
-            <Navbar />
-            <div className="min-h-screen pt-20 py-8 px-6">
-                <div className="max-w-5xl mx-auto">
+        <div className="min-h-screen pt-20 py-8 px-6">
+            <div className="max-w-5xl mx-auto">
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -183,8 +180,7 @@ export default function HistoryPage() {
                             )}
                         </div>
                     </motion.div>
-                </div>
             </div>
-        </>
+        </div>
     );
 }

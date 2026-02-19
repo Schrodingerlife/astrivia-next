@@ -1,59 +1,62 @@
 import Link from "next/link";
-
-const productLinks = [
-    { name: "PharmaRoleplay", href: "/tools/pharmaroleplay" },
-    { name: "Social Vigilante", href: "/tools/social-vigilante" },
-    { name: "MedSafe AI", href: "/tools/medsafe" },
-    { name: "Ver todos", href: "/products" },
-];
+import { toolsConfig, upcomingToolsConfig } from "@/lib/tools-config";
 
 const companyLinks = [
     { name: "Tecnologia", href: "/technology" },
     { name: "Time", href: "/team" },
-    { name: "Docs", href: "/docs" },
+    { name: "Plataforma", href: "/platform" },
     { name: "Status", href: "/status" },
 ];
 
+const resourceLinks = [
+    { name: "Produtos", href: "/products" },
+    { name: "Docs", href: "/docs" },
+    { name: "Contato", href: "/contact" },
+];
+
 const contactLinks = [
-    { name: "Fale Conosco", href: "/contact" },
     { name: "nicollas.braga@astriviaai.tech", href: "mailto:nicollas.braga@astriviaai.tech", external: true },
     { name: "LinkedIn", href: "https://www.linkedin.com/company/astriviaai/", external: true },
 ];
 
 export function Footer() {
     return (
-        <footer className="footer py-16 px-6">
-            <div className="max-w-7xl mx-auto">
-                <div className="grid md:grid-cols-4 gap-12 mb-16">
-                    {/* Brand */}
+        <footer className="footer py-14">
+            <div className="site-container">
+                <div className="grid lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] gap-10 mb-12">
                     <div>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                            src="/images/astrivia-logo-fixed.png"
-                            alt="Astrivia AI"
-                            className="h-8 mb-4 opacity-60"
-                        />
-                        <p className="text-white/30 text-sm leading-relaxed">
-                            Sistema de agentes autônomos para Life Sciences. Powered by Google Cloud.
+                        <img src="/images/astrivia-logo-fixed.png" alt="Astrivia AI" className="h-9 mb-4 opacity-80" />
+                        <p className="text-white/35 text-sm leading-relaxed max-w-xs">
+                            Sistema de agentes autônomos para Life Sciences com foco em segurança regulatória e execução enterprise.
                         </p>
                     </div>
 
-                    {/* Products */}
                     <div>
-                        <h4 className="font-semibold text-sm mb-4">Produtos</h4>
-                        <div className="space-y-3">
-                            {productLinks.map((link) => (
-                                <Link key={link.name} href={link.href} className="footer-link block">
-                                    {link.name}
+                        <h4 className="font-semibold text-sm mb-4 text-white/90">Demos</h4>
+                        <div className="space-y-2.5">
+                            {toolsConfig.map((tool) => (
+                                <Link key={tool.slug} href={tool.demoHref} className="footer-link block">
+                                    {tool.name}
                                 </Link>
                             ))}
                         </div>
                     </div>
 
-                    {/* Company */}
                     <div>
-                        <h4 className="font-semibold text-sm mb-4">Empresa</h4>
-                        <div className="space-y-3">
+                        <h4 className="font-semibold text-sm mb-4 text-white/90">Em breve</h4>
+                        <div className="space-y-2.5">
+                            {upcomingToolsConfig.map((tool) => (
+                                <Link key={tool.slug} href={tool.href} className="footer-link block">
+                                    {tool.name}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h4 className="font-semibold text-sm mb-4 text-white/90">Empresa</h4>
+                        <div className="space-y-2.5">
                             {companyLinks.map((link) => (
                                 <Link key={link.name} href={link.href} className="footer-link block">
                                     {link.name}
@@ -62,10 +65,16 @@ export function Footer() {
                         </div>
                     </div>
 
-                    {/* Contact */}
                     <div>
-                        <h4 className="font-semibold text-sm mb-4">Contato</h4>
-                        <div className="space-y-3">
+                        <h4 className="font-semibold text-sm mb-4 text-white/90">Recursos</h4>
+                        <div className="space-y-2.5 mb-6">
+                            {resourceLinks.map((link) => (
+                                <Link key={link.name} href={link.href} className="footer-link block">
+                                    {link.name}
+                                </Link>
+                            ))}
+                        </div>
+                        <div className="space-y-2.5">
                             {contactLinks.map((link) =>
                                 link.external ? (
                                     <a
@@ -87,18 +96,14 @@ export function Footer() {
                     </div>
                 </div>
 
-                <div className="section-divider mb-8" />
+                <div className="section-divider mb-6" />
 
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <p className="text-white/20 text-xs">
-                        © 2025 Astrivia AI. Todos os direitos reservados.
-                    </p>
-                    <div className="flex items-center gap-4">
-                        <span className="text-white/20 text-xs flex items-center gap-1.5">
-                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
-                            Todos os sistemas operacionais
-                        </span>
-                    </div>
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <p className="text-white/25 text-xs">© 2026 Astrivia AI. Todos os direitos reservados.</p>
+                    <span className="text-white/25 text-xs flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
+                        Todos os sistemas operacionais
+                    </span>
                 </div>
             </div>
         </footer>

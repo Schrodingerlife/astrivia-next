@@ -1,6 +1,5 @@
 'use client';
 
-import { Navbar } from "@/components/navbar";
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -46,10 +45,8 @@ export default function TrainingPage() {
     const personaInfo = personas.find(p => p.id === personaSelecionada);
 
     return (
-        <>
-            <Navbar />
-            <div className="min-h-screen pt-20 py-8 px-6">
-                <div className="max-w-4xl mx-auto">
+        <div className="min-h-screen pt-20 py-8 px-6">
+            <div className="max-w-4xl mx-auto">
                     {/* Header */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -240,8 +237,7 @@ export default function TrainingPage() {
                             </div>
                         </motion.div>
                     )}
-                </div>
             </div>
-        </>
+        </div>
     );
 }

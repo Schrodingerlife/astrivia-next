@@ -1,6 +1,5 @@
 'use client';
 
-import { Navbar } from "@/components/navbar";
 import { useState } from 'react';
 import { useParams, useSearchParams } from 'next/navigation';
 import VoiceInterfaceLocal from '@/components/tools/pharmaroleplay/VoiceInterfaceLocal';
@@ -31,26 +30,20 @@ export default function SessionPage() {
 
     if (etapa === 'relatorio' && relatorio) {
         return (
-            <>
-                <Navbar />
-                <div className="min-h-screen pt-20 py-12 px-6">
-                    <ReportCard relatorio={relatorio} sessaoId={sessaoId} />
-                </div>
-            </>
+            <div className="min-h-screen pt-20 py-12 px-6">
+                <ReportCard relatorio={relatorio} sessaoId={sessaoId} />
+            </div>
         );
     }
 
     return (
-        <>
-            <Navbar />
-            <div className="min-h-screen pt-20 p-6" style={{ height: '100vh' }}>
-                <VoiceInterfaceLocal
-                    sessaoId={sessaoId}
-                    cenario={cenario}
-                    cenarioNome={cenarioNome}
-                    onEncerrar={handleEncerrar}
-                />
-            </div>
-        </>
+        <div className="min-h-screen pt-20 p-6" style={{ height: '100vh' }}>
+            <VoiceInterfaceLocal
+                sessaoId={sessaoId}
+                cenario={cenario}
+                cenarioNome={cenarioNome}
+                onEncerrar={handleEncerrar}
+            />
+        </div>
     );
 }

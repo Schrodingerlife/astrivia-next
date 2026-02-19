@@ -1,6 +1,5 @@
 'use client';
 
-import { Navbar } from "@/components/navbar";
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import {
@@ -52,9 +51,7 @@ export default function DashboardPage() {
     const medalIcons = [Trophy, Medal, Crown];
 
     return (
-        <>
-            <Navbar />
-            <div className="min-h-screen pt-20 py-8 px-6">
+        <div className="min-h-screen pt-20 py-8 px-6">
                 {/* Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -243,7 +240,6 @@ export default function DashboardPage() {
                         </div>
                     </div>
                 </div>
-            </div>
-        </>
+        </div>
     );
 }

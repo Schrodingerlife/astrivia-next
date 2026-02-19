@@ -1,26 +1,19 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useMemo, useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
-    Shield,
-    Upload,
+    CheckCircle2,
     FileText,
-    AlertTriangle,
-    CheckCircle,
-    XCircle,
     Loader2,
+    ShieldCheck,
     Sparkles,
-    BarChart3
-} from 'lucide-react';
-
-// ═══════════════════════════════════════════════════════════════════════
-// TIPOS
-// ═══════════════════════════════════════════════════════════════════════
+    Upload,
+} from "lucide-react";
 
 interface Violacao {
     id: number;
-    tipo: 'grave' | 'moderada' | 'leve';
+    tipo: "grave" | "moderada" | "leve";
     texto: string;
     trecho: string;
     artigo: string;
@@ -34,324 +27,361 @@ interface ResultadoAnalise {
     tempoAnalise: number;
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// DADOS MOCK (será substituído pela API real)
-// ═══════════════════════════════════════════════════════════════════════
+type PainelTab = "visao" | "documentos";
 
-function gerarAnaliseSimulada(texto: string): ResultadoAnalise {
+function gerarFallback(texto: string): ResultadoAnalise {
     const violacoes: Violacao[] = [];
-    let id = 1;
+    let idx = 1;
 
-    // Detecção de claims suspeitos
-    const claimPatterns = [
-        { regex: /cur[ao]/i, tipo: 'grave' as const, artigo: 'Art. 3º, §1º', msg: 'Claim de cura é proibido pela RDC 96/2008', sugestao: 'Substitua por "auxilia no tratamento" ou "contribui para o manejo"' },
-        { regex: /100%\s*(efic|segur|garanti)/i, tipo: 'grave' as const, artigo: 'Art. 4º, III', msg: 'Garantia absoluta de eficácia/segurança não é permitida', sugestao: 'Use dados com IC95% e referencie estudo clínico específico' },
-        { regex: /sem\s*(efeito|risco|contra)/i, tipo: 'moderada' as const, artigo: 'Art. 4º, V', msg: 'Omissão de riscos/efeitos adversos pode induzir a erro', sugestao: 'Inclua referência ao perfil de segurança e bula' },
-        { regex: /melhor\s*(que|do que)/i, tipo: 'moderada' as const, artigo: 'Art. 5º', msg: 'Comparação com concorrente requer estudo head-to-head publicado', sugestao: 'Cite o estudo comparativo com DOI e PMID' },
-        { regex: /revolucion|inovad|únic/i, tipo: 'leve' as const, artigo: 'Art. 3º, §2º', msg: 'Linguagem superlativa pode ser considerada misleading', sugestao: 'Prefira termos como "diferenciado" ou "com novo mecanismo de ação"' },
-        { regex: /natural|orgânic/i, tipo: 'leve' as const, artigo: 'Art. 7º', msg: 'Claim "natural" pode dar falsa sensação de segurança', sugestao: 'Especifique a composição e origem do ingrediente ativo' },
+    const regras = [
+        {
+            regex: /cura|cura definitiva/i,
+            tipo: "grave" as const,
+            artigo: "Art. 3º",
+            texto: "Claim de cura não é permitido.",
+        },
+        {
+            regex: /100%\s*(efic|segur|garant)/i,
+            tipo: "grave" as const,
+            artigo: "Art. 4º, III",
+            texto: "Garantia absoluta de eficácia/segurança é proibida.",
+        },
+        {
+            regex: /sem efeitos|sem risco/i,
+            tipo: "moderada" as const,
+            artigo: "Art. 4º, V",
+            texto: "Omissão de risco pode induzir erro.",
+        },
+        {
+            regex: /melhor que|superior a/i,
+            tipo: "moderada" as const,
+            artigo: "Art. 5º",
+            texto: "Comparação com concorrente exige base técnica robusta.",
+        },
     ];
 
-    const linhas = texto.split('\n').filter(l => l.trim());
-
-    for (const linha of linhas) {
-        for (const pattern of claimPatterns) {
-            if (pattern.regex.test(linha)) {
+    for (const linha of texto.split("\n")) {
+        for (const regra of regras) {
+            if (regra.regex.test(linha)) {
                 violacoes.push({
-                    id: id++,
-                    tipo: pattern.tipo,
-                    texto: pattern.msg,
-                    trecho: linha.trim().substring(0, 80) + (linha.length > 80 ? '...' : ''),
-                    artigo: pattern.artigo,
-                    sugestao: pattern.sugestao
+                    id: idx++,
+                    tipo: regra.tipo,
+                    texto: regra.texto,
+                    trecho: linha.slice(0, 160),
+                    artigo: regra.artigo,
+                    sugestao: "Revisar o claim com base na bula aprovada e referências científicas.",
                 });
             }
         }
     }
 
-    // Calcular score
-    const penalidades = violacoes.reduce((acc, v) => {
-        if (v.tipo === 'grave') return acc + 25;
-        if (v.tipo === 'moderada') return acc + 12;
-        return acc + 5;
-    }, 0);
-
-    const score = Math.max(0, Math.min(100, 100 - penalidades));
+    const score = Math.max(
+        0,
+        100 - violacoes.reduce((acc, v) => acc + (v.tipo === "grave" ? 25 : v.tipo === "moderada" ? 10 : 5), 0)
+    );
 
     return {
         score,
         violacoes,
-        resumo: violacoes.length === 0
-            ? 'Material analisado não apresenta violações identificáveis à RDC 96/2008. Recomenda-se revisão final com equipe jurídica.'
-            : `Identificadas ${violacoes.length} possíveis violações à RDC 96/2008 ANVISA. ${violacoes.filter(v => v.tipo === 'grave').length} graves, ${violacoes.filter(v => v.tipo === 'moderada').length} moderadas, ${violacoes.filter(v => v.tipo === 'leve').length} leves.`,
-        tempoAnalise: 1.2 + Math.random() * 2
+        resumo: violacoes.length
+            ? `Identificadas ${violacoes.length} possíveis violações com prioridade de revisão.`
+            : "Nenhuma violação evidente detectada no texto informado.",
+        tempoAnalise: 1.6,
     };
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// COMPONENTE PRINCIPAL
-// ═══════════════════════════════════════════════════════════════════════
-
 export default function MedSafeApp() {
-    const [texto, setTexto] = useState('');
+    const [tab, setTab] = useState<PainelTab>("visao");
+    const [texto, setTexto] = useState("");
+    const [arquivoNome, setArquivoNome] = useState<string | null>(null);
     const [analisando, setAnalisando] = useState(false);
     const [resultado, setResultado] = useState<ResultadoAnalise | null>(null);
-    const [arquivoNome, setArquivoNome] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const analisar = async () => {
+    const resumo = useMemo(() => {
+        if (!resultado) return { graves: 0, moderadas: 0, leves: 0 };
+        return {
+            graves: resultado.violacoes.filter((v) => v.tipo === "grave").length,
+            moderadas: resultado.violacoes.filter((v) => v.tipo === "moderada").length,
+            leves: resultado.violacoes.filter((v) => v.tipo === "leve").length,
+        };
+    }, [resultado]);
+
+    const linhasComMarcacao = useMemo(() => {
+        const linhas = texto.split("\n").filter((linha) => linha.trim().length > 0).slice(0, 8);
+        if (!resultado || resultado.violacoes.length === 0) {
+            return linhas.map((linha) => ({ linha, tipo: null as null | Violacao["tipo"] }));
+        }
+
+        return linhas.map((linha) => {
+            const match = resultado.violacoes.find((violacao) =>
+                linha.toLowerCase().includes(violacao.trecho.toLowerCase().slice(0, 24))
+            );
+            return { linha, tipo: match?.tipo || null };
+        });
+    }, [texto, resultado]);
+
+    const enviarParaAnalise = async () => {
         if (!texto.trim()) return;
         setAnalisando(true);
         setResultado(null);
 
-        // Simular tempo de processamento
-        await new Promise(r => setTimeout(r, 2000 + Math.random() * 1500));
+        try {
+            const started = Date.now();
+            const response = await fetch("/api/medsafe", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ texto }),
+            });
 
-        const res = gerarAnaliseSimulada(texto);
-        setResultado(res);
-        setAnalisando(false);
-    };
-
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        setArquivoNome(file.name);
-
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            setTexto(event.target?.result as string);
-        };
-        reader.readAsText(file);
-    };
-
-    const getScoreColor = (score: number) => {
-        if (score >= 80) return 'text-green-400';
-        if (score >= 60) return 'text-yellow-400';
-        return 'text-red-400';
-    };
-
-    const getScoreBg = (score: number) => {
-        if (score >= 80) return 'bg-green-500/20 border-green-500/30';
-        if (score >= 60) return 'bg-yellow-500/20 border-yellow-500/30';
-        return 'bg-red-500/20 border-red-500/30';
-    };
-
-    const getTipoConfig = (tipo: string) => {
-        switch (tipo) {
-            case 'grave': return { icon: XCircle, color: 'text-red-400', bg: 'bg-red-500/10 border-red-500/20', label: 'Grave' };
-            case 'moderada': return { icon: AlertTriangle, color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20', label: 'Moderada' };
-            default: return { icon: Shield, color: 'text-blue-400', bg: 'bg-blue-500/10 border-blue-500/20', label: 'Leve' };
+            if (!response.ok) throw new Error("API indisponível");
+            const data = (await response.json()) as ResultadoAnalise;
+            setResultado({
+                ...data,
+                tempoAnalise: Number(((Date.now() - started) / 1000).toFixed(1)),
+            });
+        } catch {
+            setResultado(gerarFallback(texto));
+        } finally {
+            setAnalisando(false);
         }
     };
 
+    const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (!file) return;
+
+        setArquivoNome(file.name);
+        const reader = new FileReader();
+        reader.onload = (e) => setTexto((e.target?.result as string) || "");
+        reader.readAsText(file);
+    };
+
+    const classeRisco = (tipo: Violacao["tipo"]) => {
+        if (tipo === "grave") return "border-red-500/30 bg-red-500/8 text-red-300";
+        if (tipo === "moderada") return "border-yellow-500/30 bg-yellow-500/8 text-yellow-300";
+        return "border-cyan-500/30 bg-cyan-500/8 text-cyan-300";
+    };
+
     return (
-        <div className="p-6 max-w-6xl mx-auto">
-            {/* Input Section */}
-            <div className="grid lg:grid-cols-2 gap-6 mb-6">
-                {/* Text Area */}
-                <div className="glass-card rounded-xl p-5">
-                    <div className="flex items-center justify-between mb-4">
+        <div className="rounded-[28px] overflow-hidden border border-white/[0.12] bg-[#060D16] shadow-[0_24px_90px_rgba(0,0,0,0.5)]">
+            <header className="h-16 border-b border-white/10 px-5 md:px-6 flex items-center justify-between bg-[#0A1628]/55">
+                <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center">
+                        <ShieldCheck size={18} />
+                    </div>
+                    <div>
+                        <p className="text-sm font-semibold text-white leading-tight">MedSafe Workspace</p>
+                        <p className="text-[11px] text-white/45 leading-tight">Compliance regulatório em tempo real</p>
+                    </div>
+                </div>
+
+                <nav className="hidden md:flex items-center gap-1">
+                    {[
+                        { id: "visao", label: "Visão Geral" },
+                        { id: "documentos", label: "Documentos" },
+                    ].map((item) => (
+                        <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => setTab(item.id as PainelTab)}
+                            className={`px-3.5 py-1.5 rounded-lg text-xs border transition-colors ${
+                                tab === item.id
+                                    ? "border-emerald-500/45 bg-emerald-500/15 text-emerald-200"
+                                    : "border-white/10 bg-white/[0.02] text-white/55 hover:text-white/80"
+                            }`}
+                        >
+                            {item.label}
+                        </button>
+                    ))}
+                </nav>
+            </header>
+
+            <div className="grid lg:grid-cols-[1.18fr_0.82fr] gap-0 min-h-[760px]">
+                <section className="border-r border-white/10 p-5 md:p-6">
+                    <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
                         <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-                            <FileText size={16} className="text-[#00D9FF]" />
-                            Material para Análise
+                            <FileText size={15} className="text-emerald-300" />
+                            Material para análise
                         </h3>
-                        <div className="flex gap-2">
+
+                        <div className="flex items-center gap-2">
                             <input
                                 ref={fileInputRef}
                                 type="file"
                                 accept=".txt,.md,.csv"
+                                onChange={handleUpload}
                                 className="hidden"
-                                onChange={handleFileUpload}
                             />
                             <button
+                                type="button"
                                 onClick={() => fileInputRef.current?.click()}
-                                className="text-xs px-3 py-1.5 rounded-lg border border-white/10 text-white/50 hover:text-white hover:border-white/20 transition-colors inline-flex items-center gap-1.5"
+                                className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 hover:text-white hover:border-white/25"
                             >
-                                <Upload size={12} />
+                                <Upload size={13} />
                                 Upload
                             </button>
                         </div>
                     </div>
 
                     {arquivoNome && (
-                        <div className="mb-3 text-xs text-[#00D9FF] bg-[#00D9FF]/10 rounded-lg px-3 py-2 inline-flex items-center gap-2">
-                            <FileText size={12} />
-                            {arquivoNome}
-                        </div>
+                        <p className="mb-3 inline-flex items-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs text-emerald-200">
+                            Arquivo: {arquivoNome}
+                        </p>
                     )}
 
                     <textarea
                         value={texto}
                         onChange={(e) => setTexto(e.target.value)}
-                        placeholder="Cole aqui o texto do material promocional para análise de conformidade com a RDC 96/2008...
-
-Exemplo:
-'Nosso medicamento é a cura definitiva para diabetes. 100% eficaz e sem efeitos colaterais. Melhor que qualquer concorrente do mercado.'"
-                        className="w-full h-64 bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-white text-sm placeholder-white/20 focus:outline-none focus:border-[#00D9FF]/50 resize-none"
+                        placeholder="Cole aqui o conteúdo promocional para análise de conformidade com a RDC 96/2008..."
+                        className="h-[320px] w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/25 focus:border-emerald-400/60 focus:outline-none"
                     />
 
                     <div className="mt-4 flex items-center justify-between">
-                        <span className="text-white/30 text-xs">{texto.length} caracteres</span>
+                        <span className="text-xs text-white/40">{texto.length} caracteres</span>
                         <button
-                            onClick={analisar}
+                            type="button"
+                            onClick={enviarParaAnalise}
                             disabled={!texto.trim() || analisando}
-                            className="btn-primary px-6 py-2.5 rounded-xl text-sm inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="btn-primary !px-5 !py-2.5 text-sm inline-flex items-center gap-2 disabled:opacity-40"
                         >
-                            {analisando ? (
-                                <>
-                                    <Loader2 size={16} className="animate-spin" />
-                                    Analisando...
-                                </>
-                            ) : (
-                                <>
-                                    <Sparkles size={16} />
-                                    Analisar Conformidade
-                                </>
-                            )}
+                            {analisando ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
+                            Analisar Conformidade
                         </button>
                     </div>
-                </div>
 
-                {/* Score & Summary */}
-                <div className="glass-card rounded-xl p-5">
-                    <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                        <BarChart3 size={16} className="text-[#00D9FF]" />
-                        Resultado da Análise
-                    </h3>
+                    <div className="mt-6 rounded-xl border border-white/10 bg-[#0B1422] p-4">
+                        <div className="mb-3 flex items-center justify-between">
+                            <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/55">Preview do documento</p>
+                            <p className="text-[11px] text-white/35">Análise contextual</p>
+                        </div>
+
+                        {linhasComMarcacao.length === 0 && (
+                            <p className="text-sm text-white/35">As linhas analisadas aparecerão aqui após inserir conteúdo.</p>
+                        )}
+
+                        <div className="space-y-2 max-h-[210px] overflow-y-auto pr-1">
+                            {linhasComMarcacao.map((item, idx) => (
+                                <div
+                                    key={`${item.linha}-${idx}`}
+                                    className={`rounded-lg border px-3 py-2 text-xs ${
+                                        item.tipo
+                                            ? classeRisco(item.tipo)
+                                            : "border-white/10 bg-white/[0.02] text-white/65"
+                                    }`}
+                                >
+                                    {item.linha}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                <aside className="p-5 md:p-6 bg-[#07111D]">
+                    <h3 className="mb-4 text-sm font-semibold text-white">Resultado da análise</h3>
 
                     {analisando && (
-                        <div className="flex flex-col items-center justify-center h-64 gap-4">
-                            <div className="relative">
-                                <div className="w-16 h-16 border-4 border-[#00D9FF]/20 rounded-full" />
-                                <div className="absolute inset-0 w-16 h-16 border-4 border-[#00D9FF] rounded-full border-t-transparent animate-spin" />
-                            </div>
-                            <div className="text-center">
-                                <p className="text-white text-sm font-medium">Analisando documento...</p>
-                                <p className="text-white/40 text-xs mt-1">Multi-pass analysis com Gemini 3</p>
-                            </div>
+                        <div className="h-[420px] rounded-xl border border-white/10 bg-white/[0.02] flex flex-col items-center justify-center gap-3 text-white/60">
+                            <Loader2 className="animate-spin" />
+                            Processando material promocional...
                         </div>
                     )}
 
                     {!analisando && !resultado && (
-                        <div className="flex flex-col items-center justify-center h-64 gap-3 text-center">
-                            <Shield size={40} className="text-white/10" />
-                            <p className="text-white/30 text-sm">Cole ou faça upload de um material promocional para começar</p>
-                            <p className="text-white/15 text-xs">Análise baseada na RDC 96/2008 ANVISA</p>
+                        <div className="h-[420px] rounded-xl border border-white/10 bg-white/[0.02] flex flex-col items-center justify-center gap-3 text-center text-white/35 px-8">
+                            <ShieldCheck size={32} />
+                            <p>Inicie uma análise para visualizar score, violações e ações sugeridas.</p>
                         </div>
                     )}
 
                     <AnimatePresence>
                         {resultado && !analisando && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                className="space-y-4"
-                            >
-                                {/* Score Circle */}
-                                <div className="flex items-center gap-6">
-                                    <div className={`w-24 h-24 rounded-full border-4 ${getScoreBg(resultado.score)} flex items-center justify-center`}>
-                                        <span className={`text-3xl font-bold ${getScoreColor(resultado.score)}`}>
-                                            {resultado.score}
-                                        </span>
-                                    </div>
-                                    <div className="flex-1">
-                                        <p className="text-white font-medium mb-1">Score de Conformidade</p>
-                                        <p className="text-white/50 text-sm">{resultado.resumo}</p>
-                                        <p className="text-white/30 text-xs mt-2">
-                                            Análise em {resultado.tempoAnalise.toFixed(1)}s • RDC 96/2008 ANVISA
-                                        </p>
+                            <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
+                                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                                    <div className="flex items-center gap-4">
+                                        <div
+                                            className="h-24 w-24 rounded-full grid place-items-center text-2xl font-bold text-emerald-200 border border-white/15"
+                                            style={{
+                                                background: `conic-gradient(#10B981 ${resultado.score * 3.6}deg, rgba(255,255,255,0.08) 0deg)`,
+                                            }}
+                                        >
+                                            <span className="h-[74px] w-[74px] rounded-full bg-[#07111D] grid place-items-center">
+                                                {resultado.score}
+                                            </span>
+                                        </div>
+
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium text-white">Score de conformidade</p>
+                                            <p className="text-xs text-white/55 mt-1">{resultado.resumo}</p>
+                                            <p className="text-[11px] text-white/35 mt-2">
+                                                Tempo: {resultado.tempoAnalise.toFixed(1)}s
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
-                                {/* Stats */}
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div className="bg-red-500/10 rounded-lg p-2.5 text-center border border-red-500/10">
-                                        <p className="text-red-400 text-lg font-bold">{resultado.violacoes.filter(v => v.tipo === 'grave').length}</p>
-                                        <p className="text-red-400/60 text-xs">Graves</p>
+                                <div className="grid grid-cols-3 gap-2 text-center">
+                                    <div className="rounded-lg border border-red-500/25 bg-red-500/10 py-2">
+                                        <p className="text-lg font-semibold text-red-300">{resumo.graves}</p>
+                                        <p className="text-[11px] text-red-200/70">Graves</p>
                                     </div>
-                                    <div className="bg-yellow-500/10 rounded-lg p-2.5 text-center border border-yellow-500/10">
-                                        <p className="text-yellow-400 text-lg font-bold">{resultado.violacoes.filter(v => v.tipo === 'moderada').length}</p>
-                                        <p className="text-yellow-400/60 text-xs">Moderadas</p>
+                                    <div className="rounded-lg border border-yellow-500/25 bg-yellow-500/10 py-2">
+                                        <p className="text-lg font-semibold text-yellow-300">{resumo.moderadas}</p>
+                                        <p className="text-[11px] text-yellow-200/70">Moderadas</p>
                                     </div>
-                                    <div className="bg-blue-500/10 rounded-lg p-2.5 text-center border border-blue-500/10">
-                                        <p className="text-blue-400 text-lg font-bold">{resultado.violacoes.filter(v => v.tipo === 'leve').length}</p>
-                                        <p className="text-blue-400/60 text-xs">Leves</p>
+                                    <div className="rounded-lg border border-cyan-500/25 bg-cyan-500/10 py-2">
+                                        <p className="text-lg font-semibold text-cyan-300">{resumo.leves}</p>
+                                        <p className="text-[11px] text-cyan-200/70">Leves</p>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-white/50">
+                                        Violações identificadas
+                                    </p>
+
+                                    <div className="space-y-2 max-h-[240px] overflow-y-auto pr-1">
+                                        {resultado.violacoes.length === 0 && (
+                                            <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 p-3 text-sm text-emerald-200 flex items-center gap-2">
+                                                <CheckCircle2 size={15} />
+                                                Nenhuma violação relevante detectada.
+                                            </div>
+                                        )}
+
+                                        {resultado.violacoes.map((violacao) => (
+                                            <div
+                                                key={violacao.id}
+                                                className={`rounded-lg border p-3 ${classeRisco(violacao.tipo)}`}
+                                            >
+                                                <div className="mb-1 flex items-center justify-between gap-2">
+                                                    <span className="text-[11px] uppercase font-semibold">{violacao.tipo}</span>
+                                                    <span className="text-[10px] text-white/55">{violacao.artigo}</span>
+                                                </div>
+                                                <p className="text-xs text-white/80">{violacao.texto}</p>
+                                                <p className="mt-1 text-[11px] text-white/55">
+                                                    Sugestão: {violacao.sugestao}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-3">
+                                    <p className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-white/50">
+                                        Regras avaliadas
+                                    </p>
+                                    <div className="space-y-1.5 text-xs text-white/65">
+                                        <p>• Art. 3º - vedação de promessas absolutas</p>
+                                        <p>• Art. 4º - segurança, eficácia e riscos</p>
+                                        <p>• Art. 5º - comparações com concorrentes</p>
+                                        <p>• Art. 8º - transparência de contraindicações</p>
                                     </div>
                                 </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
-                </div>
+                </aside>
             </div>
-
-            {/* Violations List */}
-            <AnimatePresence>
-                {resultado && resultado.violacoes.length > 0 && !analisando && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="glass-card rounded-xl p-5"
-                    >
-                        <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
-                            <AlertTriangle size={16} className="text-yellow-400" />
-                            Violações Identificadas ({resultado.violacoes.length})
-                        </h3>
-
-                        <div className="space-y-3">
-                            {resultado.violacoes.map((v, i) => {
-                                const config = getTipoConfig(v.tipo);
-                                const Icon = config.icon;
-
-                                return (
-                                    <motion.div
-                                        key={v.id}
-                                        initial={{ opacity: 0, x: -20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        transition={{ delay: i * 0.1 }}
-                                        className={`p-4 rounded-lg border ${config.bg}`}
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <Icon size={18} className={`${config.color} flex-shrink-0 mt-0.5`} />
-                                            <div className="flex-1 min-w-0">
-                                                <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${config.bg} ${config.color}`}>
-                                                        {config.label}
-                                                    </span>
-                                                    <span className="text-white/30 text-xs">{v.artigo}</span>
-                                                </div>
-                                                <p className="text-white text-sm mb-2">{v.texto}</p>
-                                                <div className="bg-white/5 rounded px-3 py-2 mb-2">
-                                                    <p className="text-white/40 text-xs italic">&quot;{v.trecho}&quot;</p>
-                                                </div>
-                                                <div className="flex items-start gap-1.5">
-                                                    <CheckCircle size={12} className="text-green-400 flex-shrink-0 mt-0.5" />
-                                                    <p className="text-green-400/80 text-xs">{v.sugestao}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </motion.div>
-                                );
-                            })}
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Perfect score */}
-            <AnimatePresence>
-                {resultado && resultado.violacoes.length === 0 && !analisando && (
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="glass-card rounded-xl p-8 text-center"
-                    >
-                        <CheckCircle size={48} className="text-green-400 mx-auto mb-4" />
-                        <h3 className="text-xl font-bold text-white mb-2">Material Conforme</h3>
-                        <p className="text-white/50 text-sm">Nenhuma violação à RDC 96/2008 foi identificada. Recomenda-se revisão final com equipe regulatória.</p>
-                    </motion.div>
-                )}
-            </AnimatePresence>
         </div>
     );
 }
