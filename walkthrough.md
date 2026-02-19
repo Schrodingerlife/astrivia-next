@@ -1,5 +1,24 @@
 # Walkthrough - Header/Nav/Footer e Design System
 
+## Atualizacao - Landings, ToolHero e Products
+
+### Itens finalizados do escopo solicitado
+- `Item 2`: criado componente novo `ToolHero` em `src/components/tools/ToolHero.tsx`.
+- `Item 3`: rotas `/tools/[slug]` viraram landings premium sem demo embutida:
+  - `src/app/tools/pharmaroleplay/page.tsx`
+  - `src/app/tools/social-vigilante/page.tsx`
+  - `src/app/tools/medsafe/page.tsx`
+  - Estrutura aplicada nas 3: `ToolHero` + secao "Como funciona" + secao de beneficios.
+- `Item 6`: pagina `/products` refatorada para consumir `toolsConfig`:
+  - `src/app/products/page.tsx`
+  - cards com thumbnail, descricao curta, chips e links para landing + demo.
+
+### Ajustes visuais extras solicitados
+- Correcao do logo duplicado no topo:
+  - `src/components/navbar.tsx` agora exibe apenas a marca principal (sem texto repetido ao lado).
+- Remocao do componente antigo de hero:
+  - `src/components/tools/ToolShowcaseHero.tsx` removido.
+
 ## 1) Auditoria rapida (estado anterior)
 
 ### Estrutura global

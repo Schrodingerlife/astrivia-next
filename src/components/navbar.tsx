@@ -101,12 +101,9 @@ export function Navbar() {
         <>
             <nav ref={navRef} className={`navbar fixed top-0 w-full z-50 ${isScrolled ? "scrolled" : ""}`}>
                 <div className="site-container h-[76px] flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-3 group">
+                    <Link href="/" className="flex items-center group">
                         <span className="relative h-10 w-[148px] block">
                             <Image src="/images/astrivia-logo-fixed.png" alt="Astrivia AI" fill priority className="object-contain" />
-                        </span>
-                        <span className="hidden sm:block text-xl font-bold tracking-tight text-white group-hover:text-white/90 transition-colors">
-                            Astrivia <span className="text-[#00D9FF]">AI</span>
                         </span>
                     </Link>
 

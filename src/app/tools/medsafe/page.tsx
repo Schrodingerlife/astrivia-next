@@ -1,29 +1,91 @@
 "use client";
 
-import MedSafeApp from "@/components/tools/medsafe/MedSafeApp";
-import ToolShowcaseHero from "@/components/tools/ToolShowcaseHero";
-import { ShieldCheck } from "lucide-react";
+import { motion } from "framer-motion";
+import { CheckCircle2, ShieldCheck, FileSearch } from "lucide-react";
+import ToolHero from "@/components/tools/ToolHero";
+import { getToolConfig } from "@/lib/tools-config";
 
 export default function MedSafePage() {
+    const tool = getToolConfig("medsafe");
+
     return (
-        <div className="min-h-screen pt-20 pb-10">
-            <ToolShowcaseHero
-                badge="Compliance Regulatório"
-                title="Audite materiais promocionais em segundos"
-                description="IA auditora treinada na RDC 96 que analisa peças de marketing linha por linha, identifica claims não suportados e sugere correções — tudo com 100% de rastreabilidade."
-                metrics={["90% menos tempo de revisão", "Zero falsos positivos", "Auditoria completa"]}
-                ctaHref="#medsafe-demo"
-                ctaLabel="Testar Demo"
-                imageSrc="/images/product-medsafe.png"
-                imageAlt="MedSafe AI - painel de auditoria regulatória"
-                accentColor="#10B981"
+        <div className="min-h-screen pt-20 pb-14">
+            <ToolHero
+                badge={tool.categoryLabel}
+                title={tool.headline}
+                description={tool.description}
+                chips={tool.chips}
+                ctaHref={tool.demoHref}
+                ctaLabel="Iniciar Demo"
+                imageSrc={tool.heroImage}
+                imageAlt="MedSafe - compliance regulatório"
+                accentColor={tool.accent}
                 icon={<ShieldCheck size={18} />}
                 imageFirst
             />
 
-            <section id="medsafe-demo" className="px-6">
-                <div className="max-w-7xl mx-auto">
-                    <MedSafeApp />
+            <section className="py-16 px-6">
+                <div className="max-w-6xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="text-center mb-12"
+                    >
+                        <p className="label mb-4" style={{ color: tool.accent }}>Como funciona</p>
+                        <h2 className="heading-lg mb-4">Fluxo de Auditoria</h2>
+                    </motion.div>
+
+                    <div className="grid md:grid-cols-3 gap-5">
+                        {tool.howItWorks.map((step, idx) => (
+                            <motion.article
+                                key={step}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: idx * 0.08 }}
+                                className="glass-card rounded-2xl p-6"
+                            >
+                                <div
+                                    className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
+                                    style={{ backgroundColor: `${tool.accent}1f` }}
+                                >
+                                    <FileSearch size={18} style={{ color: tool.accent }} />
+                                </div>
+                                <p className="text-white/80 text-sm leading-relaxed">{step}</p>
+                            </motion.article>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            <section className="py-8 px-6">
+                <div className="max-w-6xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        className="mb-8"
+                    >
+                        <p className="label mb-3" style={{ color: tool.accent }}>Benefícios</p>
+                        <h2 className="heading-md">Governança e Segurança Regulatória</h2>
+                    </motion.div>
+
+                    <div className="grid md:grid-cols-3 gap-4">
+                        {tool.benefits.map((benefit, idx) => (
+                            <motion.div
+                                key={benefit}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: idx * 0.08 }}
+                                className="glass-card rounded-xl p-5"
+                            >
+                                <CheckCircle2 size={18} className="mb-3" style={{ color: tool.accent }} />
+                                <p className="text-sm text-white/75">{benefit}</p>
+                            </motion.div>
+                        ))}
+                    </div>
                 </div>
             </section>
         </div>

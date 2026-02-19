@@ -1,16 +1,16 @@
 "use client";
 
+import { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { ReactNode } from "react";
+import { ArrowRight } from "lucide-react";
 
-interface ToolShowcaseHeroProps {
+interface ToolHeroProps {
     badge: string;
     title: string;
     description: string;
-    metrics: string[];
+    chips: string[];
     ctaHref: string;
     ctaLabel?: string;
     imageSrc: string;
@@ -20,37 +20,38 @@ interface ToolShowcaseHeroProps {
     imageFirst?: boolean;
 }
 
-export default function ToolShowcaseHero({
+export default function ToolHero({
     badge,
     title,
     description,
-    metrics,
+    chips,
     ctaHref,
-    ctaLabel = "Testar Demo",
+    ctaLabel = "Iniciar Demo",
     imageSrc,
     imageAlt,
     accentColor,
     icon,
     imageFirst = false,
-}: ToolShowcaseHeroProps) {
+}: ToolHeroProps) {
     const imageOrderClass = imageFirst ? "lg:order-1" : "lg:order-2";
     const textOrderClass = imageFirst ? "lg:order-2" : "lg:order-1";
 
     return (
         <section className="relative py-14 md:py-20 px-6 overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-b from-[#0A1628] via-[#090914] to-[#0A1628]" />
+            <div className="absolute inset-0 bg-gradient-to-b from-[#071332] via-[#060B1D] to-[#050B16]" />
             <div className="absolute inset-0 bg-grid-pattern opacity-25" />
+
             <div className="relative z-10 max-w-7xl mx-auto grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                 <motion.div
-                    initial={{ opacity: 0, y: 24 }}
+                    initial={{ opacity: 0, y: 22 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.55 }}
-                    className={`${imageOrderClass}`}
+                    transition={{ duration: 0.5 }}
+                    className={imageOrderClass}
                 >
-                    <div className="relative rounded-[26px] overflow-hidden border border-white/[0.08] shadow-[0_22px_80px_rgba(0,0,0,0.45)]">
+                    <div className="relative rounded-[28px] overflow-hidden border border-white/[0.08] shadow-[0_24px_84px_rgba(0,0,0,0.5)]">
                         <div
                             className="absolute inset-0 pointer-events-none"
-                            style={{ boxShadow: `inset 0 0 40px ${accentColor}22` }}
+                            style={{ boxShadow: `inset 0 0 44px ${accentColor}2e` }}
                         />
                         <div className="relative aspect-[16/10]">
                             <Image
@@ -66,10 +67,10 @@ export default function ToolShowcaseHero({
                 </motion.div>
 
                 <motion.div
-                    initial={{ opacity: 0, y: 24 }}
+                    initial={{ opacity: 0, y: 22 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.55, delay: 0.08 }}
-                    className={`${textOrderClass}`}
+                    transition={{ duration: 0.5, delay: 0.06 }}
+                    className={textOrderClass}
                 >
                     <div
                         className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold uppercase tracking-[0.16em] border mb-6"
@@ -88,24 +89,27 @@ export default function ToolShowcaseHero({
                         {badge}
                     </div>
 
-                    <h1 className="text-4xl md:text-5xl font-bold leading-tight text-white mb-5">{title}</h1>
+                    <h1 className="text-4xl md:text-6xl font-bold leading-[1.02] text-white mb-5">{title}</h1>
 
-                    <p className="text-xl text-white/55 max-w-2xl leading-relaxed mb-7">{description}</p>
+                    <p className="text-2xl md:text-[1.9rem] text-white/56 max-w-2xl leading-[1.35] mb-8">{description}</p>
 
                     <div className="flex flex-wrap gap-3 mb-10">
-                        {metrics.map((metric) => (
+                        {chips.map((chip) => (
                             <span
-                                key={metric}
-                                className="px-5 py-2.5 rounded-full text-[1.05rem] bg-white/[0.03] border border-white/[0.08] text-white/72"
+                                key={chip}
+                                className="px-5 py-2.5 rounded-full text-[1.05rem] bg-white/[0.03] border border-white/[0.08] text-white/75"
                             >
-                                {metric}
+                                {chip}
                             </span>
                         ))}
                     </div>
 
-                    <Link href={ctaHref} className="inline-flex items-center gap-2 text-white text-lg font-semibold hover:gap-3 transition-all">
+                    <Link
+                        href={ctaHref}
+                        className="inline-flex items-center gap-2 text-white text-[2rem] font-semibold hover:gap-3 transition-all"
+                    >
                         {ctaLabel}
-                        <ArrowRight size={20} />
+                        <ArrowRight size={22} />
                     </Link>
                 </motion.div>
             </div>
