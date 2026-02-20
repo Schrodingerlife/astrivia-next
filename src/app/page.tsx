@@ -182,6 +182,12 @@ function HeroSection() {
         />
       </div>
       <HeroBackgroundSVG />
+      {/* Ecosystem convergence — full-width, all streams toward patient center */}
+      <ConvergeFlowSVG className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" />
+      {/* Orbital ecosystem — left side */}
+      <OrbitalEcosystemSVG className="absolute left-[-120px] top-1/2 -translate-y-1/2 w-[480px] h-[480px] opacity-15 pointer-events-none" />
+      {/* Orbital ecosystem — right side */}
+      <OrbitalEcosystemSVG className="absolute right-[-120px] top-1/2 -translate-y-1/2 w-[380px] h-[380px] opacity-12 pointer-events-none" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[900px] gradient-orb gradient-orb-cyan" />
       <div className="absolute top-[20%] right-0 w-[600px] h-[600px] gradient-orb gradient-orb-purple" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] gradient-orb gradient-orb-green opacity-20" />
@@ -267,6 +273,8 @@ function TrustedBySection() {
       {/* Glow divider at top */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00D9FF]/20 to-transparent" />
       <div className="absolute inset-0 bg-section-elevated" />
+      {/* Infrastructure grid — Google Cloud / Vertex AI backbone */}
+      <InfraGridSVG className="absolute inset-0 w-full h-full pointer-events-none opacity-60" />
       <div className="relative z-10 max-w-5xl mx-auto">
         <p className="text-center text-white/25 text-xs mb-10 tracking-[0.2em] uppercase">
           Construído sobre
@@ -294,6 +302,11 @@ function ProductShowcase() {
     <section className="relative pt-20 pb-10 overflow-hidden">
       {/* Background mesh gradient for depth */}
       <div className="absolute inset-0 bg-mesh-gradient" />
+      {/* Tools ecosystem — orbital on right, converge on left */}
+      <OrbitalEcosystemSVG className="absolute right-[-80px] top-[10%] w-[420px] h-[420px] opacity-18 pointer-events-none" />
+      <ConvergeFlowSVG className="absolute left-[-60px] bottom-[10%] w-[460px] h-[400px] opacity-22 pointer-events-none" />
+      {/* Mid-section orbital */}
+      <OrbitalEcosystemSVG className="absolute left-[5%] top-[45%] w-[280px] h-[280px] opacity-12 pointer-events-none" />
       <div className="absolute top-0 right-0 w-[500px] h-[500px] gradient-orb gradient-orb-cyan opacity-20" />
       <div className="absolute bottom-[30%] left-0 w-[400px] h-[400px] gradient-orb gradient-orb-purple opacity-15" />
       <div className="relative z-10 max-w-7xl mx-auto px-6">
@@ -392,6 +405,9 @@ function ComingSoonSection() {
     <section className="relative py-24 px-6 overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
       <div className="absolute inset-0 bg-dot-pattern opacity-30" />
+      {/* Expanding ecosystem — more tools joining the orbit */}
+      <OrbitalEcosystemSVG className="absolute right-[-60px] top-1/2 -translate-y-1/2 w-[400px] h-[400px] opacity-25 pointer-events-none" />
+      <InfraGridSVG className="absolute inset-0 w-full h-full pointer-events-none opacity-40" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] gradient-orb gradient-orb-amber opacity-20" />
       <div className="relative z-10 max-w-5xl mx-auto">
         <motion.p
