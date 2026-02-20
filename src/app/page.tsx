@@ -90,20 +90,20 @@ const mainProducts = [
     demoUrl: "/tools/pharmaroleplay/demo",
     color: "#00D9FF",
     visual: <PharmaRoleplayVisual />,
-    metrics: ["Ramp-up 50% mais rápido", "<200ms latência", "24/7 disponível"],
+    metrics: ["Onboarding 50% mais rápido", "<200ms latência", "24/7 disponível"],
   },
   {
     id: "vigilante",
     icon: <SocialVigilanteLogo size={40} />,
     title: "Social Vigilante",
     headline: "Escute o paciente antes do reporte formal",
-    description: "O paciente não desabafa nos canais oficiais — ele vai ao Twitter, ao Reclame Aqui, ao fórum de pacientes. O Social Vigilante captura esses sinais em tempo real, antes que virem notificações formais, transformando pós-mercado reativo em vigilância preditiva.",
+    description: "O paciente não desabafa nos canais oficiais — ele vai ao X, ao Reclame Aqui, ao fórum de pacientes. O Social Vigilante captura esses sinais em tempo real, antes que virem notificações formais, tornando o pós-mercado preditivo em vez de reativo.",
     badge: "BigQuery ML",
     category: "Vigilância Pós-Mercado",
     demoUrl: "/tools/social-vigilante/demo",
     color: "#A855F7",
     visual: <SocialVigilanteVisual />,
-    metrics: ["100% cobertura pública", "Terabytes/dia", "Alertas em tempo real"],
+    metrics: ["100% cobertura pública", "Web, redes e fóruns", "Alertas em tempo real"],
   },
   {
     id: "medsafe",
@@ -116,7 +116,7 @@ const mainProducts = [
     demoUrl: "/tools/medsafe/demo",
     color: "#10B981",
     visual: <MedSafeVisual />,
-    metrics: ["90% menos tempo de revisão", "Zero falsos positivos", "Auditoria completa"],
+    metrics: ["90% menos tempo de revisão", "Citação por artigo da RDC", "Auditoria completa"],
   },
 ];
 
@@ -143,7 +143,7 @@ const comingSoonProducts = [
 
 const impactStats = [
   { value: "90", suffix: "%", label: "Menos tempo de revisão" },
-  { value: "50", suffix: "%", label: "Ramp-up mais rápido" },
+  { value: "50", suffix: "%", label: "Onboarding mais rápido" },
   { value: "100", suffix: "%", label: "Cobertura de menções" },
   { value: "5", suffix: "", label: "Produtos no ecossistema" },
 ];
@@ -232,11 +232,12 @@ function HeroSection() {
           <span className="block">O ecossistema que leva</span>
           <span className="block py-1">
             <span className="rotating-text-container">
+              <span className="rotating-text-width-ref text-gradient-cyan" aria-hidden="true">treinamento</span>
               <span className="rotating-text-inner">
                 <span className="text-gradient-cyan">treinamento</span>
                 <span className="text-gradient-cyan">compliance</span>
                 <span className="text-gradient-cyan">vigilância</span>
-                <span className="text-gradient-cyan">inovação</span>
+                <span className="text-gradient-cyan">segurança</span>
               </span>
             </span>
           </span>
@@ -250,7 +251,7 @@ function HeroSection() {
           className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto mb-12 leading-relaxed"
         >
           A plataforma de agentes de IA para Life Sciences.
-          Velocidade de campo com segurança regulatória — rastreável, auditável, escalável.
+          Segurança regulatória e velocidade de campo — com rastreabilidade em cada etapa.
         </motion.p>
 
         <motion.div
