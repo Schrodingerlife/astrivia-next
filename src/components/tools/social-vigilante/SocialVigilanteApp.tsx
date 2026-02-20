@@ -154,7 +154,7 @@ export default function SocialVigilanteApp({ embedded = false }: SocialVigilante
     };
 
     return (
-        <div className={`flex overflow-hidden text-white ${embedded ? "h-full min-h-[760px]" : "h-[calc(100vh-82px)]"} bg-[radial-gradient(circle_at_20%_0%,#22103f_0%,#0b1330_36%,#050913_78%)]`}>
+        <div className={`flex text-white ${embedded ? "min-h-[900px]" : "h-[calc(100vh-82px)] overflow-hidden"} bg-[radial-gradient(circle_at_20%_0%,#22103f_0%,#0b1330_36%,#050913_78%)]`}>
             <aside className="hidden md:flex w-[320px] shrink-0 border-r border-white/10 bg-[#090f24]/80 backdrop-blur-xl p-6 flex-col gap-5">
                 <header className="flex items-center gap-3">
                     <div className="h-11 w-11 rounded-xl bg-[#2a1a4f] border border-[#8b5cf6]/35 text-[#c4b5fd] grid place-items-center"><Globe size={19} /></div>

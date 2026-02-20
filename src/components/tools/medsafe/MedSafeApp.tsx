@@ -145,7 +145,10 @@ export default function MedSafeApp() {
             });
             if (!response.ok) {
                 const payload = await response.json().catch(() => ({}));
-                throw new Error(payload?.error || "Falha na análise RAG");
+                const msg = payload?.details
+                    ? `${payload.error}: ${payload.details}`
+                    : payload?.error || "Falha na análise RAG";
+                throw new Error(msg);
             }
             const data = (await response.json()) as AnalysisResult;
             setResult({

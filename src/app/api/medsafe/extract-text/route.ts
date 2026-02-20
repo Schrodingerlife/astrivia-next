@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { GEMINI_TEXT_MODEL } from "@/lib/ai-models";
+import { GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL } from "@/lib/ai-models";
 
 const SUPPORTED_MIME_TYPES = new Set([
     "application/pdf",
@@ -12,6 +12,11 @@ const SUPPORTED_MIME_TYPES = new Set([
     "image/bmp",
     "image/tiff",
 ]);
+
+const EXTRACTION_PROMPT = `Extraia TODO o texto visível neste documento com fidelidade máxima.
+Inclua textos em imagens, tabelas, cabeçalhos, rodapés e qualquer texto impresso ou manuscrito.
+Preserve a estrutura: use quebras de linha para separar seções, mantenha a ordem de leitura natural.
+Retorne APENAS o texto extraído — sem comentários, sem explicações, sem marcadores adicionais.`;
 
 /**
  * POST /api/medsafe/extract-text
@@ -40,31 +45,32 @@ export async function POST(req: Request) {
         }
 
         const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
-        const model = genAI.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
+        const modelNames = [GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL].filter(Boolean);
 
-        const result = await model.generateContent([
-            {
-                inlineData: {
-                    data: fileBase64,
-                    mimeType: normalizedMime,
-                },
-            },
-            `Extraia TODO o texto visível neste documento com fidelidade máxima.
-Inclua textos em imagens, tabelas, cabeçalhos, rodapés e qualquer texto impresso ou manuscrito.
-Preserve a estrutura: use quebras de linha para separar seções, mantenha a ordem de leitura natural.
-Retorne APENAS o texto extraído — sem comentários, sem explicações, sem marcadores adicionais.`,
-        ]);
+        let extracted = "";
+        let lastError: unknown;
 
-        const text = result.response.text().trim();
-
-        if (!text) {
-            return NextResponse.json(
-                { error: "Nenhum texto encontrado no documento" },
-                { status: 422 }
-            );
+        for (const modelName of modelNames) {
+            try {
+                const m = genAI.getGenerativeModel({ model: modelName });
+                const result = await m.generateContent([
+                    { inlineData: { data: fileBase64, mimeType: normalizedMime } },
+                    EXTRACTION_PROMPT,
+                ]);
+                extracted = result.response.text().trim();
+                if (extracted) break;
+            } catch (err) {
+                console.warn(`[extract-text] Model ${modelName} failed:`, err instanceof Error ? err.message : err);
+                lastError = err;
+            }
         }
 
-        return NextResponse.json({ text, charCount: text.length });
+        if (!extracted) {
+            const details = lastError instanceof Error ? lastError.message : "Nenhum texto encontrado";
+            return NextResponse.json({ error: "Nenhum texto encontrado no documento", details }, { status: 422 });
+        }
+
+        return NextResponse.json({ text: extracted, charCount: extracted.length });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : "Unknown error";
         console.error("Extract-text error:", message);

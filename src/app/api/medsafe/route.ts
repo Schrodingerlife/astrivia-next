@@ -1,11 +1,26 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import { GEMINI_TEXT_MODEL } from "@/lib/ai-models";
+import { GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL } from "@/lib/ai-models";
 import { queryVertexSearch } from "@/lib/vertex-search";
 import { writeFirestoreDocument } from "@/lib/firestore-admin";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
+
+async function generateWithFallback(prompt: string): Promise<{ text: string; model: string }> {
+    const models = [GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL].filter(Boolean);
+    let lastError: unknown;
+    for (const modelName of models) {
+        try {
+            const m = genAI.getGenerativeModel({ model: modelName });
+            const result = await m.generateContent(prompt);
+            return { text: result.response.text(), model: modelName };
+        } catch (err) {
+            console.warn(`[MedSafe] Model ${modelName} failed:`, err instanceof Error ? err.message : err);
+            lastError = err;
+        }
+    }
+    throw lastError;
+}
 
 const MEDSAFE_SERVING_CONFIG =
     (process.env.VERTEX_MEDSAFE_SERVING_CONFIG || process.env.VERTEX_MEDSAFE_RAG_SERVING_CONFIG || "").trim();
@@ -164,8 +179,9 @@ Responda APENAS com JSON válido:
   ]
 }`;
 
-        const generation = await model.generateContent(prompt);
-        const responseText = generation.response.text();
+        const generation = await generateWithFallback(prompt);
+        const responseText = generation.text;
+        const usedModel = generation.model;
         const parsed = JSON.parse(extractJsonObject(responseText));
 
         const validatedReferences: MedsafeReference[] = Array.isArray(parsed.referencias)
@@ -198,7 +214,7 @@ Responda APENAS com JSON válido:
             grounded: true,
             retrievalCount,
             ragSource,
-            model: GEMINI_TEXT_MODEL,
+            model: usedModel,
             tempoAnalise: 0,
         };
 
