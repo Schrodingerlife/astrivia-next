@@ -232,7 +232,6 @@ function HeroSection() {
           <span className="block">O ecossistema que leva</span>
           <span className="block py-1">
             <span className="rotating-text-container">
-              <span className="rotating-text-width-ref text-gradient-cyan" aria-hidden="true">treinamento</span>
               <span className="rotating-text-inner">
                 <span className="text-gradient-cyan">treinamento</span>
                 <span className="text-gradient-cyan">compliance</span>
