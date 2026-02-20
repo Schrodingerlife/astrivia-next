@@ -234,7 +234,7 @@ function HeroSection() {
             <span className="rotating-text-container">
               <span className="rotating-text-inner">
                 <span className="text-gradient-cyan">treinamento</span>
-                <span className="text-gradient-cyan">compliance</span>
+                <span className="text-gradient-cyan">clareza</span>
                 <span className="text-gradient-cyan">vigilância</span>
                 <span className="text-gradient-cyan">segurança</span>
               </span>
