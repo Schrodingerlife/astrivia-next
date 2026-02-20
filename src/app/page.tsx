@@ -229,18 +229,18 @@ function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="heading-xl mb-10"
         >
-          <span className="block">O ecossistema que leva</span>
+          <span className="block">O ecossistema que conecta</span>
           <span className="block py-1">
             <span className="rotating-text-container">
               <span className="rotating-text-inner">
                 <span className="text-gradient-cyan">treinamento</span>
-                <span className="text-gradient-cyan">clareza</span>
+                <span className="text-gradient-cyan">compliance</span>
                 <span className="text-gradient-cyan">vigilância</span>
                 <span className="text-gradient-cyan">segurança</span>
               </span>
             </span>
           </span>
-          <span className="block">até o paciente</span>
+          <span className="block">ao paciente</span>
         </motion.h1>
 
         <motion.p
@@ -685,7 +685,7 @@ function CTASection() {
           viewport={{ once: true }}
           className="heading-lg mb-8"
         >
-          A infraestrutura invisível que faz<br className="hidden md:block" /> a história do paciente chegar ao desfecho certo
+          A infraestrutura invisível que garante<br className="hidden md:block" /> o desfecho certo — do campo ao paciente
         </motion.h2>
         <motion.p
           initial={{ opacity: 0 }}
@@ -771,7 +771,7 @@ function ManifestoSection() {
           </div>
           <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5 text-center hover:bg-white/[0.05] transition-colors">
             <Globe size={24} className="text-[#A855F7] mx-auto mb-3" />
-            <p className="text-white/70 text-sm">Pós-mercado que escuta sinais antes</p>
+            <p className="text-white/70 text-sm">Pós-mercado que detecta sinais antes do reporte</p>
           </div>
         </motion.div>
       </div>

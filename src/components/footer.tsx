@@ -33,7 +33,7 @@ export function Footer() {
                             </span>
                         </div>
                         <p className="text-white/35 text-sm leading-relaxed max-w-xs">
-                            Sistema de agentes autônomos para Life Sciences com foco em segurança regulatória e execução enterprise.
+                            Agentes de IA para Life Sciences — segurança regulatória, rastreabilidade e velocidade de campo.
                         </p>
                     </div>
 
@@ -107,7 +107,7 @@ export function Footer() {
                     <p className="text-white/25 text-xs">© 2026 Astrivia AI. Todos os direitos reservados.</p>
                     <span className="text-white/25 text-xs flex items-center gap-2">
                         <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
-                        Todos os sistemas operacionais
+                        Todos os sistemas online
                     </span>
                 </div>
             </div>
