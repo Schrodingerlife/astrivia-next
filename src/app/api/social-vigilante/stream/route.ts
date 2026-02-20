@@ -1,12 +1,27 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import { GEMINI_TEXT_MODEL } from "@/lib/ai-models";
+import { GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL } from "@/lib/ai-models";
 import { writeFirestoreDocument } from "@/lib/firestore-admin";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
-const model = genAI.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
 
-type Platform = "twitter" | "facebook" | "instagram" | "reddit" | "reclameaqui";
+async function generateWithFallback(prompt: string): Promise<string> {
+    const models = [GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL].filter(Boolean);
+    let lastError: unknown;
+    for (const modelName of models) {
+        try {
+            const m = genAI.getGenerativeModel({ model: modelName });
+            const result = await m.generateContent(prompt);
+            return result.response.text();
+        } catch (err) {
+            console.warn(`[SocialVigilante] Model ${modelName} failed:`, err instanceof Error ? err.message : err);
+            lastError = err;
+        }
+    }
+    throw lastError;
+}
+
+type Platform = "twitter" | "facebook" | "instagram" | "reddit" | "reclameaqui" | "hackernews";
 type Sentiment = "negative" | "neutral" | "positive";
 type RiskLevel = "critical" | "high" | "medium" | "low";
 
@@ -23,6 +38,7 @@ function normalizePlatform(value: unknown): Platform {
     if (raw.includes("face")) return "facebook";
     if (raw.includes("reddit")) return "reddit";
     if (raw.includes("reclame")) return "reclameaqui";
+    if (raw.includes("hacker") || raw.includes("hn")) return "hackernews";
     return "twitter";
 }
 
@@ -77,6 +93,39 @@ interface RedditPost {
     url: string;
 }
 
+interface HNHit {
+    objectID: string;
+    title: string;
+    author: string;
+    points: number;
+    num_comments: number;
+    created_at: string;
+    story_url: string | null;
+}
+
+async function fetchHackerNewsPosts(term: string): Promise<HNHit[]> {
+    const encoded = encodeURIComponent(term);
+    const url = `https://hn.algolia.com/api/v1/search?query=${encoded}&tags=story&hitsPerPage=10`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7000);
+
+    try {
+        const response = await fetch(url, {
+            signal: controller.signal,
+            headers: { "Accept": "application/json" },
+        });
+
+        clearTimeout(timeout);
+        if (!response.ok) return [];
+        const data = await response.json();
+        return Array.isArray(data?.hits) ? data.hits.filter((h: HNHit) => h.title) : [];
+    } catch {
+        clearTimeout(timeout);
+        return [];
+    }
+}
+
 async function fetchRedditPosts(term: string): Promise<RedditPost[]> {
     const encoded = encodeURIComponent(term);
     const url = `https://www.reddit.com/search.json?q=${encoded}&sort=new&limit=20&type=link`;
@@ -124,7 +173,7 @@ interface GeminiPost {
 
 async function generateSyntheticPosts(term: string): Promise<GeminiPost[]> {
     const prompt = `Você é um sistema de monitoramento de farmacovigilância em redes sociais.
-Gere ${3 + Math.floor(Math.random() * 3)} posts REALISTAS que poderiam ser encontrados em redes sociais brasileiras sobre "${term}".
+Gere ${4 + Math.floor(Math.random() * 3)} posts REALISTAS que poderiam ser encontrados em redes sociais brasileiras sobre "${term}".
 
 Os posts devem simular o que REALMENTE seria publicado por pacientes, profissionais de saúde ou cuidadores em plataformas brasileiras.
 Varie as plataformas, sentimentos e níveis de risco. Inclua pelo menos 1 post com risco alto ou crítico (evento adverso real).
@@ -141,8 +190,7 @@ Retorne APENAS JSON array:
   }
 ]`;
 
-    const generation = await model.generateContent(prompt);
-    const responseText = generation.response.text();
+    const responseText = await generateWithFallback(prompt);
     const parsed = JSON.parse(extractJsonArray(responseText));
     if (!Array.isArray(parsed)) return [];
     return parsed;
@@ -185,8 +233,8 @@ Retorne APENAS JSON array:
 ]`;
 
     try {
-        const gen = await model.generateContent(prompt);
-        const classified = JSON.parse(extractJsonArray(gen.response.text()));
+        const responseText = await generateWithFallback(prompt);
+        const classified = JSON.parse(extractJsonArray(responseText));
         if (!Array.isArray(classified)) return [];
         return classified;
     } catch {
@@ -207,13 +255,15 @@ export async function POST(req: Request) {
         let posts: unknown[] = [];
         let source = "gemini-generated";
 
-        // Try real Reddit search first
-        const redditRaw = await fetchRedditPosts(term);
+        // Fetch Reddit + Hacker News in parallel
+        const [redditRaw, hnRaw] = await Promise.all([
+            fetchRedditPosts(term),
+            fetchHackerNewsPosts(term),
+        ]);
+
+        const livePosts: unknown[] = [];
 
         if (redditRaw.length > 0) {
-            source = "reddit-live";
-
-            // Classify with Gemini for pharmavigilance relevance
             const classified = await classifyRedditPosts(redditRaw, term);
             const byIndex = new Map(classified.map((c) => [c.index, c]));
 
@@ -246,13 +296,51 @@ export async function POST(req: Request) {
                         complianceFlag: riskLevel === "critical" || riskLevel === "high",
                         confidence: meta?.relevant ? 0.88 : 0.62,
                     },
+                    isSimulated: false,
+                    dataSource: "reddit",
                     status: "new",
                 };
             });
 
-            // Keep only relevant posts, or all if none classified as relevant
             const relevant = mappedPosts.filter((_, i) => byIndex.get(i)?.relevant !== false);
-            posts = relevant.length > 0 ? relevant : mappedPosts.slice(0, 8);
+            livePosts.push(...(relevant.length > 0 ? relevant : mappedPosts.slice(0, 8)));
+        }
+
+        if (hnRaw.length > 0) {
+            const hnPosts = hnRaw.slice(0, 8).map((hit) => {
+                const text = hit.title;
+                const sentiment = heuristicSentiment(text);
+                const riskLevel = heuristicRisk(text);
+                return {
+                    id: `hn-${hit.objectID}`,
+                    platform: "hackernews" as Platform,
+                    author: hit.author || "hn_user",
+                    handle: hit.author || "hn_user",
+                    avatar: `https://i.pravatar.cc/150?u=hn-${hit.objectID}`,
+                    content: hit.title.slice(0, 190),
+                    timestamp: parseTimestamp(hit.created_at),
+                    likes: hit.points || 0,
+                    shares: hit.num_comments || 0,
+                    sentiment,
+                    riskLevel,
+                    sourceUrl: hit.story_url || `https://news.ycombinator.com/item?id=${hit.objectID}`,
+                    aiAnalysis: {
+                        detectedEvent: "Discussão técnica detectada",
+                        drugMentioned: term,
+                        complianceFlag: riskLevel === "critical" || riskLevel === "high",
+                        confidence: 0.70,
+                    },
+                    isSimulated: false,
+                    dataSource: "hackernews",
+                    status: "new",
+                };
+            });
+            livePosts.push(...hnPosts);
+        }
+
+        if (livePosts.length > 0) {
+            source = "live";
+            posts = livePosts;
         }
 
         // Fallback: generate synthetic posts with Gemini
@@ -286,6 +374,8 @@ export async function POST(req: Request) {
                             complianceFlag: riskLevel === "critical" || riskLevel === "high",
                             confidence: 0.72,
                         },
+                        isSimulated: true,
+                        dataSource: "gemini",
                         status: "new",
                     };
                 });
