@@ -312,9 +312,8 @@ h6 {
 .rotating-text-container {
   display: inline-flex;
   overflow: hidden;
-  height: 1.35em;
+  height: 1.2em;
   vertical-align: bottom;
-  padding-top: 0.05em;
 }
 
 .rotating-text-inner {
@@ -324,7 +323,7 @@ h6 {
 }
 
 .rotating-text-inner span {
-  height: 1.35em;
+  height: 1.2em;
   display: flex;
   align-items: center;
 }
