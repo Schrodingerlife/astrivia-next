@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { CheckCircle2, FileText, Loader2, ShieldCheck, Sparkles, Upload } from "lucide-react";
+import { CheckCircle2, FileText, Loader2, ScanText, ShieldCheck, Sparkles, Upload } from "lucide-react";
 
 type RiskLevel = "grave" | "moderada" | "leve";
 type WorkspaceTab = "overview" | "documents";
@@ -30,6 +30,18 @@ interface AnalysisResult {
     }>;
 }
 
+const TEXT_MIME_TYPES = new Set(["text/plain", "text/markdown", "text/csv", "application/csv"]);
+const OCR_MIME_TYPES = new Set([
+    "application/pdf",
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/webp",
+    "image/gif",
+    "image/bmp",
+    "image/tiff",
+]);
+
 function riskClass(level: RiskLevel) {
     if (level === "grave") return "text-red-200 border-red-500/35 bg-red-500/10";
     if (level === "moderada") return "text-amber-200 border-amber-500/35 bg-amber-500/10";
@@ -40,6 +52,7 @@ export default function MedSafeApp() {
     const [tab, setTab] = useState<WorkspaceTab>("overview");
     const [text, setText] = useState("");
     const [fileName, setFileName] = useState<string | null>(null);
+    const [isExtracting, setIsExtracting] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [result, setResult] = useState<AnalysisResult | null>(null);
@@ -68,10 +81,54 @@ export default function MedSafeApp() {
     const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (!file) return;
+        // Reset input value so same file can be re-selected
+        event.target.value = "";
         setFileName(file.name);
-        const reader = new FileReader();
-        reader.onload = () => setText(String(reader.result || ""));
-        reader.readAsText(file);
+        setError(null);
+
+        const isText = TEXT_MIME_TYPES.has(file.type) || /\.(txt|md|csv)$/i.test(file.name);
+        const isOcr = OCR_MIME_TYPES.has(file.type) || /\.(pdf|jpe?g|png|webp|gif|bmp|tiff?)$/i.test(file.name);
+
+        if (isText) {
+            const reader = new FileReader();
+            reader.onload = () => setText(String(reader.result || ""));
+            reader.readAsText(file);
+            return;
+        }
+
+        if (isOcr) {
+            setIsExtracting(true);
+            setText("");
+            const reader = new FileReader();
+            reader.onload = async () => {
+                try {
+                    // Strip the "data:mimeType;base64," prefix
+                    const dataUrl = reader.result as string;
+                    const base64 = dataUrl.split(",")[1];
+                    const mimeType = file.type || (file.name.endsWith(".pdf") ? "application/pdf" : "image/jpeg");
+
+                    const response = await fetch("/api/medsafe/extract-text", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ fileBase64: base64, mimeType }),
+                    });
+                    const data = await response.json();
+                    if (!response.ok) {
+                        setError(data.error || "Falha na leitura do documento");
+                    } else {
+                        setText(data.text);
+                    }
+                } catch {
+                    setError("Falha ao processar o arquivo");
+                } finally {
+                    setIsExtracting(false);
+                }
+            };
+            reader.readAsDataURL(file);
+            return;
+        }
+
+        setError("Formato não suportado. Use PDF, imagem (JPG, PNG, WEBP) ou texto.");
     };
 
     const runAnalysis = async () => {
@@ -143,30 +200,49 @@ export default function MedSafeApp() {
                             Análise de Documento
                         </h3>
                         <div className="flex items-center gap-2">
-                            <input ref={inputRef} type="file" accept=".txt,.md,.csv" onChange={handleUpload} className="hidden" />
+                            {/* Hidden file input — accepts text, PDF and images */}
+                            <input
+                                ref={inputRef}
+                                type="file"
+                                accept=".txt,.md,.csv,.pdf,.jpg,.jpeg,.png,.webp,.gif,.bmp,.tiff,.tif"
+                                onChange={handleUpload}
+                                className="hidden"
+                            />
                             <button
                                 type="button"
                                 onClick={() => inputRef.current?.click()}
-                                className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 hover:text-white"
+                                disabled={isExtracting}
+                                className="inline-flex items-center gap-1 rounded-lg border border-white/15 px-3 py-1.5 text-xs text-white/70 hover:text-white disabled:opacity-50"
                             >
-                                <Upload size={13} />
-                                Upload
+                                {isExtracting ? <Loader2 size={13} className="animate-spin" /> : <Upload size={13} />}
+                                {isExtracting ? "Lendo..." : "Upload"}
                             </button>
                         </div>
                     </div>
 
+                    {/* File badge */}
                     {fileName ? (
-                        <p className="mb-3 inline-flex items-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs text-emerald-200">
-                            Arquivo: {fileName}
+                        <p className="mb-3 inline-flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-xs text-emerald-200">
+                            <ScanText size={12} />
+                            {fileName}
+                            {isExtracting && <span className="text-emerald-300/70">— extraindo texto...</span>}
                         </p>
                     ) : null}
+
+                    {/* Supported formats hint */}
+                    <p className="mb-2 text-[11px] text-white/25">
+                        Formatos: PDF, JPG, PNG, WEBP (OCR automático) · TXT, MD, CSV
+                    </p>
 
                     <textarea
                         value={text}
                         onChange={(event) => setText(event.target.value)}
-                        placeholder="Cole aqui o texto do material promocional para análise de conformidade com a RDC 96/2008..."
-                        className={`w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none ${
-                            tab === "documents" ? "h-[360px]" : "h-[220px]"
+                        placeholder={isExtracting
+                            ? "Extraindo texto do documento via IA..."
+                            : "Cole aqui o texto do material promocional ou faça upload de um PDF/imagem para análise com a RDC 96/2008..."}
+                        disabled={isExtracting}
+                        className={`w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none disabled:opacity-50 ${
+                            tab === "documents" ? "h-[360px]" : "h-[200px]"
                         }`}
                     />
 
@@ -175,7 +251,7 @@ export default function MedSafeApp() {
                         <button
                             type="button"
                             onClick={runAnalysis}
-                            disabled={!text.trim() || isLoading}
+                            disabled={!text.trim() || isLoading || isExtracting}
                             className="btn-primary !px-5 !py-2.5 !text-sm inline-flex items-center gap-2 disabled:opacity-45"
                         >
                             {isLoading ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={15} />}
@@ -231,7 +307,7 @@ export default function MedSafeApp() {
                             <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
                                 <div className="flex items-center gap-4">
                                     <div
-                                        className="h-28 w-28 rounded-full grid place-items-center border border-white/15"
+                                        className="h-28 w-28 rounded-full grid place-items-center border border-white/15 flex-shrink-0"
                                         style={{ background: `conic-gradient(#10B981 ${score * 3.6}deg, rgba(255,255,255,0.08) 0deg)` }}
                                     >
                                         <span className="h-[86px] w-[86px] rounded-full bg-[#07111D] grid place-items-center text-4xl font-bold text-emerald-200">
@@ -243,7 +319,7 @@ export default function MedSafeApp() {
                                         <p className="text-xs text-white/55 mt-1">{result?.resumo ?? "A análise aparecerá após envio do material."}</p>
                                         <p className="text-[11px] text-white/35 mt-2">Tempo: {(result?.tempoAnalise ?? 0).toFixed(1)}s</p>
                                         {result?.analysisId ? (
-                                            <p className="text-[11px] text-emerald-300/90 mt-1">ID da análise: {result.analysisId}</p>
+                                            <p className="text-[11px] text-emerald-300/90 mt-1">ID: {result.analysisId}</p>
                                         ) : null}
                                         {typeof result?.retrievalCount === "number" ? (
                                             <p className="text-[11px] text-cyan-300/90 mt-1">Contextos RAG: {result.retrievalCount}</p>

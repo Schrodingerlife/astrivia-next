@@ -213,7 +213,7 @@ function HeroSection() {
           transition={{ duration: 0.8, delay: 0.1 }}
           className="heading-xl mb-10"
         >
-          A cadeia que conecta
+          O ecossistema que leva
           <br />
           <span className="text-gradient-cyan rotating-text-container">
             <span className="rotating-text-inner">
@@ -224,7 +224,7 @@ function HeroSection() {
             </span>
           </span>
           <br />
-          ao paciente
+          até o paciente
         </motion.h1>
 
         <motion.p
@@ -318,7 +318,7 @@ function ProductShowcase() {
         >
           <p className="label mb-4 text-[#00D9FF]">Produtos</p>
           <h2 className="heading-lg mb-6">
-            Cada ferramenta resolve um elo<br className="hidden md:block" /> da cadeia até o paciente
+            Três agentes. Um ecossistema.<br className="hidden md:block" /> O desfecho que importa: o paciente.
           </h2>
           <p className="text-lg text-white/45 max-w-xl mx-auto">
             3 demos disponíveis agora. Teste direto no navegador.
@@ -609,7 +609,7 @@ function TeamSection() {
         >
           <p className="label mb-4">Liderança</p>
           <h2 className="heading-lg">
-            Da operação ao regulatório —<br className="hidden md:block" /> founders que viveram cada elo da cadeia
+            Da operação ao regulatório —<br className="hidden md:block" /> founders que conhecem cada ponto do ecossistema
           </h2>
         </motion.div>
 
@@ -733,7 +733,7 @@ function ManifestoSection() {
             escutar sinais de risco no mundo real.&rdquo;
           </p>
           <p className="text-white/50 text-base md:text-lg mt-8 not-italic">
-            A Astrivia constrói essa cadeia para ser rápida, segura e auditável — porque
+            A Astrivia constrói essa infraestrutura para ser rápida, segura e auditável — porque
             eficiência em Life Sciences não é economia: <span className="text-white font-medium">é cuidado.</span>
           </p>
         </motion.blockquote>
