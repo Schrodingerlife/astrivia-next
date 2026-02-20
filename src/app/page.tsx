@@ -17,6 +17,7 @@ import {
   Award,
 } from "lucide-react";
 import {
+  AstriviaSymbol,
   PharmaRoleplayLogo,
   SocialVigilanteLogo,
   MedSafeLogo,
@@ -195,10 +196,23 @@ function HeroSection() {
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse,rgba(0,217,255,0.06),transparent_70%)]" />
 
       <div className="relative z-10 max-w-5xl mx-auto text-center">
+        {/* Brand identity */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex items-center justify-center gap-3 mb-8"
+        >
+          <AstriviaSymbol size={42} />
+          <span className="text-[28px] font-bold tracking-tight text-white leading-none">
+            Astrivia <span className="text-[#00D9FF]">AI</span>
+          </span>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
           className="mb-8"
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-sm text-white/40 backdrop-blur-sm">
@@ -210,7 +224,7 @@ function HeroSection() {
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
           className="heading-xl mb-10"
         >
           O ecossistema que leva
