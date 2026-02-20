@@ -203,9 +203,11 @@ function HeroSection() {
           transition={{ duration: 0.5 }}
           className="flex items-center justify-center gap-3 mb-8"
         >
-          <AstriviaSymbol size={42} />
-          <span className="text-[28px] font-bold tracking-tight text-white leading-none">
-            Astrivia <span className="text-[#00D9FF]">AI</span>
+          <div className="brand-symbol-glow">
+            <AstriviaSymbol size={42} />
+          </div>
+          <span className="text-[28px] font-bold tracking-tight leading-none brand-name-shimmer">
+            Astrivia AI
           </span>
         </motion.div>
 

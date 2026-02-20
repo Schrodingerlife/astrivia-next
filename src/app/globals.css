@@ -312,8 +312,11 @@ h6 {
 .rotating-text-container {
   display: inline-flex;
   overflow: hidden;
-  height: 1.2em;
+  height: 1.15em;
   vertical-align: bottom;
+  /* Soft fade at edges so accents don't hard-clip */
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
 }
 
 .rotating-text-inner {
@@ -323,7 +326,7 @@ h6 {
 }
 
 .rotating-text-inner span {
-  height: 1.2em;
+  height: 1.15em;
   display: flex;
   align-items: center;
 }
@@ -666,6 +669,37 @@ select.form-input option {
     radial-gradient(at 20% 30%, rgba(0, 217, 255, 0.04) 0%, transparent 50%),
     radial-gradient(at 80% 70%, rgba(168, 85, 247, 0.04) 0%, transparent 50%),
     radial-gradient(at 50% 50%, rgba(16, 185, 129, 0.02) 0%, transparent 50%);
+}
+
+/* ---------- BRAND IDENTITY EFFECTS ---------- */
+@keyframes brandShimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+.brand-name-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.85) 0%,
+    rgba(255, 255, 255, 0.85) 30%,
+    rgba(0, 217, 255, 1) 50%,
+    rgba(255, 255, 255, 0.85) 70%,
+    rgba(255, 255, 255, 0.85) 100%
+  );
+  background-size: 300% auto;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: brandShimmer 5s linear infinite;
+}
+
+@keyframes symbolGlow {
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(0, 217, 255, 0.35)); }
+  50%       { filter: drop-shadow(0 0 18px rgba(0, 217, 255, 0.75)); }
+}
+
+.brand-symbol-glow {
+  animation: symbolGlow 3.5s ease-in-out infinite;
 }
 
 /* ---------- ANIMATIONS ---------- */
