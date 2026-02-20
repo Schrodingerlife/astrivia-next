@@ -310,50 +310,39 @@ h6 {
 
 /* ---------- ROTATING TEXT (Hero) ---------- */
 .rotating-text-container {
-  display: inline-flex;
-  overflow: hidden;
+  display: block;
+  position: relative;
+  width: 100%;
   height: 1.5em;
-  vertical-align: bottom;
 }
 
 .rotating-text-inner {
-  display: flex;
-  flex-direction: column;
-  animation: rotateWords 8s ease-in-out infinite;
+  position: absolute;
+  inset: 0;
 }
 
+/* Each word stacks in the same spot — fades in/out independently, no slide overlap */
 .rotating-text-inner span {
-  height: 1.5em;
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
+  justify-content: center;
+  opacity: 0;
+  animation: wordCycle 8s ease-in-out infinite;
 }
 
-@keyframes rotateWords {
+.rotating-text-inner span:nth-child(1) { animation-delay: 0s; }
+.rotating-text-inner span:nth-child(2) { animation-delay: 2s; }
+.rotating-text-inner span:nth-child(3) { animation-delay: 4s; }
+.rotating-text-inner span:nth-child(4) { animation-delay: 6s; }
 
-  0%,
-  18% {
-    transform: translateY(0);
-  }
-
-  22%,
-  40% {
-    transform: translateY(-1.5em);
-  }
-
-  44%,
-  62% {
-    transform: translateY(-3em);
-  }
-
-  66%,
-  84% {
-    transform: translateY(-4.5em);
-  }
-
-  88%,
-  100% {
-    transform: translateY(0);
-  }
+@keyframes wordCycle {
+  0%    { opacity: 0; transform: translateY(8px); }
+  5%    { opacity: 1; transform: translateY(0);   }
+  20%   { opacity: 1; transform: translateY(0);   }
+  25%   { opacity: 0; transform: translateY(-8px);}
+  100%  { opacity: 0; transform: translateY(-8px);}
 }
 
 /* ---------- NUMBERED STEPS ---------- */
