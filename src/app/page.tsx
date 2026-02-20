@@ -215,12 +215,12 @@ function HeroSection() {
         >
           O ecossistema que leva
           <br />
-          <span className="text-gradient-cyan rotating-text-container">
+          <span className="rotating-text-container">
             <span className="rotating-text-inner">
-              <span>treinamento</span>
-              <span>compliance</span>
-              <span>vigilância</span>
-              <span>inovação</span>
+              <span className="text-gradient-cyan">treinamento</span>
+              <span className="text-gradient-cyan">compliance</span>
+              <span className="text-gradient-cyan">vigilância</span>
+              <span className="text-gradient-cyan">inovação</span>
             </span>
           </span>
           <br />
