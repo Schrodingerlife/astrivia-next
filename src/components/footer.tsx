@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { toolsConfig, upcomingToolsConfig } from "@/lib/tools-config";
+import { AstriviaSymbol } from "@/components/product-logos";
 
 const companyLinks = [
     { name: "Tecnologia", href: "/technology" },
@@ -25,8 +26,12 @@ export function Footer() {
             <div className="site-container">
                 <div className="grid lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] gap-10 mb-12">
                     <div>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src="/images/astrivia-logo-fixed.png" alt="Astrivia AI" className="h-9 mb-4 opacity-80" />
+                        <div className="flex items-center gap-2 mb-4">
+                            <AstriviaSymbol size={28} />
+                            <span className="text-[18px] font-bold tracking-tight text-white/80 leading-none">
+                                Astrivia <span className="text-[#00D9FF]">AI</span>
+                            </span>
+                        </div>
                         <p className="text-white/35 text-sm leading-relaxed max-w-xs">
                             Sistema de agentes autônomos para Life Sciences com foco em segurança regulatória e execução enterprise.
                         </p>
