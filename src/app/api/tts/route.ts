@@ -32,7 +32,7 @@ function createWavHeader(pcmLength: number): Buffer {
 }
 
 function buildPrompt(text: string): string {
-    return `Fale com voz masculina natural, tom profissional e caloroso de médico brasileiro. Ritmo moderado, claro e articulado. Evite sonar robótico e mantenha entonação humana:\n\n${text}`;
+    return `Você é um médico brasileiro falando em consulta. Fale de forma completamente natural e humana: ritmo ágil e fluido como numa conversa real, entonação expressiva e variada, sem pausas artificiais entre frases. Tom direto e confiante, com calor humano. Não separe sílabas, não soe formal demais:\n\n${text}`;
 }
 
 async function generateGeminiTts(prompt: string, model: string): Promise<Buffer> {

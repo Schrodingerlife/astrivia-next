@@ -1,243 +1,323 @@
 "use client";
 
 /**
- * Life Sciences themed SVG background components.
- * Pure SVG + CSS — zero extra dependencies.
+ * Ecosystem-themed SVG backgrounds for Astrivia.
+ *
+ * Visual concept: three nested ecosystems converging toward the patient —
+ *   Outer:  Industry sectors (field, regulatory, marketing, post-market)
+ *   Middle: Astrivia tools (PharmaRoleplay, Social Vigilante, MedSafe…)
+ *   Core:   Google infrastructure connecting everything
+ *   Center: The patient — the purpose of it all
+ *
+ * All pure SVG + CSS, zero JS animation overhead.
  */
 
-/* ══ MOLECULAR NETWORK ══════════════════════════════════════════════════════ */
-// Floating nodes connected like a pharma/biotech molecular graph
+/* ══ ECOSYSTEM CONVERGENCE FLOW ═════════════════════════════════════════════
+ * Multiple streams flowing from the edges toward a glowing center.
+ * Represents industry sectors + tools all pointing at the patient outcome.
+ */
+export function ConvergeFlowSVG({ className = "" }: { className?: string }) {
+    // Sources: positions around the canvas edges
+    const W = 600, H = 500;
+    const cx = W * 0.55, cy = H * 0.48; // "patient" focus point (slightly off-center)
 
-const MOL_NODES = [
-    { id: "a", cx: 80,  cy: 100, r: 6,  color: "#00D9FF", delay: "0s"   },
-    { id: "b", cx: 220, cy: 50,  r: 4,  color: "#A855F7", delay: "0.8s" },
-    { id: "c", cx: 340, cy: 130, r: 8,  color: "#00D9FF", delay: "1.4s" },
-    { id: "d", cx: 170, cy: 200, r: 5,  color: "#10B981", delay: "0.3s" },
-    { id: "e", cx: 55,  cy: 290, r: 4,  color: "#A855F7", delay: "1.1s" },
-    { id: "f", cx: 290, cy: 260, r: 6,  color: "#00D9FF", delay: "1.9s" },
-    { id: "g", cx: 420, cy: 190, r: 5,  color: "#10B981", delay: "0.5s" },
-    { id: "h", cx: 140, cy: 360, r: 4,  color: "#00D9FF", delay: "2.1s" },
-    { id: "i", cx: 370, cy: 360, r: 7,  color: "#A855F7", delay: "0.7s" },
-    { id: "j", cx: 240, cy: 430, r: 4,  color: "#10B981", delay: "1.6s" },
-    { id: "k", cx: 460, cy: 310, r: 3,  color: "#00D9FF", delay: "1.3s" },
-    { id: "l", cx: 30,  cy: 180, r: 3,  color: "#10B981", delay: "0.9s" },
-];
+    const sources = [
+        { x: 20,  y: 60,   color: "#00D9FF", label: "Campo",       delay: "0s"    },
+        { x: 60,  y: 200,  color: "#A855F7", label: "Regulatório", delay: "0.4s"  },
+        { x: 30,  y: 370,  color: "#10B981", label: "Pós-mercado", delay: "0.9s"  },
+        { x: 180, y: 470,  color: "#00D9FF", label: "Compliance",  delay: "1.3s"  },
+        { x: 400, y: 490,  color: "#A855F7", label: "Marketing",   delay: "0.2s"  },
+        { x: 560, y: 420,  color: "#10B981", label: "Safety",      delay: "1.1s"  },
+        { x: 590, y: 200,  color: "#00D9FF", label: "MedSafe",     delay: "0.7s"  },
+        { x: 490, y: 30,   color: "#A855F7", label: "Roleplay",    delay: "1.6s"  },
+        { x: 280, y: 10,   color: "#10B981", label: "Vigilante",   delay: "0.5s"  },
+        { x: 120, y: 20,   color: "#00D9FF", label: "Letterfix",   delay: "1.8s"  },
+    ];
 
-const MOL_EDGES = [
-    ["a","b"],["b","c"],["a","d"],["c","g"],["d","e"],["d","f"],
-    ["f","g"],["e","h"],["f","i"],["i","j"],["h","j"],["b","d"],
-    ["c","f"],["g","i"],["g","k"],["a","l"],["l","e"],["c","i"],
-];
+    // Generate a curved bezier path from source to focus, with a natural arc
+    function curveTo(sx: number, sy: number, i: number): string {
+        // Control point: midpoint offset to create natural curve
+        const mx = (sx + cx) / 2;
+        const my = (sy + cy) / 2;
+        const offset = (i % 2 === 0 ? 1 : -1) * 40;
+        const cpx = mx + (sy - cy) * 0.2 + offset;
+        const cpy = my - (sx - cx) * 0.2 + offset;
+        return `M ${sx} ${sy} Q ${cpx} ${cpy} ${cx} ${cy}`;
+    }
 
-export function MolecularNetworkSVG({ className = "" }: { className?: string }) {
     return (
         <svg
             className={className}
-            viewBox="0 0 500 480"
+            viewBox={`0 0 ${W} ${H}`}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
         >
             <defs>
-                {MOL_NODES.map(n => (
-                    <radialGradient key={`mg-${n.id}`} id={`mg-${n.id}`} cx="50%" cy="50%" r="50%">
-                        <stop offset="0%" stopColor={n.color} stopOpacity="0.6" />
-                        <stop offset="100%" stopColor={n.color} stopOpacity="0" />
-                    </radialGradient>
+                {sources.map((s, i) => (
+                    <linearGradient key={`cg-${i}`} id={`cg-${i}`}
+                        x1={s.x} y1={s.y} x2={cx} y2={cy} gradientUnits="userSpaceOnUse">
+                        <stop offset="0%"   stopColor={s.color} stopOpacity="0" />
+                        <stop offset="40%"  stopColor={s.color} stopOpacity="0.35" />
+                        <stop offset="100%" stopColor={s.color} stopOpacity="0.7" />
+                    </linearGradient>
                 ))}
-                <filter id="mol-glow">
-                    <feGaussianBlur stdDeviation="1.5" result="blur" />
+                {/* Center glow */}
+                <radialGradient id="cg-center" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stopColor="#00D9FF" stopOpacity="0.9" />
+                    <stop offset="40%"  stopColor="#00D9FF" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#00D9FF" stopOpacity="0" />
+                </radialGradient>
+                <radialGradient id="cg-halo" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stopColor="#ffffff" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+                </radialGradient>
+                <filter id="cf-glow">
+                    <feGaussianBlur stdDeviation="2" result="blur" />
                     <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
                 </filter>
             </defs>
 
-            {/* Connection lines */}
-            {MOL_EDGES.map(([from, to], i) => {
-                const a = MOL_NODES.find(n => n.id === from)!;
-                const b = MOL_NODES.find(n => n.id === to)!;
-                return (
-                    <line key={i}
-                        x1={a.cx} y1={a.cy} x2={b.cx} y2={b.cy}
-                        stroke="rgba(0,217,255,0.10)" strokeWidth="1"
+            {/* Flow paths */}
+            {sources.map((s, i) => (
+                <g key={i}>
+                    <path
+                        d={curveTo(s.x, s.y, i)}
+                        stroke={`url(#cg-${i})`}
+                        strokeWidth="1.2"
+                        strokeLinecap="round"
                     />
-                );
-            })}
-
-            {/* Nodes */}
-            {MOL_NODES.map(n => (
-                <g key={n.id} style={{ animationDelay: n.delay }} className="mol-node-float">
-                    {/* Outer glow halo */}
-                    <circle cx={n.cx} cy={n.cy} r={n.r * 5} fill={`url(#mg-${n.id})`} />
-                    {/* Main node */}
-                    <circle cx={n.cx} cy={n.cy} r={n.r} fill={n.color} opacity="0.55" filter="url(#mol-glow)" />
-                    {/* Bright center */}
-                    <circle cx={n.cx} cy={n.cy} r={n.r * 0.45} fill="white" opacity="0.7" />
+                    {/* Animated dot flowing along each path */}
+                    <circle r="2.5" fill={s.color} opacity="0.8" filter="url(#cf-glow)">
+                        <animateMotion
+                            dur={`${2.8 + (i % 4) * 0.5}s`}
+                            repeatCount="indefinite"
+                            begin={s.delay}
+                        >
+                            <mpath href={`#flow-path-${i}`} />
+                        </animateMotion>
+                    </circle>
+                    <path id={`flow-path-${i}`} d={curveTo(s.x, s.y, i)} style={{ display: "none" }} />
+                    {/* Source node */}
+                    <circle cx={s.x} cy={s.y} r="3" fill={s.color} opacity="0.4" />
+                    <circle cx={s.x} cy={s.y} r="5" fill={s.color} opacity="0.08" />
                 </g>
             ))}
+
+            {/* Center "patient" node */}
+            <circle cx={cx} cy={cy} r="40" fill="url(#cg-center)" />
+            <circle cx={cx} cy={cy} r="20" fill="url(#cg-center)" />
+            <circle cx={cx} cy={cy} r="8"  fill="url(#cg-halo)" filter="url(#cf-glow)" />
+            <circle cx={cx} cy={cy} r="3"  fill="white" opacity="0.9" />
+
+            {/* Pulse rings on center */}
+            <circle cx={cx} cy={cy} r="14" stroke="#00D9FF" strokeWidth="0.8" strokeOpacity="0.3">
+                <animate attributeName="r" values="14;30;14" dur="3s" repeatCount="indefinite" />
+                <animate attributeName="stroke-opacity" values="0.3;0;0.3" dur="3s" repeatCount="indefinite" />
+            </circle>
         </svg>
     );
 }
 
-/* ══ DNA HELIX ══════════════════════════════════════════════════════════════ */
-// Vertical double helix — pharma's most iconic visual
+/* ══ ORBITAL ECOSYSTEM ══════════════════════════════════════════════════════
+ * Three concentric elliptical orbits, each tilted at a different angle.
+ * Outer = industry sectors, Middle = Astrivia tools, Inner = Google infra.
+ * Nodes orbit each ring. Center glows.
+ */
+export function OrbitalEcosystemSVG({ className = "" }: { className?: string }) {
+    const cx = 250, cy = 250;
 
-function buildHelixPath(cx: number, amp: number, cycleH: number, cycles: number, phase: number): string {
-    // One full sine cycle = two cubic bezier segments
-    let d = `M ${cx + amp * Math.sin(phase)} 0`;
-    for (let i = 0; i < cycles; i++) {
-        const y0 = i * cycleH;
-        const y1 = y0 + cycleH / 2;
-        const y2 = y0 + cycleH;
-        // Up half
-        d += ` C ${cx + amp * 1.5 * Math.cos(phase)} ${y0 + cycleH * 0.25},`;
-        d += ` ${cx + amp * 1.5 * Math.cos(phase)} ${y0 + cycleH * 0.25 * 3},`;
-        d += ` ${cx - amp * Math.sin(phase)} ${y1}`;
-        // Down half
-        d += ` C ${cx - amp * 1.5 * Math.cos(phase)} ${y1 + cycleH * 0.25},`;
-        d += ` ${cx - amp * 1.5 * Math.cos(phase)} ${y1 + cycleH * 0.25 * 3},`;
-        d += ` ${cx + amp * Math.sin(phase)} ${y2}`;
-    }
-    return d;
-}
+    const orbits = [
+        // [rx, ry, rotation, color, nodeCount, duration, orbitOpacity]
+        [160, 55,  -15, "#00D9FF", 4, "28s", 0.18],
+        [110, 40,   30, "#A855F7", 3, "20s", 0.22],
+        [ 65, 25,  -45, "#10B981", 3, "14s", 0.28],
+    ] as const;
 
-export function DNAHelixSVG({ className = "" }: { className?: string }) {
-    const cx = 60, amp = 32, cycleH = 80, cycles = 6;
-    const totalH = cycleH * cycles;
-
-    // Generate crossbar points (one per half-cycle, alternating sides)
-    const crossbars: Array<{ y: number; x1: number; x2: number; opacity: number }> = [];
-    for (let i = 0; i < cycles * 2; i++) {
-        const y = i * (cycleH / 2) + cycleH / 4;
-        const side = i % 2 === 0 ? 1 : -1;
-        crossbars.push({
-            y,
-            x1: cx + amp * 0.9 * side,
-            x2: cx - amp * 0.9 * side,
-            opacity: 0.25 + (Math.abs(Math.sin(i * 0.9)) * 0.35),
-        });
+    // Points evenly distributed on an ellipse, rotated by angle
+    function ellipsePoint(rx: number, ry: number, angleDeg: number, t: number): [number, number] {
+        const a = (t * 2 * Math.PI) + (angleDeg * Math.PI / 180);
+        const rotRad = angleDeg * Math.PI / 180;
+        const x0 = rx * Math.cos(a);
+        const y0 = ry * Math.sin(a);
+        return [
+            cx + x0 * Math.cos(rotRad) - y0 * Math.sin(rotRad),
+            cy + x0 * Math.sin(rotRad) + y0 * Math.cos(rotRad),
+        ];
     }
 
     return (
         <svg
             className={className}
-            viewBox={`0 0 120 ${totalH}`}
+            viewBox="0 0 500 500"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
         >
             <defs>
-                <linearGradient id="dna-grad-1" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#00D9FF" stopOpacity="0" />
-                    <stop offset="20%" stopColor="#00D9FF" stopOpacity="0.5" />
-                    <stop offset="80%" stopColor="#A855F7" stopOpacity="0.5" />
-                    <stop offset="100%" stopColor="#A855F7" stopOpacity="0" />
-                </linearGradient>
-                <linearGradient id="dna-grad-2" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#A855F7" stopOpacity="0" />
-                    <stop offset="20%" stopColor="#A855F7" stopOpacity="0.5" />
-                    <stop offset="80%" stopColor="#00D9FF" stopOpacity="0.5" />
+                <radialGradient id="orb-center" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stopColor="#00D9FF" stopOpacity="1" />
+                    <stop offset="35%"  stopColor="#00D9FF" stopOpacity="0.4" />
                     <stop offset="100%" stopColor="#00D9FF" stopOpacity="0" />
-                </linearGradient>
-                <filter id="dna-glow">
-                    <feGaussianBlur stdDeviation="1" result="blur" />
-                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </radialGradient>
+                <filter id="orb-glow">
+                    <feGaussianBlur stdDeviation="2" result="b" />
+                    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
                 </filter>
+                {orbits.map(([rx, ry, rot, color, , , ], i) => (
+                    <linearGradient key={`og-${i}`} id={`og-${i}`} x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%"   stopColor={color} stopOpacity="0" />
+                        <stop offset="50%"  stopColor={color} stopOpacity="0.45" />
+                        <stop offset="100%" stopColor={color} stopOpacity="0" />
+                    </linearGradient>
+                ))}
             </defs>
 
-            {/* Crossbars */}
-            {crossbars.map((cb, i) => (
-                <line key={i}
-                    x1={cb.x1} y1={cb.y} x2={cb.x2} y2={cb.y}
-                    stroke="#00D9FF" strokeWidth="1.5"
-                    strokeOpacity={cb.opacity}
+            {/* Orbit ellipses */}
+            {orbits.map(([rx, ry, rot, color, , , opacity], i) => (
+                <ellipse key={i}
+                    cx={cx} cy={cy} rx={rx} ry={ry}
+                    transform={`rotate(${rot} ${cx} ${cy})`}
+                    stroke={color} strokeWidth="0.8" strokeOpacity={opacity}
+                    strokeDasharray="4 8"
                 />
             ))}
 
-            {/* Strand 1 */}
-            <path
-                d={buildHelixPath(cx, amp, cycleH, cycles, 0)}
-                stroke="url(#dna-grad-1)"
-                strokeWidth="2"
-                filter="url(#dna-glow)"
-            />
-            {/* Strand 2 */}
-            <path
-                d={buildHelixPath(cx, amp, cycleH, cycles, Math.PI)}
-                stroke="url(#dna-grad-2)"
-                strokeWidth="2"
-                filter="url(#dna-glow)"
-            />
+            {/* Orbiting nodes */}
+            {orbits.map(([rx, ry, rot, color, count, duration], orbitIdx) =>
+                Array.from({ length: count }, (_, ni) => {
+                    const t0 = ni / count;
+                    const [px, py] = ellipsePoint(rx, ry, rot as number, t0);
+                    return (
+                        <g key={`n-${orbitIdx}-${ni}`}>
+                            {/* Glow halo */}
+                            <circle cx={px} cy={py} r="10" fill={color} opacity="0.06" />
+                            {/* Node */}
+                            <circle cx={px} cy={py} r="3.5" fill={color} opacity="0.65" filter="url(#orb-glow)" />
+                            <circle cx={px} cy={py} r="1.5" fill="white" opacity="0.8" />
+                            {/* Line to center */}
+                            <line x1={px} y1={py} x2={cx} y2={cy}
+                                stroke={color} strokeWidth="0.5" strokeOpacity="0.12" />
+                        </g>
+                    );
+                })
+            )}
 
-            {/* Node dots at crossbar intersections — strand 1 side */}
-            {crossbars.map((cb, i) => (
-                <g key={`dot-${i}`}>
-                    <circle cx={cb.x1} cy={cb.y} r="3" fill={i % 2 === 0 ? "#00D9FF" : "#A855F7"} opacity="0.6" />
-                    <circle cx={cb.x2} cy={cb.y} r="3" fill={i % 2 === 0 ? "#A855F7" : "#00D9FF"} opacity="0.6" />
-                </g>
-            ))}
+            {/* Center glow — "the patient" */}
+            <circle cx={cx} cy={cy} r="45" fill="url(#orb-center)" />
+            <circle cx={cx} cy={cy} r="20" fill="url(#orb-center)" opacity="0.7" />
+            <circle cx={cx} cy={cy} r="7"  fill="white" opacity="0.8" filter="url(#orb-glow)" />
+            <circle cx={cx} cy={cy} r="3"  fill="white" />
+
+            {/* Pulse */}
+            <circle cx={cx} cy={cy} stroke="#00D9FF" strokeWidth="0.8" fill="none">
+                <animate attributeName="r" values="10;55;10" dur="4s" repeatCount="indefinite" />
+                <animate attributeName="stroke-opacity" values="0.4;0;0.4" dur="4s" repeatCount="indefinite" />
+            </circle>
         </svg>
     );
 }
 
-/* ══ HEXAGON GRID ═══════════════════════════════════════════════════════════ */
-// Honeycomb / molecular lattice pattern
+/* ══ INFRASTRUCTURE GRID ═════════════════════════════════════════════════════
+ * Clean tech node-graph representing the Google Cloud backbone.
+ * Nodes at grid intersections, some highlighted as hubs.
+ * More architectural/tech, less biological.
+ */
+export function InfraGridSVG({ className = "" }: { className?: string }) {
+    const COLS = 13, ROWS = 6;
+    const SPACING = 70;
+    const W = COLS * SPACING, H = ROWS * SPACING;
 
-export function HexagonGridSVG({ className = "" }: { className?: string }) {
-    const hexSize = 28;
-    const cols = 16, rows = 7;
-    const hexW = hexSize * 2;
-    const hexH = Math.sqrt(3) * hexSize;
-    const hexagons: Array<{ x: number; y: number; id: number; lit: boolean }> = [];
-    let id = 0;
+    // Hub nodes that glow — represent key connection points
+    const hubs = new Set([
+        `2-1`, `5-2`, `8-1`, `11-2`,
+        `1-3`, `4-4`, `7-3`, `10-4`, `12-3`,
+        `3-5`, `6-4`, `9-5`,
+    ]);
 
-    // Highlight some hexagons thematically
-    const litSet = new Set([2, 7, 15, 22, 31, 38, 45, 55, 60, 68, 75]);
+    type Node = { x: number; y: number; key: string; isHub: boolean };
+    const nodes: Node[] = [];
 
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            const x = c * hexW * 0.75 + hexSize;
-            const y = r * hexH + (c % 2 === 0 ? 0 : hexH / 2) + hexSize;
-            hexagons.push({ x, y, id: id++, lit: litSet.has(id) });
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            nodes.push({
+                x: c * SPACING + SPACING / 2,
+                y: r * SPACING + SPACING / 2,
+                key: `${c}-${r}`,
+                isHub: hubs.has(`${c}-${r}`),
+            });
         }
     }
 
-    function hexPoints(cx: number, cy: number, size: number): string {
-        return Array.from({ length: 6 }, (_, i) => {
-            const angle = (Math.PI / 180) * (60 * i - 30);
-            return `${cx + size * Math.cos(angle)},${cy + size * Math.sin(angle)}`;
-        }).join(" ");
+    // Edges: connect adjacent nodes (horizontal + vertical + some diagonals)
+    const edges: Array<[Node, Node]> = [];
+    for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+            const n = nodes[r * COLS + c];
+            if (c < COLS - 1) edges.push([n, nodes[r * COLS + c + 1]]);       // horizontal
+            if (r < ROWS - 1) edges.push([n, nodes[(r + 1) * COLS + c]]);     // vertical
+            if (c < COLS - 1 && r < ROWS - 1 && (c + r) % 3 === 0)            // selective diagonal
+                edges.push([n, nodes[(r + 1) * COLS + c + 1]]);
+        }
     }
 
     return (
         <svg
             className={className}
-            viewBox={`0 0 ${hexW * cols * 0.75 + hexSize} ${hexH * rows + hexH}`}
+            viewBox={`0 0 ${W} ${H}`}
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
         >
             <defs>
-                <radialGradient id="hex-lit-1" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#00D9FF" stopOpacity="0.18" />
+                <radialGradient id="ig-hub-c" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stopColor="#00D9FF" stopOpacity="0.5" />
                     <stop offset="100%" stopColor="#00D9FF" stopOpacity="0" />
                 </radialGradient>
-                <radialGradient id="hex-lit-2" cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor="#A855F7" stopOpacity="0.14" />
+                <radialGradient id="ig-hub-p" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%"   stopColor="#A855F7" stopOpacity="0.4" />
                     <stop offset="100%" stopColor="#A855F7" stopOpacity="0" />
                 </radialGradient>
+                <filter id="ig-glow">
+                    <feGaussianBlur stdDeviation="1.5" result="b" />
+                    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
             </defs>
-            {hexagons.map((h, i) => (
-                <polygon
-                    key={h.id}
-                    points={hexPoints(h.x, h.y, hexSize - 1)}
-                    fill={h.lit ? (i % 3 === 0 ? "url(#hex-lit-1)" : "url(#hex-lit-2)") : "none"}
-                    stroke={h.lit ? "rgba(0,217,255,0.15)" : "rgba(255,255,255,0.04)"}
-                    strokeWidth="0.8"
-                    style={h.lit ? {
-                        animation: `hexPulse ${2.5 + (i % 3)}s ease-in-out infinite`,
-                        animationDelay: `${(i % 7) * 0.4}s`,
-                    } : undefined}
+
+            {/* Grid edges */}
+            {edges.map(([a, b], i) => (
+                <line key={i}
+                    x1={a.x} y1={a.y} x2={b.x} y2={b.y}
+                    stroke="rgba(255,255,255,0.045)" strokeWidth="0.8"
                 />
+            ))}
+
+            {/* Nodes */}
+            {nodes.map((n, i) => (
+                <g key={n.key}>
+                    {n.isHub && (
+                        <>
+                            <circle cx={n.x} cy={n.y} r="14"
+                                fill={i % 2 === 0 ? "url(#ig-hub-c)" : "url(#ig-hub-p)"}
+                                style={{
+                                    animation: `hexPulse ${2 + (i % 3)}s ease-in-out infinite`,
+                                    animationDelay: `${(i % 5) * 0.5}s`,
+                                }}
+                            />
+                            <circle cx={n.x} cy={n.y} r="3.5"
+                                fill={i % 2 === 0 ? "#00D9FF" : "#A855F7"}
+                                opacity="0.7"
+                                filter="url(#ig-glow)"
+                            />
+                            <circle cx={n.x} cy={n.y} r="1.5" fill="white" opacity="0.8" />
+                        </>
+                    )}
+                    {!n.isHub && (
+                        <circle cx={n.x} cy={n.y} r="1.5"
+                            fill="rgba(255,255,255,0.12)"
+                        />
+                    )}
+                </g>
             ))}
         </svg>
     );
