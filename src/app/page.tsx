@@ -229,18 +229,18 @@ function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="heading-xl mb-10"
         >
-          O ecossistema que leva
-          <br />
-          <span className="rotating-text-container">
-            <span className="rotating-text-inner">
-              <span className="text-gradient-cyan">treinamento</span>
-              <span className="text-gradient-cyan">compliance</span>
-              <span className="text-gradient-cyan">vigilância</span>
-              <span className="text-gradient-cyan">inovação</span>
+          <span className="block">O ecossistema que leva</span>
+          <span className="block py-1">
+            <span className="rotating-text-container">
+              <span className="rotating-text-inner">
+                <span className="text-gradient-cyan">treinamento</span>
+                <span className="text-gradient-cyan">compliance</span>
+                <span className="text-gradient-cyan">vigilância</span>
+                <span className="text-gradient-cyan">inovação</span>
+              </span>
             </span>
           </span>
-          <br />
-          até o paciente
+          <span className="block">até o paciente</span>
         </motion.h1>
 
         <motion.p

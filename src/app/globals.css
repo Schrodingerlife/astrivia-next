@@ -312,11 +312,8 @@ h6 {
 .rotating-text-container {
   display: inline-flex;
   overflow: hidden;
-  height: 1.15em;
+  height: 1.5em;
   vertical-align: bottom;
-  /* Soft fade at edges so accents don't hard-clip */
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
-  mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%);
 }
 
 .rotating-text-inner {
@@ -326,7 +323,7 @@ h6 {
 }
 
 .rotating-text-inner span {
-  height: 1.15em;
+  height: 1.5em;
   display: flex;
   align-items: center;
 }
@@ -340,17 +337,17 @@ h6 {
 
   22%,
   40% {
-    transform: translateY(-1.15em);
+    transform: translateY(-1.5em);
   }
 
   44%,
   62% {
-    transform: translateY(-2.3em);
+    transform: translateY(-3em);
   }
 
   66%,
   84% {
-    transform: translateY(-3.45em);
+    transform: translateY(-4.5em);
   }
 
   88%,
