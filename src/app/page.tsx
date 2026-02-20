@@ -229,7 +229,7 @@ function HeroSection() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="heading-xl mb-10"
         >
-          <span className="block">O ecossistema que conecta</span>
+          <span className="block">O ecossistema de</span>
           <span className="block py-1">
             <span className="rotating-text-container">
               <span className="rotating-text-inner">
@@ -240,7 +240,7 @@ function HeroSection() {
               </span>
             </span>
           </span>
-          <span className="block">ao paciente</span>
+          <span className="block">a serviço do paciente</span>
         </motion.h1>
 
         <motion.p
