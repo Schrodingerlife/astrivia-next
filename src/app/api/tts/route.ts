@@ -2,9 +2,14 @@ import { NextResponse } from "next/server";
 import { GEMINI_TTS_FALLBACK_MODEL, GEMINI_TTS_PRIMARY_MODEL } from "@/lib/ai-models";
 
 const API_KEY = process.env.GOOGLE_API_KEY || "";
-// Flash first for speed — Pro as fallback only if Flash fails
-const GEMINI_TTS_MODELS = [GEMINI_TTS_FALLBACK_MODEL, GEMINI_TTS_PRIMARY_MODEL].filter(Boolean);
+const FAST_TTS_MODEL = GEMINI_TTS_FALLBACK_MODEL || GEMINI_TTS_PRIMARY_MODEL;
+const HQ_TTS_MODEL = GEMINI_TTS_PRIMARY_MODEL || GEMINI_TTS_FALLBACK_MODEL;
 const GOOGLE_CLOUD_TTS_URL = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEY}`;
+const FAST_TTS_TIMEOUT_MS = 4200;
+const HQ_TTS_TIMEOUT_MS = 7000;
+const CLOUD_TTS_TIMEOUT_MS = 4500;
+const HQ_TTS_DELAY_MS = 220;
+const CLOUD_TTS_DELAY_MS = 650;
 
 // Create a WAV header for raw PCM data (16-bit LE, mono, 24000Hz)
 function createWavHeader(pcmLength: number): Buffer {
@@ -36,11 +41,11 @@ function buildPrompt(text: string): string {
     return `Você é um médico brasileiro falando em consulta. Fale de forma completamente natural e humana: ritmo ágil e fluido como numa conversa real, entonação expressiva e variada, sem pausas artificiais entre frases. Tom direto e confiante, com calor humano. Não separe sílabas, não soe formal demais:\n\n${text}`;
 }
 
-async function generateGeminiTts(prompt: string, model: string): Promise<Buffer> {
+async function generateGeminiTts(prompt: string, model: string, timeoutMs: number): Promise<Buffer> {
     const ttsUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 7000);
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
         const response = await fetch(ttsUrl, {
@@ -84,9 +89,13 @@ async function generateGeminiTts(prompt: string, model: string): Promise<Buffer>
     }
 }
 
-async function generateGoogleCloudFallback(text: string): Promise<Buffer> {
+async function generateGoogleCloudFallback(text: string, timeoutMs: number): Promise<Buffer> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
     const response = await fetch(GOOGLE_CLOUD_TTS_URL, {
         method: "POST",
+        signal: controller.signal,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             input: { text },
@@ -103,6 +112,8 @@ async function generateGoogleCloudFallback(text: string): Promise<Buffer> {
         }),
     });
 
+    clearTimeout(timeout);
+
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Google Cloud TTS failed: ${response.status} ${errorText.slice(0, 240)}`);
@@ -115,6 +126,10 @@ async function generateGoogleCloudFallback(text: string): Promise<Buffer> {
     }
 
     return Buffer.from(audioContent, "base64");
+}
+
+function delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 export async function POST(req: Request) {
@@ -132,40 +147,54 @@ export async function POST(req: Request) {
             );
         }
 
-        const truncated = text.slice(0, 2000);
+        const truncated = text.slice(0, 1800);
         const prompt = buildPrompt(truncated);
+        const geminiFastTask = async () => {
+            if (!FAST_TTS_MODEL) throw new Error("Missing FAST_TTS_MODEL");
+            const wavBuffer = await generateGeminiTts(prompt, FAST_TTS_MODEL, FAST_TTS_TIMEOUT_MS);
+            return {
+                buffer: wavBuffer,
+                contentType: "audio/wav",
+                provider: `gemini-fast:${FAST_TTS_MODEL}`,
+            };
+        };
 
-        // 1) Gemini TTS primary/fallback models
-        for (const model of GEMINI_TTS_MODELS) {
-            try {
-                const wavBuffer = await generateGeminiTts(prompt, model);
-                return new Response(new Uint8Array(wavBuffer), {
-                    headers: {
-                        "Content-Type": "audio/wav",
-                        "Content-Length": wavBuffer.length.toString(),
-                        "Cache-Control": "no-cache, no-store, must-revalidate",
-                        "X-TTS-Provider": `gemini:${model}`,
-                    },
-                });
-            } catch (error: unknown) {
-                const message = error instanceof Error ? error.message : "Unknown Gemini TTS error";
-                console.warn(message);
+        const geminiHqTask = async () => {
+            if (!HQ_TTS_MODEL || HQ_TTS_MODEL === FAST_TTS_MODEL) {
+                throw new Error("Missing or duplicated HQ_TTS_MODEL");
             }
-        }
+            await delay(HQ_TTS_DELAY_MS);
+            const wavBuffer = await generateGeminiTts(prompt, HQ_TTS_MODEL, HQ_TTS_TIMEOUT_MS);
+            return {
+                buffer: wavBuffer,
+                contentType: "audio/wav",
+                provider: `gemini-hq:${HQ_TTS_MODEL}`,
+            };
+        };
 
-        // 2) Server-side Neural fallback before browser fallback
+        const cloudTask = async () => {
+            await delay(CLOUD_TTS_DELAY_MS);
+            const mp3Buffer = await generateGoogleCloudFallback(truncated, CLOUD_TTS_TIMEOUT_MS);
+            return {
+                buffer: mp3Buffer,
+                contentType: "audio/mpeg",
+                provider: "google-cloud-neural2",
+            };
+        };
+
         try {
-            const mp3Buffer = await generateGoogleCloudFallback(truncated);
-            return new Response(new Uint8Array(mp3Buffer), {
+            const winner = await Promise.any([geminiFastTask(), geminiHqTask(), cloudTask()]);
+            return new Response(new Uint8Array(winner.buffer), {
                 headers: {
-                    "Content-Type": "audio/mpeg",
-                    "Content-Length": mp3Buffer.length.toString(),
+                    "Content-Type": winner.contentType,
+                    "Content-Length": winner.buffer.length.toString(),
                     "Cache-Control": "no-cache, no-store, must-revalidate",
-                    "X-TTS-Provider": "google-cloud-neural2",
+                    "X-TTS-Provider": winner.provider,
+                    "X-TTS-Strategy": "adaptive-race-v1",
                 },
             });
         } catch (error: unknown) {
-            const message = error instanceof Error ? error.message : "Unknown Cloud TTS error";
+            const message = error instanceof Error ? error.message : "Unknown adaptive TTS error";
             console.error(message);
             return NextResponse.json(
                 { error: "TTS API unavailable", useBrowserFallback: true },
