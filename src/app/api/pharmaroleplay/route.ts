@@ -1,9 +1,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import { GEMINI_TEXT_MODEL } from "@/lib/ai-models";
+import { GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL } from "@/lib/ai-models";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
+const flashModel = genAI.getGenerativeModel({ model: GEMINI_TEXT_FALLBACK_MODEL });
 
 const MEDICOS: Record<string, { nome: string; especialidade: string; personalidade: string; perfil: string }> = {
     objecao_preco: {
@@ -105,13 +106,9 @@ ${numTurnos >= 7 ? "7. Esta é uma das últimas falas — comece a encerrar natu
 
 Sua resposta (apenas o texto do médico, sem aspas, sem prefixo):`;
 
-        const result = await model.generateContent(prompt);
-        const resposta = result.response.text().trim();
-
-        // Feedback on the rep's last message
-        let feedback = null;
-        if (ultimaFalaTexto) {
-            const feedbackPrompt = `Analise esta fala de um representante farmacêutico no cenário "${cenarioNome}":
+        // Build feedback prompt in parallel with doctor response
+        const feedbackPrompt = ultimaFalaTexto
+            ? `Analise esta fala de um representante farmacêutico no cenário "${cenarioNome}":
 
 "${ultimaFalaTexto}"
 
@@ -123,10 +120,20 @@ Retorne JSON (sem markdown):
   "categoria": "Técnica de Vendas"|"Conhecimento do Produto"|"Comunicação"|"Compliance",
   "mensagem": "<feedback específico sobre o que foi dito, 1 frase concreta, em pt-BR>",
   "pontos": <0-100>
-}`;
+}`
+            : null;
 
+        // Fire both calls at the same time — doctor response (Pro) + feedback (Flash)
+        const [result, feedbackResult] = await Promise.all([
+            model.generateContent(prompt),
+            feedbackPrompt ? flashModel.generateContent(feedbackPrompt).catch(() => null) : Promise.resolve(null),
+        ]);
+
+        const resposta = result.response.text().trim();
+
+        let feedback = null;
+        if (feedbackResult) {
             try {
-                const feedbackResult = await model.generateContent(feedbackPrompt);
                 const feedbackText = feedbackResult.response.text()
                     .replace(/```json\s*/gi, "")
                     .replace(/```\s*/g, "")

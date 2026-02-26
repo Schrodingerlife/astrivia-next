@@ -2,7 +2,8 @@ import { NextResponse } from "next/server";
 import { GEMINI_TTS_FALLBACK_MODEL, GEMINI_TTS_PRIMARY_MODEL } from "@/lib/ai-models";
 
 const API_KEY = process.env.GOOGLE_API_KEY || "";
-const GEMINI_TTS_MODELS = [GEMINI_TTS_PRIMARY_MODEL, GEMINI_TTS_FALLBACK_MODEL].filter(Boolean);
+// Flash first for speed — Pro as fallback only if Flash fails
+const GEMINI_TTS_MODELS = [GEMINI_TTS_FALLBACK_MODEL, GEMINI_TTS_PRIMARY_MODEL].filter(Boolean);
 const GOOGLE_CLOUD_TTS_URL = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEY}`;
 
 // Create a WAV header for raw PCM data (16-bit LE, mono, 24000Hz)
