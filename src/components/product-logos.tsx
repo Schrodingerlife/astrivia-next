@@ -66,7 +66,7 @@ export function AstriviaWordmark({
             src="/images/astrivia-logo-v3.png"
             alt="Astrivia AI"
             width={width}
-            height={Math.round((width * 280) / 800)}
+            height={width}
             priority
             className={className}
             style={{ width: `${width}px`, height: "auto", objectFit: "contain" }}

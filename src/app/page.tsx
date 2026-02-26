@@ -203,7 +203,7 @@ function HeroSection() {
           transition={{ duration: 0.5 }}
           className="flex items-center justify-center mb-8"
         >
-          <AstriviaWordmark width={360} className="w-[280px] md:w-[360px] h-auto" />
+          <AstriviaWordmark width={300} className="w-[220px] md:w-[300px] h-auto" />
         </motion.div>
 
         <motion.div
