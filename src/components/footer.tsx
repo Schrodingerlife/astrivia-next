@@ -27,9 +27,9 @@ export function Footer() {
                 <div className="grid lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] gap-10 mb-12">
                     <div>
                         <div className="flex items-center gap-2 mb-4">
-                            <AstriviaSymbol size={28} />
-                            <span className="text-[18px] font-bold tracking-tight text-white/80 leading-none">
-                                Astrivia <span className="text-[#00D9FF]">AI</span>
+                            <AstriviaSymbol size={32} />
+                            <span className="text-[18px] font-light tracking-tight text-white/80 leading-none">
+                                strivia <span className="text-[#00D9FF] font-semibold">AI</span>
                             </span>
                         </div>
                         <p className="text-white/35 text-sm leading-relaxed max-w-xs">

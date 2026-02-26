@@ -204,10 +204,10 @@ function HeroSection() {
           className="flex items-center justify-center gap-3 mb-8"
         >
           <div className="brand-symbol-glow">
-            <AstriviaSymbol size={42} />
+            <AstriviaSymbol size={48} />
           </div>
-          <span className="text-[28px] font-bold tracking-tight leading-none brand-name-shimmer">
-            Astrivia AI
+          <span className="text-[28px] font-light tracking-tight leading-none brand-name-shimmer">
+            strivia <span className="text-[#00D9FF] font-semibold">AI</span>
           </span>
         </motion.div>
 
