@@ -653,6 +653,7 @@ function TeamSection() {
               <Link
                 href={member.linkedin}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-xs text-white/25 hover:text-white/60 transition-colors"
               >
                 LinkedIn ↗

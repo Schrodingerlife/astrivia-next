@@ -6,7 +6,7 @@ import { ClientLayout } from "@/components/client-layout";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://astriviaai.tech"),
+  metadataBase: new URL("https://astrivia.ai"),
   title: {
     default: "Astrivia AI | Sistema Operacional de Agentes para Life Sciences",
     template: "%s | Astrivia AI",
