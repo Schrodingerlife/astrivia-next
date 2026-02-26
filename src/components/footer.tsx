@@ -27,7 +27,7 @@ export function Footer() {
                 <div className="grid lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] gap-10 mb-12">
                     <div>
                         <AstriviaWordmark
-                            width={96}
+                            width={120}
                             className="mb-4 block"
                         />
                         <p className="text-white/35 text-sm leading-relaxed max-w-xs">
