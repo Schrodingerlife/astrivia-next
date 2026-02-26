@@ -1,23 +1,55 @@
 "use client";
 
-import Image from "next/image";
-
 /* ============== BRAND LOGO ============== */
 
 export function AstriviaSymbol({ size = 36 }: { size?: number }) {
     return (
-        <Image
-            src="/images/logo-symbol.png"
-            alt="Astrivia AI"
+        <svg
             width={size}
             height={size}
-            priority
-            style={{
-                objectFit: "contain",
-                mixBlendMode: "screen",
-                filter: "saturate(1.15) contrast(1.08) drop-shadow(0 0 8px rgba(0, 217, 255, 0.3))",
-            }}
-        />
+            viewBox="0 0 230 230"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-label="Astrivia AI"
+        >
+            <defs>
+                <filter id="neoGlow" x="-40%" y="-40%" width="180%" height="180%">
+                    <feGaussianBlur stdDeviation="2.4" result="blur1" />
+                    <feGaussianBlur stdDeviation="6.2" result="blur2" />
+                    <feMerge>
+                        <feMergeNode in="blur2" />
+                        <feMergeNode in="blur1" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                </filter>
+                <linearGradient id="tubeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#8ef0e8" stopOpacity="0.55" />
+                    <stop offset="35%" stopColor="#00d4c0" stopOpacity="0.3" />
+                    <stop offset="65%" stopColor="#007a8a" stopOpacity="0.2" />
+                    <stop offset="100%" stopColor="#003a50" stopOpacity="0.45" />
+                </linearGradient>
+                <linearGradient id="neonLine" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#00ffe8" />
+                    <stop offset="50%" stopColor="#00d4b0" />
+                    <stop offset="100%" stopColor="#00ff99" />
+                </linearGradient>
+            </defs>
+
+            <g transform="translate(0, 0)">
+                <path d="M 80,200 L 58,200 L 100,72 L 118,72 Z" fill="url(#tubeGrad)" stroke="#00c8b8" strokeWidth="1.4" opacity="0.9" />
+                <path d="M 90,195 L 73,195 L 109,78 L 112,78 Z" fill="url(#neonLine)" opacity="0.58" filter="url(#neoGlow)" />
+                <line x1="118" y1="72" x2="80" y2="200" stroke="#a0f0e8" strokeWidth="1.2" opacity="0.66" />
+
+                <path d="M 150,200 L 172,200 L 130,72 L 112,72 Z" fill="url(#tubeGrad)" stroke="#00c8b8" strokeWidth="1.4" opacity="0.9" />
+                <path d="M 140,195 L 157,195 L 121,78 L 118,78 Z" fill="url(#neonLine)" opacity="0.58" filter="url(#neoGlow)" />
+                <line x1="112" y1="72" x2="150" y2="200" stroke="#a0f0e8" strokeWidth="1.2" opacity="0.66" />
+
+                <path d="M 100,72 L 110,52 L 120,52 L 130,72 Z" fill="url(#tubeGrad)" stroke="#00c8b8" strokeWidth="1.3" opacity="0.92" />
+                <path d="M 108,68 L 115,56 L 122,68 Z" fill="url(#neonLine)" opacity="0.72" filter="url(#neoGlow)" />
+                <rect x="84" y="148" width="62" height="16" rx="8" fill="url(#tubeGrad)" stroke="#00c8b8" strokeWidth="1.2" opacity="0.9" />
+                <rect x="88" y="151" width="54" height="10" rx="5" fill="url(#neonLine)" opacity="0.52" filter="url(#neoGlow)" />
+            </g>
+        </svg>
     );
 }
 
