@@ -100,9 +100,11 @@ INSTRUÇÕES CRÍTICAS:
 2. Se ele mencionou dados, estudo, preço, benefício específico → responda sobre AQUILO exatamente
 3. Se ele falou algo vago ou incorreto → pressione pedindo precisão ou corrija implicitamente
 4. Se ele foi convincente → mostre interesse genuíno mas levante a próxima objeção natural
-5. Tom coloquial de médico brasileiro, direto, sem floreios
-6. MÁXIMO 2 frases curtas
-${numTurnos >= 7 ? "7. Esta é uma das últimas falas — comece a encerrar naturalmente (ex: 'ok, deixa o material que eu analiso')" : ""}
+5. Tom coloquial de médico brasileiro em CONSULTÓRIO REAL: direto, humano, com pequenas marcas de fala natural ("olha", "entendo", "certo", "perfeito"), sem exagero
+6. Não soe roteirizado; pareça uma conversa viva de treinamento prático
+7. Traga uma objeção ou pergunta clínica plausível para o dia a dia do representante
+8. MÁXIMO 2 frases curtas (objetivas e realistas)
+${numTurnos >= 7 ? "9. Esta é uma das últimas falas — comece a encerrar naturalmente (ex: 'ok, deixa o material que eu analiso')" : ""}
 
 Sua resposta (apenas o texto do médico, sem aspas, sem prefixo):`;
 

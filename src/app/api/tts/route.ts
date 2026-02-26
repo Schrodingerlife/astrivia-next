@@ -5,11 +5,12 @@ const API_KEY = process.env.GOOGLE_API_KEY || "";
 const FAST_TTS_MODEL = GEMINI_TTS_FALLBACK_MODEL || GEMINI_TTS_PRIMARY_MODEL;
 const HQ_TTS_MODEL = GEMINI_TTS_PRIMARY_MODEL || GEMINI_TTS_FALLBACK_MODEL;
 const GOOGLE_CLOUD_TTS_URL = `https://texttospeech.googleapis.com/v1/text:synthesize?key=${API_KEY}`;
-const FAST_TTS_TIMEOUT_MS = 4200;
-const HQ_TTS_TIMEOUT_MS = 7000;
-const CLOUD_TTS_TIMEOUT_MS = 4500;
-const HQ_TTS_DELAY_MS = 220;
-const CLOUD_TTS_DELAY_MS = 650;
+const FAST_TTS_TIMEOUT_MS = 5200;
+const HQ_TTS_TIMEOUT_MS = 8200;
+const CLOUD_TTS_TIMEOUT_MS = 5200;
+const FAST_TTS_DELAY_MS = 550;
+const HQ_TTS_DELAY_MS = 0;
+const CLOUD_TTS_DELAY_MS = 1600;
 
 // Create a WAV header for raw PCM data (16-bit LE, mono, 24000Hz)
 function createWavHeader(pcmLength: number): Buffer {
@@ -38,7 +39,12 @@ function createWavHeader(pcmLength: number): Buffer {
 }
 
 function buildPrompt(text: string): string {
-    return `Você é um médico brasileiro falando em consulta. Fale de forma completamente natural e humana: ritmo ágil e fluido como numa conversa real, entonação expressiva e variada, sem pausas artificiais entre frases. Tom direto e confiante, com calor humano. Não separe sílabas, não soe formal demais:\n\n${text}`;
+    return `Você é um médico brasileiro em consulta real.
+Fale com naturalidade humana: tom profissional, calor humano, microvariações de entonação e ritmo conversacional.
+Evite voz de locutor, robótica ou leitura de texto.
+Não soletre, não separe sílabas e não use formalidade artificial.
+Mantenha fluidez contínua, com pausas orgânicas curtas entre ideias.
+Texto a ser falado:\n\n${text}`;
 }
 
 async function generateGeminiTts(prompt: string, model: string, timeoutMs: number): Promise<Buffer> {
@@ -101,13 +107,13 @@ async function generateGoogleCloudFallback(text: string, timeoutMs: number): Pro
             input: { text },
             voice: {
                 languageCode: "pt-BR",
-                name: "pt-BR-Neural2-B",
+                name: "pt-BR-Wavenet-B",
                 ssmlGender: "MALE",
             },
             audioConfig: {
                 audioEncoding: "MP3",
-                speakingRate: 0.95,
-                pitch: -1.0,
+                speakingRate: 1.0,
+                pitch: -0.3,
             },
         }),
     });
@@ -151,6 +157,7 @@ export async function POST(req: Request) {
         const prompt = buildPrompt(truncated);
         const geminiFastTask = async () => {
             if (!FAST_TTS_MODEL) throw new Error("Missing FAST_TTS_MODEL");
+            await delay(FAST_TTS_DELAY_MS);
             const wavBuffer = await generateGeminiTts(prompt, FAST_TTS_MODEL, FAST_TTS_TIMEOUT_MS);
             return {
                 buffer: wavBuffer,
