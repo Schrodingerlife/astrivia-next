@@ -2,6 +2,7 @@
 import Image from "next/image";
 
 /* ============== BRAND LOGO ============== */
+const ASTRIVIA_LOGO_SRC = "/images/astrivia_ai_logo_3d.svg";
 
 export function AstriviaSymbol({ size = 36 }: { size?: number }) {
     return (
@@ -57,20 +58,58 @@ export function AstriviaSymbol({ size = 36 }: { size?: number }) {
 export function AstriviaWordmark({
     width = 210,
     className = "",
+    variant = "full",
 }: {
     width?: number;
     className?: string;
+    variant?: "full" | "compact";
+}) {
+    if (variant === "compact") {
+        const markSize = Math.max(32, Math.round(width * 0.35));
+        return (
+            <span className={`inline-flex items-center gap-3 ${className}`.trim()}>
+                <AstriviaMark size={markSize} />
+                <span className="text-lg font-semibold leading-none tracking-[-0.02em] text-white">
+                    Astrivia <span className="text-[#00D9FF]">AI</span>
+                </span>
+            </span>
+        );
+    }
+
+    return (
+        <span className={`relative inline-block isolate ${className}`.trim()} style={{ width: `${width}px` }}>
+            <Image
+                src={ASTRIVIA_LOGO_SRC}
+                alt="Astrivia AI"
+                width={width}
+                height={width}
+                priority
+                className="relative z-10 h-auto w-full object-contain mix-blend-screen [filter:saturate(1.1)_contrast(1.05)]"
+            />
+            <span aria-hidden className="pointer-events-none absolute inset-x-[8%] bottom-[5%] h-[28%] rounded-full bg-[#00D9FF]/22 blur-2xl" />
+        </span>
+    );
+}
+
+export function AstriviaMark({
+    size = 42,
+    className = "",
+}: {
+    size?: number;
+    className?: string;
 }) {
     return (
-        <Image
-            src="/images/astrivia-logo-v3.png"
-            alt="Astrivia AI"
-            width={width}
-            height={width}
-            priority
-            className={className}
-            style={{ width: `${width}px`, height: "auto", objectFit: "contain" }}
-        />
+        <span className={`relative inline-flex overflow-hidden rounded-md ${className}`.trim()} style={{ width: `${size}px`, height: `${size}px` }}>
+            <Image
+                src={ASTRIVIA_LOGO_SRC}
+                alt="Astrivia AI"
+                fill
+                sizes={`${size}px`}
+                priority
+                className="object-cover object-[50%_17%] scale-[1.14] mix-blend-screen [filter:saturate(1.08)_contrast(1.06)]"
+            />
+            <span aria-hidden className="pointer-events-none absolute inset-0 rounded-md ring-1 ring-cyan-300/30 shadow-[0_0_22px_rgba(0,217,255,0.25)]" />
+        </span>
     );
 }
 

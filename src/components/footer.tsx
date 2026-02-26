@@ -28,7 +28,8 @@ export function Footer() {
                     <div>
                         <AstriviaWordmark
                             width={120}
-                            className="mb-4 block"
+                            variant="compact"
+                            className="mb-4"
                         />
                         <p className="text-white/35 text-sm leading-relaxed max-w-xs">
                             Agentes de IA para Life Sciences — segurança regulatória, rastreabilidade e velocidade de campo.
