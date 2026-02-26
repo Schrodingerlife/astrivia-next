@@ -1,0 +1,181 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 280" width="800" height="280">
+  <defs>
+    <!-- Background -->
+    <radialGradient id="bgGlow" cx="18%" cy="50%" r="35%">
+      <stop offset="0%" stop-color="#0a2a3a" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#040d14" stop-opacity="1"/>
+    </radialGradient>
+
+    <!-- Neon teal glow for symbol -->
+    <filter id="neonGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="4" result="blur1"/>
+      <feGaussianBlur stdDeviation="10" result="blur2"/>
+      <feMerge>
+        <feMergeNode in="blur2"/>
+        <feMergeNode in="blur1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Soft outer glow -->
+    <filter id="outerGlow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Glass gradient for tube body -->
+    <linearGradient id="tubeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#8ef0e8" stop-opacity="0.55"/>
+      <stop offset="35%"  stop-color="#00d4c0" stop-opacity="0.30"/>
+      <stop offset="65%"  stop-color="#007a8a" stop-opacity="0.20"/>
+      <stop offset="100%" stop-color="#003a50" stop-opacity="0.45"/>
+    </linearGradient>
+
+    <!-- Inner neon line gradient -->
+    <linearGradient id="neonLine" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#00ffe8"/>
+      <stop offset="50%"  stop-color="#00d4b0"/>
+      <stop offset="100%" stop-color="#00ff99"/>
+    </linearGradient>
+
+    <!-- Text gradient -->
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#e8f8f8"/>
+      <stop offset="100%" stop-color="#b0d8d8"/>
+    </linearGradient>
+
+    <!-- AI text gradient -->
+    <linearGradient id="aiGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"   stop-color="#60e0d0"/>
+      <stop offset="100%" stop-color="#00b8a0"/>
+    </linearGradient>
+
+    <!-- Reflection gradient -->
+    <linearGradient id="reflectGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"  stop-color="#00e5cc" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#00e5cc" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="280" fill="url(#bgGlow)" rx="18"/>
+
+  <!-- Subtle circuit lines in bg -->
+  <g opacity="0.07" stroke="#00e5cc" stroke-width="1" fill="none">
+    <line x1="0" y1="70"  x2="120" y2="70"/>
+    <line x1="120" y1="70" x2="120" y2="40"/>
+    <line x1="120" y1="40" x2="170" y2="40"/>
+    <line x1="0" y1="200" x2="80"  y2="200"/>
+    <line x1="80" y1="200" x2="80" y2="230"/>
+    <circle cx="120" cy="70"  r="3" fill="#00e5cc"/>
+    <circle cx="80"  cy="200" r="3" fill="#00e5cc"/>
+    <line x1="340" y1="20"  x2="340" y2="60"/>
+    <line x1="340" y1="60"  x2="380" y2="60"/>
+    <line x1="340" y1="260" x2="340" y2="220"/>
+    <circle cx="340" cy="60"  r="2.5" fill="#00e5cc"/>
+    <circle cx="340" cy="220" r="2.5" fill="#00e5cc"/>
+  </g>
+
+  <!-- ═══════════════════════════════════ -->
+  <!--         SYMBOL — stylised A        -->
+  <!-- ═══════════════════════════════════ -->
+  <g transform="translate(50, 28)">
+
+    <!-- Outer glow blob behind symbol -->
+    <ellipse cx="115" cy="118" rx="75" ry="80" fill="#00e5cc" opacity="0.06" filter="url(#outerGlow)"/>
+
+    <!-- === LEFT LEG of A (glass tube) === -->
+    <!-- Tube body -->
+    <path d="M 80,200 L 58,200 L 100,72 L 118,72 Z"
+          fill="url(#tubeGrad)" stroke="#00c8b8" stroke-width="1.2" opacity="0.85"/>
+    <!-- Inner neon core -->
+    <path d="M 90,195 L 73,195 L 109,78 L 112,78 Z"
+          fill="url(#neonLine)" opacity="0.45" filter="url(#neonGlow)"/>
+    <!-- Highlight edge -->
+    <line x1="118" y1="72" x2="80" y2="200" stroke="#a0f0e8" stroke-width="1.2" opacity="0.6"/>
+
+    <!-- === RIGHT LEG of A (glass tube) === -->
+    <!-- Tube body -->
+    <path d="M 150,200 L 172,200 L 130,72 L 112,72 Z"
+          fill="url(#tubeGrad)" stroke="#00c8b8" stroke-width="1.2" opacity="0.85"/>
+    <!-- Inner neon core -->
+    <path d="M 140,195 L 157,195 L 121,78 L 118,78 Z"
+          fill="url(#neonLine)" opacity="0.45" filter="url(#neonGlow)"/>
+    <!-- Highlight edge -->
+    <line x1="112" y1="72" x2="150" y2="200" stroke="#a0f0e8" stroke-width="1.2" opacity="0.6"/>
+
+    <!-- === TOP ARCH of A === -->
+    <!-- Tube body -->
+    <path d="M 100,72 L 110,52 L 120,52 L 130,72 Z"
+          fill="url(#tubeGrad)" stroke="#00c8b8" stroke-width="1.2" opacity="0.9"/>
+    <!-- Neon top glow -->
+    <path d="M 108,68 L 115,56 L 122,68 Z"
+          fill="url(#neonLine)" opacity="0.7" filter="url(#neonGlow)"/>
+
+    <!-- === CROSSBAR of A === -->
+    <!-- Tube body -->
+    <rect x="84" y="148" width="62" height="16" rx="8"
+          fill="url(#tubeGrad)" stroke="#00c8b8" stroke-width="1.2" opacity="0.85"/>
+    <!-- Neon core -->
+    <rect x="88" y="151" width="54" height="10" rx="5"
+          fill="url(#neonLine)" opacity="0.5" filter="url(#neonGlow)"/>
+
+    <!-- Apex neon spark -->
+    <circle cx="115" cy="54" r="4" fill="#00ffe8" opacity="0.9" filter="url(#neonGlow)"/>
+    <circle cx="115" cy="54" r="2" fill="#ffffff" opacity="0.8"/>
+
+    <!-- === REFLECTION beneath symbol === -->
+    <g transform="translate(0, 10) scale(1, -0.18) translate(0, -420)">
+      <path d="M 80,200 L 58,200 L 100,72 L 118,72 Z" fill="url(#reflectGrad)" opacity="0.4"/>
+      <path d="M 150,200 L 172,200 L 130,72 L 112,72 Z" fill="url(#reflectGrad)" opacity="0.4"/>
+    </g>
+    <line x1="55" y1="205" x2="175" y2="205" stroke="#00e5cc" stroke-width="0.5" opacity="0.2"/>
+  </g>
+
+  <!-- ═══════════════════════════════════ -->
+  <!--              WORDMARK              -->
+  <!-- ═══════════════════════════════════ -->
+
+  <!-- "strivia" — white/light -->
+  <text x="278" y="166"
+        font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="88"
+        font-weight="300"
+        letter-spacing="-1"
+        fill="url(#textGrad)">strivia</text>
+
+  <!-- "A" prefix — same size, teal -->
+  <text x="238" y="166"
+        font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="88"
+        font-weight="600"
+        fill="url(#aiGrad)">A</text>
+
+  <!-- "AI" suffix — teal, smaller, vertically centred -->
+  <text x="716" y="162"
+        font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="52"
+        font-weight="700"
+        letter-spacing="2"
+        fill="url(#aiGrad)"> AI</text>
+
+  <!-- Subtle divider dot between wordmark and AI -->
+  <circle cx="712" cy="148" r="4" fill="#00c8b8" opacity="0.6"/>
+
+  <!-- Tagline -->
+  <text x="240" y="196"
+        font-family="'Helvetica Neue', Helvetica, Arial, sans-serif"
+        font-size="13"
+        font-weight="400"
+        letter-spacing="4"
+        fill="#00c8b8"
+        opacity="0.65">INTELLIGENT AGENTS FOR HEALTHCARE</text>
+
+  <!-- Corner sparkle -->
+  <g transform="translate(762, 32)" fill="#00e5cc" opacity="0.5">
+    <polygon points="0,-6 1.5,-1.5 6,0 1.5,1.5 0,6 -1.5,1.5 -6,0 -1.5,-1.5" />
+  </g>
+</svg>
