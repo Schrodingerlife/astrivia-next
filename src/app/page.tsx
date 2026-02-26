@@ -206,8 +206,8 @@ function HeroSection() {
           <div className="brand-symbol-glow">
             <AstriviaSymbol size={48} />
           </div>
-          <span className="text-[28px] font-light tracking-tight leading-none brand-name-shimmer">
-            strivia <span className="text-[#00D9FF] font-semibold">AI</span>
+          <span className="text-[28px] font-medium tracking-tight leading-none brand-name-shimmer text-white">
+            Astrivia <span className="text-[#00D9FF] font-semibold">AI</span>
           </span>
         </motion.div>
 

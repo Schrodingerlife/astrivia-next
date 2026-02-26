@@ -102,10 +102,10 @@ export function Navbar() {
         <>
             <nav ref={navRef} className={`navbar fixed top-0 w-full z-50 ${isScrolled ? "scrolled" : ""}`}>
                 <div className="site-container h-[76px] flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2 group">
+                    <Link href="/" className="flex items-center gap-2.5 group">
                         <AstriviaSymbol size={36} />
-                        <span className="text-xl font-light leading-none tracking-[-0.01em] text-white">
-                            strivia <span className="text-[#00D9FF] font-semibold">AI</span>
+                        <span className="text-xl font-medium leading-none tracking-[-0.01em] text-white">
+                            Astrivia <span className="text-[#00D9FF] font-semibold">AI</span>
                         </span>
                     </Link>
 

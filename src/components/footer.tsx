@@ -28,8 +28,8 @@ export function Footer() {
                     <div>
                         <div className="flex items-center gap-2 mb-4">
                             <AstriviaSymbol size={32} />
-                            <span className="text-[18px] font-light tracking-tight text-white/80 leading-none">
-                                strivia <span className="text-[#00D9FF] font-semibold">AI</span>
+                            <span className="text-[18px] font-medium tracking-tight text-white/90 leading-none">
+                                Astrivia <span className="text-[#00D9FF] font-semibold">AI</span>
                             </span>
                         </div>
                         <p className="text-white/35 text-sm leading-relaxed max-w-xs">
