@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
 import { toolsConfig, upcomingToolsConfig } from "@/lib/tools-config";
-import { AstriviaSymbol } from "@/components/product-logos";
+import { AstriviaWordmark } from "@/components/product-logos";
 
 const navLinks = [
     { name: "Tecnologia", href: "/technology" },
@@ -102,11 +102,12 @@ export function Navbar() {
         <>
             <nav ref={navRef} className={`navbar fixed top-0 w-full z-50 ${isScrolled ? "scrolled" : ""}`}>
                 <div className="site-container h-[76px] flex items-center justify-between">
-                    <Link href="/" className="flex items-center gap-2.5 group">
-                        <AstriviaSymbol size={36} />
-                        <span className="text-xl font-medium leading-none tracking-[-0.01em] text-white">
-                            Astrivia <span className="text-[#00D9FF] font-semibold">AI</span>
-                        </span>
+                    <Link href="/" className="group">
+                        <AstriviaWordmark
+                            symbolSize={32}
+                            className="flex items-center gap-2.5"
+                            textClassName="text-xl font-semibold leading-none tracking-[-0.01em]"
+                        />
                     </Link>
 
                     <div className="hidden lg:flex items-center gap-1">

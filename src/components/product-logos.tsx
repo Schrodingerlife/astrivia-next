@@ -53,6 +53,29 @@ export function AstriviaSymbol({ size = 36 }: { size?: number }) {
     );
 }
 
+export function AstriviaWordmark({
+    symbolSize = 36,
+    textClassName = "text-xl font-semibold leading-none tracking-[-0.01em]",
+    className = "flex items-center gap-2.5",
+    symbolClassName = "",
+}: {
+    symbolSize?: number;
+    textClassName?: string;
+    className?: string;
+    symbolClassName?: string;
+}) {
+    return (
+        <div className={className}>
+            <span className={symbolClassName}>
+                <AstriviaSymbol size={symbolSize} />
+            </span>
+            <span className={`${textClassName} text-white`}>
+                Astrivia <span className="text-[#00D9FF] font-semibold">AI</span>
+            </span>
+        </div>
+    );
+}
+
 /* ============== 3D-STYLE PRODUCT LOGOS ============== */
 /* Premium SVG logos with gradients, shadows, and 3D effects */
 
