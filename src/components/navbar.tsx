@@ -104,9 +104,8 @@ export function Navbar() {
                 <div className="site-container h-[76px] flex items-center justify-between">
                     <Link href="/" className="group">
                         <AstriviaWordmark
-                            symbolSize={32}
-                            className="flex items-center gap-2.5"
-                            textClassName="text-xl font-semibold leading-none tracking-[-0.01em]"
+                            width={170}
+                            className="block"
                         />
                     </Link>
 

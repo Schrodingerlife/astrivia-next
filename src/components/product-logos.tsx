@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 
 /* ============== BRAND LOGO ============== */
 
@@ -54,25 +55,22 @@ export function AstriviaSymbol({ size = 36 }: { size?: number }) {
 }
 
 export function AstriviaWordmark({
-    symbolSize = 36,
-    textClassName = "text-xl font-semibold leading-none tracking-[-0.01em]",
-    className = "flex items-center gap-2.5",
-    symbolClassName = "",
+    width = 210,
+    className = "",
 }: {
-    symbolSize?: number;
-    textClassName?: string;
+    width?: number;
     className?: string;
-    symbolClassName?: string;
 }) {
     return (
-        <div className={className}>
-            <span className={symbolClassName}>
-                <AstriviaSymbol size={symbolSize} />
-            </span>
-            <span className={`${textClassName} text-white`}>
-                Astrivia <span className="text-[#00D9FF] font-semibold">AI</span>
-            </span>
-        </div>
+        <Image
+            src="/images/astrivia-logo-v3.png"
+            alt="Astrivia AI"
+            width={width}
+            height={Math.round((width * 280) / 800)}
+            priority
+            className={className}
+            style={{ width: `${width}px`, height: "auto", objectFit: "contain" }}
+        />
     );
 }
 

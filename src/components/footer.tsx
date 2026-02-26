@@ -27,9 +27,8 @@ export function Footer() {
                 <div className="grid lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] gap-10 mb-12">
                     <div>
                         <AstriviaWordmark
-                            symbolSize={28}
-                            className="flex items-center gap-2 mb-4"
-                            textClassName="text-[18px] font-semibold tracking-tight leading-none"
+                            width={160}
+                            className="mb-4 block"
                         />
                         <p className="text-white/35 text-sm leading-relaxed max-w-xs">
                             Agentes de IA para Life Sciences — segurança regulatória, rastreabilidade e velocidade de campo.
