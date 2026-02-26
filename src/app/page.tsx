@@ -17,7 +17,6 @@ import {
   Award,
 } from "lucide-react";
 import {
-  AstriviaSymbol,
   PharmaRoleplayLogo,
   SocialVigilanteLogo,
   MedSafeLogo,
@@ -201,14 +200,20 @@ function HeroSection() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center justify-center gap-3 mb-8"
+          className="flex items-center justify-center mb-8"
         >
-          <div className="brand-symbol-glow">
-            <AstriviaSymbol size={48} />
-          </div>
-          <span className="text-[28px] font-medium tracking-tight leading-none brand-name-shimmer text-white">
-            Astrivia <span className="text-[#00D9FF] font-semibold">AI</span>
-          </span>
+          <Image
+            src="/images/astrivia-logo-v3.png"
+            alt="Astrivia AI"
+            width={460}
+            height={220}
+            priority
+            className="w-[270px] md:w-[360px] lg:w-[420px] h-auto select-none pointer-events-none"
+            style={{
+              mixBlendMode: "screen",
+              filter: "saturate(1.08) contrast(1.04) drop-shadow(0 0 16px rgba(0, 217, 255, 0.22))",
+            }}
+          />
         </motion.div>
 
         <motion.div
