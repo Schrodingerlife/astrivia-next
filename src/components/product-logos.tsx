@@ -1,29 +1,23 @@
 "use client";
 
+import Image from "next/image";
+
 /* ============== BRAND LOGO ============== */
 
 export function AstriviaSymbol({ size = 36 }: { size?: number }) {
     return (
-        <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <defs>
-                <linearGradient id="as-main" x1="8" y1="6" x2="40" y2="44" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#7DF9FF" />
-                    <stop offset="0.55" stopColor="#00D9FF" />
-                    <stop offset="1" stopColor="#00B8D4" />
-                </linearGradient>
-                <linearGradient id="as-glow" x1="24" y1="5" x2="24" y2="43" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#00F0FF" stopOpacity="0.7" />
-                    <stop offset="1" stopColor="#00D9FF" stopOpacity="0" />
-                </linearGradient>
-                <filter id="as-blur">
-                    <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" />
-                </filter>
-            </defs>
-            <path d="M24 6L8 38H18L24 26L30 38H40L24 6Z" fill="url(#as-glow)" filter="url(#as-blur)" />
-            <path d="M24 8L10 37H17.5L24 23.5L30.5 37H38L24 8Z" fill="url(#as-main)" />
-            <rect x="16" y="30" width="16" height="2.5" rx="1.25" fill="url(#as-main)" opacity="0.68" />
-            <path d="M24 8L18 20L24 14L30 20L24 8Z" fill="white" opacity="0.26" />
-        </svg>
+        <Image
+            src="/images/logo-symbol.png"
+            alt="Astrivia AI"
+            width={size}
+            height={size}
+            priority
+            style={{
+                objectFit: "contain",
+                mixBlendMode: "screen",
+                filter: "saturate(1.15) contrast(1.08) drop-shadow(0 0 8px rgba(0, 217, 255, 0.3))",
+            }}
+        />
     );
 }
 
