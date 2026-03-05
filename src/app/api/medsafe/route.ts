@@ -140,37 +140,34 @@ export async function POST(req: Request) {
             retrievalCount = 8; // 8 inline docs
         }
 
-        const prompt = `Você é um auditor regulatório especializado na RDC 96/2008 (ANVISA).
+        const prompt = `Você é um Auditor Sênior de Compliance Farmacêutico da ANVISA. Sua função é analisar materiais promocionais e encontrar QUALQUER violação à RDC 96/2008.
+Você receberá o texto do material promocional e os trechos recuperados da RDC 96.
 
-Você DEVE usar apenas o contexto abaixo (RAG) para fundamentar referências/citações.
-Se faltar evidência no contexto, diga explicitamente que não há suporte documental.
+Regra de Ouro: Medicamentos NUNCA são "100% eficazes", NUNCA têm "garantia de resultados" e NUNCA são "isentos de efeitos colaterais". Promessas absolutistas são violações GRAVES.
 
-CONTEXTO RAG:
+CONTEXTO RAG (Trechos da RDC 96/2008):
 ${ragContext}
 
-MATERIAL PARA ANÁLISE:
+MATERIAL PROMOCIONAL PARA ANÁLISE:
 """
 ${texto}
 """
 
-TAREFA:
-1) Analise claims e linguagem promocional do material.
-2) Identifique violações e classifique: grave, moderada, leve.
-3) Pontue score de conformidade de 0 a 100.
-4) Traga sugestões específicas e acionáveis.
-5) Inclua referências do contexto RAG para cada decisão relevante.
-
-Responda APENAS com JSON válido:
+Analise o texto e retorne APENAS um objeto JSON válido com esta estrutura EXATA:
 {
-  "score": 0-100,
-  "resumo": "texto",
+  "score": [Inteiro de 0 a 100. Comece com 100 e deduza 30 para cada erro grave, 15 para moderado e 5 para leve. Se houver erro grave, a nota máxima é 70],
+  "resumo": "Resumo executivo da análise em 2-3 frases",
+  "total_graves": [Int],
+  "total_moderadas": [Int],
+  "total_leves": [Int],
   "violacoes": [
     {
       "tipo": "grave|moderada|leve",
-      "texto": "descrição",
-      "trecho": "trecho do material",
-      "artigo": "artigo/regra",
-      "sugestao": "sugestão prática",
+      "texto": "Descrição técnica da violação",
+      "trecho": "Copie EXATAMENTE a frase ou trecho problemático do material original",
+      "artigo": "Ex: Artigo 4º, Inciso III da RDC 96/2008",
+      "sugestao": "Sugestão prática de correção",
+      "sugestao_reescrita": "Reescreva a frase problemática de forma compliance. Ex: Em vez de '100% eficaz', escrever 'Demonstrou alta eficácia nos ensaios clínicos'",
       "refs": ["DOC_1","DOC_3"]
     }
   ],
@@ -186,11 +183,11 @@ Responda APENAS com JSON válido:
 
         const validatedReferences: MedsafeReference[] = Array.isArray(parsed.referencias)
             ? parsed.referencias.map((item: any) => ({
-                  docId: String(item?.docId || ""),
-                  title: String(item?.title || "Referência"),
-                  trecho: String(item?.trecho || "").slice(0, 420),
-                  uri: item?.uri ? String(item.uri) : undefined,
-              }))
+                docId: String(item?.docId || ""),
+                title: String(item?.title || "Referência"),
+                trecho: String(item?.trecho || "").slice(0, 420),
+                uri: item?.uri ? String(item.uri) : undefined,
+            }))
             : [];
 
         const validated = {
@@ -201,14 +198,15 @@ Responda APENAS com JSON válido:
             resumo: typeof parsed.resumo === "string" ? parsed.resumo : "Análise concluída.",
             violacoes: Array.isArray(parsed.violacoes)
                 ? parsed.violacoes.map((item: any, index: number) => ({
-                      id: index + 1,
-                      tipo: ["grave", "moderada", "leve"].includes(item?.tipo) ? item.tipo : "leve",
-                      texto: String(item?.texto || "Violação identificada."),
-                      trecho: String(item?.trecho || "").slice(0, 300),
-                      artigo: String(item?.artigo || "RDC 96/2008"),
-                      sugestao: String(item?.sugestao || "Revisar o trecho com a equipe regulatória."),
-                      refs: Array.isArray(item?.refs) ? item.refs.map((ref: unknown) => String(ref)) : [],
-                  }))
+                    id: index + 1,
+                    tipo: ["grave", "moderada", "leve"].includes(item?.tipo) ? item.tipo : "leve",
+                    texto: String(item?.texto || "Violação identificada."),
+                    trecho: String(item?.trecho || "").slice(0, 300),
+                    artigo: String(item?.artigo || "RDC 96/2008"),
+                    sugestao: String(item?.sugestao || "Revisar o trecho com a equipe regulatória."),
+                    sugestao_reescrita: String(item?.sugestao_reescrita || ""),
+                    refs: Array.isArray(item?.refs) ? item.refs.map((ref: unknown) => String(ref)) : [],
+                }))
                 : [],
             referencias: validatedReferences,
             grounded: true,

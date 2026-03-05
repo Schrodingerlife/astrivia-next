@@ -38,8 +38,9 @@ function createWavHeader(pcmLength: number): Buffer {
     return header;
 }
 
-function buildPrompt(text: string): string {
-    return `Você é um médico brasileiro em consulta real.
+function buildPrompt(text: string, persona?: string): string {
+    const role = persona || 'um médico brasileiro em consulta real';
+    return `Você é ${role}.
 Fale com naturalidade humana: tom profissional, calor humano, microvariações de entonação e ritmo conversacional.
 Evite voz de locutor, robótica ou leitura de texto.
 Não soletre, não separe sílabas e não use formalidade artificial.
@@ -47,7 +48,7 @@ Mantenha fluidez contínua, com pausas orgânicas curtas entre ideias.
 Texto a ser falado:\n\n${text}`;
 }
 
-async function generateGeminiTts(prompt: string, model: string, timeoutMs: number): Promise<Buffer> {
+async function generateGeminiTts(prompt: string, model: string, timeoutMs: number, voiceName: string = "Orus"): Promise<Buffer> {
     const ttsUrl = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${API_KEY}`;
 
     const controller = new AbortController();
@@ -65,7 +66,7 @@ async function generateGeminiTts(prompt: string, model: string, timeoutMs: numbe
                     speechConfig: {
                         voiceConfig: {
                             prebuiltVoiceConfig: {
-                                voiceName: "Orus",
+                                voiceName,
                             },
                         },
                     },
@@ -95,7 +96,7 @@ async function generateGeminiTts(prompt: string, model: string, timeoutMs: numbe
     }
 }
 
-async function generateGoogleCloudFallback(text: string, timeoutMs: number): Promise<Buffer> {
+async function generateGoogleCloudFallback(text: string, timeoutMs: number, voiceName: string = 'pt-BR-Wavenet-B', gender: string = 'MALE'): Promise<Buffer> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), timeoutMs);
 
@@ -107,8 +108,8 @@ async function generateGoogleCloudFallback(text: string, timeoutMs: number): Pro
             input: { text },
             voice: {
                 languageCode: "pt-BR",
-                name: "pt-BR-Wavenet-B",
-                ssmlGender: "MALE",
+                name: voiceName,
+                ssmlGender: gender,
             },
             audioConfig: {
                 audioEncoding: "MP3",
@@ -140,7 +141,7 @@ function delay(ms: number): Promise<void> {
 
 export async function POST(req: Request) {
     try {
-        const { text } = await req.json();
+        const { text, voice, persona } = await req.json();
 
         if (!text || typeof text !== "string") {
             return NextResponse.json({ error: "Text is required" }, { status: 400 });
@@ -153,12 +154,14 @@ export async function POST(req: Request) {
             );
         }
 
+        const voiceName = typeof voice === 'string' && voice ? voice : 'Orus';
+        const isFemale = ['Aoede', 'Kore', 'Leda', 'Zephyr'].includes(voiceName);
         const truncated = text.slice(0, 1800);
-        const prompt = buildPrompt(truncated);
+        const prompt = buildPrompt(truncated, typeof persona === 'string' ? persona : undefined);
         const geminiFastTask = async () => {
             if (!FAST_TTS_MODEL) throw new Error("Missing FAST_TTS_MODEL");
             await delay(FAST_TTS_DELAY_MS);
-            const wavBuffer = await generateGeminiTts(prompt, FAST_TTS_MODEL, FAST_TTS_TIMEOUT_MS);
+            const wavBuffer = await generateGeminiTts(prompt, FAST_TTS_MODEL, FAST_TTS_TIMEOUT_MS, voiceName);
             return {
                 buffer: wavBuffer,
                 contentType: "audio/wav",
@@ -171,7 +174,7 @@ export async function POST(req: Request) {
                 throw new Error("Missing or duplicated HQ_TTS_MODEL");
             }
             await delay(HQ_TTS_DELAY_MS);
-            const wavBuffer = await generateGeminiTts(prompt, HQ_TTS_MODEL, HQ_TTS_TIMEOUT_MS);
+            const wavBuffer = await generateGeminiTts(prompt, HQ_TTS_MODEL, HQ_TTS_TIMEOUT_MS, voiceName);
             return {
                 buffer: wavBuffer,
                 contentType: "audio/wav",
@@ -181,7 +184,9 @@ export async function POST(req: Request) {
 
         const cloudTask = async () => {
             await delay(CLOUD_TTS_DELAY_MS);
-            const mp3Buffer = await generateGoogleCloudFallback(truncated, CLOUD_TTS_TIMEOUT_MS);
+            const cloudVoice = isFemale ? 'pt-BR-Wavenet-A' : 'pt-BR-Wavenet-B';
+            const cloudGender = isFemale ? 'FEMALE' : 'MALE';
+            const mp3Buffer = await generateGoogleCloudFallback(truncated, CLOUD_TTS_TIMEOUT_MS, cloudVoice, cloudGender);
             return {
                 buffer: mp3Buffer,
                 contentType: "audio/mpeg",

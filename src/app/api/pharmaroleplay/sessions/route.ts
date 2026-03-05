@@ -17,6 +17,7 @@ export async function GET() {
             aprovado: data.aprovado ?? false,
             createdAt: data.createdAt ?? "",
             resumo: data.resumo ?? {},
+            avaliacao: data.avaliacao ?? null,
         }));
 
         return NextResponse.json({ sessions });

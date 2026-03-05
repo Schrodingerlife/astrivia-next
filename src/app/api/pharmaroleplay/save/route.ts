@@ -19,6 +19,7 @@ export async function POST(req: Request) {
                 sugestoes: body.sugestoes ?? [],
                 analiseDetalhada: body.analiseDetalhada ?? [],
                 transcricaoCompleta: body.transcricaoCompleta ?? [],
+                avaliacao: body.avaliacao ?? null,
                 createdAt: new Date().toISOString(),
             },
             sessionId

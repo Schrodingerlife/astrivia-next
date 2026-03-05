@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { CheckCircle2, FileText, Loader2, ScanText, ShieldCheck, Sparkles, Upload } from "lucide-react";
+import { CheckCircle2, FileText, Loader2, ScanText, ShieldCheck, Sparkles, Upload, Wand2 } from "lucide-react";
 
 type RiskLevel = "grave" | "moderada" | "leve";
 type WorkspaceTab = "overview" | "documents";
@@ -13,6 +13,7 @@ interface Violation {
     trecho: string;
     artigo: string;
     sugestao: string;
+    sugestao_reescrita?: string;
 }
 
 interface AnalysisResult {
@@ -56,6 +57,8 @@ export default function MedSafeApp() {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [result, setResult] = useState<AnalysisResult | null>(null);
+    const [expandedSuggestion, setExpandedSuggestion] = useState<number | null>(null);
+    const [hoveredViolation, setHoveredViolation] = useState<number | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const summary = useMemo(() => {
@@ -73,8 +76,11 @@ export default function MedSafeApp() {
             : "Nosso medicamento é 100% eficaz e sem efeitos colaterais.\nMelhor que qualquer concorrente.\nResultados garantidos em todos os pacientes.";
         const lines = source.split("\n").filter(Boolean).slice(0, 9);
         return lines.map((line, index) => {
-            const matched = result?.violacoes.find((item) => line.toLowerCase().includes(item.trecho.toLowerCase().slice(0, 20)));
-            return { id: index, line, tipo: matched?.tipo ?? null };
+            const matched = result?.violacoes.find((item) => {
+                if (!item.trecho || item.trecho.length < 5) return false;
+                return line.toLowerCase().includes(item.trecho.toLowerCase().slice(0, 30));
+            });
+            return { id: index, line, tipo: matched?.tipo ?? null, artigo: matched?.artigo ?? null, violationId: matched?.id ?? null };
         });
     }, [text, result]);
 
@@ -163,7 +169,10 @@ export default function MedSafeApp() {
         }
     };
 
-    const score = result?.score ?? 72;
+    const score = result?.score ?? null;
+    const scoreColor = score === null ? '#10B981' : score >= 90 ? '#10B981' : score >= 70 ? '#eab308' : '#ef4444';
+    const scoreTextColor = score === null ? 'text-emerald-200' : score >= 90 ? 'text-emerald-200' : score >= 70 ? 'text-yellow-200' : 'text-red-200';
+    const displayScore = score ?? 0;
 
     return (
         <div className="rounded-[28px] overflow-hidden border border-white/[0.12] bg-[radial-gradient(circle_at_8%_0%,rgba(16,185,129,0.18),transparent_28%),#07111D] shadow-[0_30px_95px_rgba(0,0,0,0.55)]">
@@ -244,9 +253,8 @@ export default function MedSafeApp() {
                             ? "Extraindo texto do documento via IA..."
                             : "Cole aqui o texto do material promocional ou faça upload de um PDF/imagem para análise com a RDC 96/2008..."}
                         disabled={isExtracting}
-                        className={`w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none disabled:opacity-50 ${
-                            tab === "documents" ? "h-[360px]" : "h-[200px]"
-                        }`}
+                        className={`w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none disabled:opacity-50 ${tab === "documents" ? "h-[360px]" : "h-[200px]"
+                            }`}
                     />
 
                     <div className="mt-4 flex items-center justify-between">
@@ -277,20 +285,31 @@ export default function MedSafeApp() {
                             <p className="text-[13px] text-[#10B981] font-semibold mb-3">Marketing</p>
                             <div className="space-y-1.5">
                                 {previewLines.map((item) => (
-                                    <p
+                                    <div
                                         key={item.id}
-                                        className={`rounded px-2 py-1 text-[11px] ${
-                                            item.tipo === "grave"
-                                                ? "bg-red-400/45 text-slate-900"
-                                                : item.tipo === "moderada"
-                                                    ? "bg-amber-300/65 text-slate-900"
-                                                    : item.tipo === "leve"
-                                                        ? "bg-cyan-300/70 text-slate-900"
-                                                        : "text-slate-700"
-                                        }`}
+                                        className="relative group"
+                                        onMouseEnter={() => item.violationId ? setHoveredViolation(item.violationId) : null}
+                                        onMouseLeave={() => setHoveredViolation(null)}
                                     >
-                                        {item.line}
-                                    </p>
+                                        <p
+                                            className={`rounded px-2 py-1 text-[11px] cursor-default transition-all ${item.tipo === "grave"
+                                                    ? "bg-red-400/45 text-slate-900 border-l-2 border-red-600"
+                                                    : item.tipo === "moderada"
+                                                        ? "bg-amber-300/65 text-slate-900 border-l-2 border-amber-600"
+                                                        : item.tipo === "leve"
+                                                            ? "bg-cyan-300/70 text-slate-900 border-l-2 border-cyan-600"
+                                                            : "text-slate-700"
+                                                }`}
+                                        >
+                                            {item.line}
+                                        </p>
+                                        {item.artigo && hoveredViolation === item.violationId && (
+                                            <div className="absolute left-0 -top-10 z-20 rounded-lg bg-slate-900 border border-white/20 px-3 py-1.5 text-[11px] text-white shadow-xl whitespace-nowrap">
+                                                ⚠️ Viola: <span className="font-semibold text-red-300">{item.artigo}</span>
+                                                <div className="absolute bottom-[-5px] left-4 w-2.5 h-2.5 bg-slate-900 border-r border-b border-white/20 rotate-45" />
+                                            </div>
+                                        )}
+                                    </div>
                                 ))}
                             </div>
                         </div>
@@ -310,11 +329,11 @@ export default function MedSafeApp() {
                             <div className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
                                 <div className="flex items-center gap-4">
                                     <div
-                                        className="h-28 w-28 rounded-full grid place-items-center border border-white/15 flex-shrink-0"
-                                        style={{ background: `conic-gradient(#10B981 ${score * 3.6}deg, rgba(255,255,255,0.08) 0deg)` }}
+                                        className="h-28 w-28 rounded-full grid place-items-center border border-white/15 flex-shrink-0 transition-all duration-500"
+                                        style={{ background: `conic-gradient(${scoreColor} ${displayScore * 3.6}deg, rgba(255,255,255,0.08) 0deg)` }}
                                     >
-                                        <span className="h-[86px] w-[86px] rounded-full bg-[#07111D] grid place-items-center text-4xl font-bold text-emerald-200">
-                                            {score}%
+                                        <span className={`h-[86px] w-[86px] rounded-full bg-[#07111D] grid place-items-center text-4xl font-bold ${scoreTextColor}`}>
+                                            {result ? `${displayScore}%` : '—'}
                                         </span>
                                     </div>
                                     <div className="min-w-0">
@@ -349,8 +368,28 @@ export default function MedSafeApp() {
                                                     <span className="text-[11px] uppercase font-semibold">{item.tipo}</span>
                                                     <span className="text-[10px] text-white/60">{item.artigo}</span>
                                                 </div>
+                                                {item.trecho && (
+                                                    <p className="text-[11px] text-white/50 italic mb-1">&ldquo;{item.trecho}&rdquo;</p>
+                                                )}
                                                 <p className="text-xs text-white/85">{item.texto}</p>
                                                 <p className="mt-1 text-[11px] text-white/55">{item.sugestao}</p>
+                                                {item.sugestao_reescrita && (
+                                                    <div className="mt-2">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setExpandedSuggestion(expandedSuggestion === item.id ? null : item.id)}
+                                                            className="inline-flex items-center gap-1 rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[11px] text-emerald-200 hover:bg-emerald-500/20 transition-colors"
+                                                        >
+                                                            <Wand2 size={11} /> Sugerir Ajuste
+                                                        </button>
+                                                        {expandedSuggestion === item.id && (
+                                                            <div className="mt-2 rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-2.5 text-[11px] text-emerald-100">
+                                                                <p className="text-[10px] text-emerald-300/70 uppercase tracking-wider mb-1">Sugestão de Reescrita</p>
+                                                                <p>&ldquo;{item.sugestao_reescrita}&rdquo;</p>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                )}
                                             </div>
                                         ))
                                     ) : (

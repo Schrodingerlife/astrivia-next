@@ -13,6 +13,16 @@ import ScoreRing from '@/components/tools/pharmaroleplay/ScoreRing';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+interface AvaliacaoData {
+    score_final: number;
+    aprovado: boolean;
+    xp_ganho: number;
+    motivo_reprovacao: string | null;
+    pontos_fortes: string[];
+    pontos_melhoria: string[];
+    usou_tecnicas_fechamento: boolean;
+}
+
 interface Sessao {
     id: string;
     cenario: string;
@@ -21,6 +31,7 @@ interface Sessao {
     aprovado: boolean;
     createdAt: string;
     resumo?: { tempoSessao?: number; mensagensUsuario?: number };
+    avaliacao?: AvaliacaoData | null;
 }
 
 // ── Level / XP system ────────────────────────────────────────────────────────
@@ -35,6 +46,8 @@ const NIVEIS = [
 
 function calcXp(sessoes: Sessao[]): number {
     return sessoes.reduce((acc, s) => {
+        // Use LLM-as-a-Judge xp_ganho when available
+        if (s.avaliacao?.xp_ganho) return acc + s.avaliacao.xp_ganho;
         let xp = s.scoreGeral;
         if (s.aprovado) xp += 30;
         if (s.scoreGeral >= 90) xp += 20;
@@ -505,6 +518,37 @@ export default function DashboardPage() {
                                             {underperformers.map(u => u.nome).join(', ')} precisam de suporte adicional.
                                             Considere sessões de coaching ou cenários mais simples para recuperação.
                                         </p>
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {/* Aggregated pontos_melhoria from real sessions */}
+                            {sessoes.some(s => s.avaliacao?.pontos_melhoria?.length) && (
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+                                    className="rounded-xl p-5 mb-6 border border-[#00D9FF]/20 bg-[#00D9FF]/5">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <Target className="w-5 h-5 text-[#00D9FF]" />
+                                        <h3 className="text-white font-semibold text-sm">Pontos de Melhoria — Análise LLM Agregada</h3>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {(() => {
+                                            const melhorias: Record<string, number> = {};
+                                            sessoes.forEach(s => {
+                                                (s.avaliacao?.pontos_melhoria || []).forEach(pm => {
+                                                    const key = pm.toLowerCase().trim();
+                                                    melhorias[key] = (melhorias[key] || 0) + 1;
+                                                });
+                                            });
+                                            return Object.entries(melhorias)
+                                                .sort((a, b) => b[1] - a[1])
+                                                .slice(0, 5)
+                                                .map(([melhoria, count], i) => (
+                                                    <div key={i} className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03]">
+                                                        <span className="text-white/70 text-sm capitalize">{melhoria}</span>
+                                                        <span className="text-[#00D9FF] text-xs font-medium">{count}x mencionado</span>
+                                                    </div>
+                                                ));
+                                        })()}
                                     </div>
                                 </motion.div>
                             )}

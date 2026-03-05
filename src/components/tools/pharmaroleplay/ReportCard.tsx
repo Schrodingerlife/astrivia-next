@@ -16,6 +16,9 @@ import {
     Lightbulb,
     ChevronDown,
     ChevronUp,
+    Zap,
+    ThumbsUp,
+    Target,
 } from 'lucide-react';
 import ScoreRing from './ScoreRing';
 import Link from 'next/link';
@@ -24,6 +27,16 @@ interface AnaliseItem {
     frase_usuario: string;
     problema: string;
     exemplo_melhor: string;
+}
+
+interface AvaliacaoData {
+    score_final: number;
+    aprovado: boolean;
+    xp_ganho: number;
+    motivo_reprovacao: string | null;
+    pontos_fortes: string[];
+    pontos_melhoria: string[];
+    usou_tecnicas_fechamento: boolean;
 }
 
 interface Relatorio {
@@ -36,6 +49,8 @@ interface Relatorio {
     };
     aprovado: boolean;
     certificadoDisponivel: boolean;
+    xpGanho?: number;
+    avaliacao?: AvaliacaoData | null;
     resumo: {
         totalMensagens: number;
         mensagensUsuario: number;
@@ -213,6 +228,86 @@ ${transcricao}
                 </div>
             </motion.div>
 
+            {/* Avaliação do Gerente Distrital */}
+            {relatorio.avaliacao && (
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.15 }}
+                    className="glass-card p-6 mb-8 rounded-xl border border-[#00D9FF]/20"
+                >
+                    <div className="flex items-center gap-2 mb-5">
+                        <Target className="w-5 h-5 text-[#00D9FF]" />
+                        <h2 className="text-xl font-semibold text-white">Avaliação do Gerente Distrital</h2>
+                        {relatorio.xpGanho && (
+                            <span className="ml-auto flex items-center gap-1.5 px-3 py-1 rounded-full bg-yellow-500/15 border border-yellow-500/25">
+                                <Zap className="w-4 h-4 text-yellow-400" />
+                                <span className="text-yellow-300 text-sm font-bold">+{relatorio.xpGanho} XP</span>
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Motivo de reprovação */}
+                    {!relatorio.avaliacao.aprovado && relatorio.avaliacao.motivo_reprovacao && (
+                        <div className="rounded-lg bg-red-500/10 border border-red-500/20 p-3.5 mb-5 flex items-start gap-2">
+                            <XCircle className="w-4 h-4 text-red-400 mt-0.5 flex-shrink-0" />
+                            <p className="text-red-300 text-sm">{relatorio.avaliacao.motivo_reprovacao}</p>
+                        </div>
+                    )}
+
+                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                        {/* Pontos Fortes */}
+                        <div className="rounded-xl bg-green-500/5 border border-green-500/15 p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <ThumbsUp className="w-4 h-4 text-green-400" />
+                                <span className="text-green-400 text-sm font-semibold">Pontos Fortes</span>
+                            </div>
+                            <ul className="space-y-2">
+                                {relatorio.avaliacao.pontos_fortes.map((pf, i) => (
+                                    <li key={i} className="flex items-start gap-2 text-white/70 text-sm">
+                                        <CheckCircle className="w-3.5 h-3.5 text-green-400 mt-0.5 flex-shrink-0" />
+                                        {pf}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Pontos de Melhoria */}
+                        <div className="rounded-xl bg-orange-500/5 border border-orange-500/15 p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <AlertTriangle className="w-4 h-4 text-orange-400" />
+                                <span className="text-orange-400 text-sm font-semibold">Pontos de Melhoria</span>
+                            </div>
+                            <ul className="space-y-2">
+                                {relatorio.avaliacao.pontos_melhoria.map((pm, i) => (
+                                    <li key={i} className="flex items-start gap-2 text-white/70 text-sm">
+                                        <Lightbulb className="w-3.5 h-3.5 text-orange-400 mt-0.5 flex-shrink-0" />
+                                        {pm}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* Técnica de Fechamento */}
+                    <div className={`rounded-lg p-3 flex items-center gap-2 ${relatorio.avaliacao.usou_tecnicas_fechamento
+                        ? 'bg-green-500/10 border border-green-500/20'
+                        : 'bg-white/5 border border-white/10'
+                        }`}>
+                        {relatorio.avaliacao.usou_tecnicas_fechamento
+                            ? <CheckCircle className="w-4 h-4 text-green-400" />
+                            : <XCircle className="w-4 h-4 text-white/30" />
+                        }
+                        <span className={`text-sm ${relatorio.avaliacao.usou_tecnicas_fechamento ? 'text-green-300' : 'text-white/40'}`}>
+                            {relatorio.avaliacao.usou_tecnicas_fechamento
+                                ? 'Utilizou técnicas de fechamento da prescrição ✓'
+                                : 'Não utilizou técnicas de fechamento — pratique o pedido de ação ao médico'
+                            }
+                        </span>
+                    </div>
+                </motion.div>
+            )}
+
             {/* Grid de estatísticas */}
             <div className="grid md:grid-cols-4 gap-4 mb-8">
                 {[
@@ -252,8 +347,8 @@ ${transcricao}
                                 <div className="flex items-center gap-2">
                                     <span className="text-xs text-white/30">{cat.peso}</span>
                                     <span className={`font-semibold ${cat.score >= 80 ? 'text-green-400' :
-                                            cat.score >= 60 ? 'text-[#00D9FF]' :
-                                                'text-yellow-400'
+                                        cat.score >= 60 ? 'text-[#00D9FF]' :
+                                            'text-yellow-400'
                                         }`}>{cat.score}</span>
                                 </div>
                             </div>
@@ -263,8 +358,8 @@ ${transcricao}
                                     animate={{ width: `${cat.score}%` }}
                                     transition={{ delay: 0.5 + i * 0.1, duration: 0.5 }}
                                     className={`h-full rounded-full ${cat.score >= 80 ? 'bg-green-500' :
-                                            cat.score >= 60 ? 'bg-[#00D9FF]' :
-                                                'bg-yellow-500'
+                                        cat.score >= 60 ? 'bg-[#00D9FF]' :
+                                            'bg-yellow-500'
                                         }`}
                                 />
                             </div>
@@ -328,11 +423,10 @@ ${transcricao}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.1 * i }}
                                 onClick={() => setSelectedAnalise(selectedAnalise === i ? null : i)}
-                                className={`rounded-xl border cursor-pointer transition-all ${
-                                    selectedAnalise === i
+                                className={`rounded-xl border cursor-pointer transition-all ${selectedAnalise === i
                                         ? 'border-orange-500/50 bg-orange-500/10'
                                         : 'border-white/10 bg-white/5 hover:border-orange-500/30 hover:bg-orange-500/5'
-                                }`}
+                                    }`}
                             >
                                 {/* Header sempre visível */}
                                 <div className="flex items-start gap-3 p-4">
@@ -417,8 +511,8 @@ ${transcricao}
                                 key={i}
                                 onClick={() => hasAnalise ? setSelectedAnalise(analiseIdx) : undefined}
                                 className={`p-3 rounded-lg transition-all ${msg.role === 'Você'
-                                        ? `bg-[#00D9FF]/10 ml-8 border-l-2 ${isHighlighted ? 'border-orange-400 bg-orange-500/15 ring-1 ring-orange-400/30' : 'border-[#00D9FF]'}`
-                                        : 'bg-purple-500/10 mr-8 border-l-2 border-purple-500'
+                                    ? `bg-[#00D9FF]/10 ml-8 border-l-2 ${isHighlighted ? 'border-orange-400 bg-orange-500/15 ring-1 ring-orange-400/30' : 'border-[#00D9FF]'}`
+                                    : 'bg-purple-500/10 mr-8 border-l-2 border-purple-500'
                                     } ${hasAnalise ? 'cursor-pointer hover:bg-orange-500/10' : ''}`}
                             >
                                 <div className="flex items-center justify-between mb-1">

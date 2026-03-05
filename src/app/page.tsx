@@ -214,7 +214,7 @@ function HeroSection() {
         >
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-sm text-white/40 backdrop-blur-sm">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            Powered by Google Cloud &amp; Gemini
+            Parte do Google for Startups Cloud Program
           </span>
         </motion.div>
 
@@ -288,13 +288,13 @@ function TrustedBySection() {
       <InfraGridSVG className="absolute inset-0 w-full h-full pointer-events-none opacity-60" />
       <div className="relative z-10 max-w-5xl mx-auto">
         <p className="text-center text-white/25 text-xs mb-10 tracking-[0.2em] uppercase">
-          Construído sobre
+          Tecnologias que utilizamos
         </p>
         <div className="flex flex-wrap justify-center items-center gap-x-16 gap-y-8">
           {[
-            "Google Cloud",
+            "Gemini",
             "Vertex AI",
-            "Google for Startups",
+            "Cloud Run",
             "USP",
           ].map((partner) => (
             <span key={partner} className="text-white/25 text-lg font-medium hover:text-white/50 transition-colors cursor-default">

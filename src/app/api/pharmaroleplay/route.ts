@@ -131,7 +131,28 @@ Retorne JSON (sem markdown):
             feedbackPrompt ? flashModel.generateContent(feedbackPrompt).catch(() => null) : Promise.resolve(null),
         ]);
 
-        const resposta = result.response.text().trim();
+        const respostaRaw = result.response.text().trim();
+
+        // Guard: Gemini sometimes wraps its answer in JSON { texto_tts, texto_ui }
+        let respostaUI = respostaRaw;
+        let respostaTTS = respostaRaw;
+        try {
+            const cleaned = respostaRaw.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+            const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (parsed.texto_ui || parsed.texto_tts) {
+                    respostaUI = String(parsed.texto_ui || parsed.texto_tts || respostaRaw);
+                    respostaTTS = String(parsed.texto_tts || parsed.texto_ui || respostaRaw);
+                }
+            }
+        } catch {
+            // Not JSON — use raw text as-is (expected path)
+        }
+
+        // Strip any remaining quotes wrapping the response
+        respostaUI = respostaUI.replace(/^["']|["']$/g, "").trim();
+        respostaTTS = respostaTTS.replace(/^["']|["']$/g, "").trim();
 
         let feedback = null;
         if (feedbackResult) {
@@ -149,7 +170,7 @@ Retorne JSON (sem markdown):
             }
         }
 
-        return NextResponse.json({ resposta, feedback });
+        return NextResponse.json({ resposta: respostaUI, resposta_tts: respostaTTS, feedback });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : "Unknown error";
         console.error("PharmaRoleplay API error:", message);

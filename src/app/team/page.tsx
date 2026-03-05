@@ -213,12 +213,12 @@ export default function TeamPage() {
                         <p className="label mb-4 text-[#10B981]">Parceiros</p>
                         <h2 className="heading-lg mb-4">Parceiros & Tecnologia</h2>
                         <p className="body-lg max-w-xl mx-auto">
-                            Construído sobre a infraestrutura de classe mundial do Google Cloud
+                            A Astrivia AI é parte do Google for Startups Cloud Program
                         </p>
                     </motion.div>
 
                     <div className="flex flex-wrap justify-center items-center gap-6">
-                        {["Google Cloud", "Vertex AI", "USP", "Google for Startups"].map((partner) => (
+                        {["Vertex AI", "Gemini", "USP", "Google for Startups"].map((partner) => (
                             <motion.div
                                 key={partner}
                                 initial={{ opacity: 0 }}
