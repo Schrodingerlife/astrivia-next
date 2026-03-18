@@ -3,18 +3,12 @@
 import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useInView } from "framer-motion";
 import {
   ArrowRight,
   Play,
   Mic,
   Globe,
   Shield,
-  Users,
-  FileText,
-  AlertTriangle,
-  CheckCircle,
-  Award,
 } from "lucide-react";
 import {
   AstriviaWordmark,
@@ -30,6 +24,7 @@ import {
   OrbitalEcosystemSVG,
   InfraGridSVG,
 } from "@/components/home/SectionBackgrounds";
+import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 /* ============== PRODUCT ILLUSTRATIONS (Image-based) ============== */
 function PharmaRoleplayVisual() {
@@ -148,6 +143,28 @@ const impactStats = [
   { value: "5", suffix: "", label: "Produtos no ecossistema" },
 ];
 
+/* ============== REUSABLE REVEAL WRAPPER ============== */
+function Reveal({
+  children,
+  className = "",
+  direction,
+  delay,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  direction?: "left" | "right";
+  delay?: 1 | 2 | 3 | 4;
+}) {
+  const [ref, isVisible] = useScrollReveal();
+  const baseClass = direction === "left" ? "reveal-left" : direction === "right" ? "reveal-right" : "reveal";
+  const delayClass = delay ? `reveal-delay-${delay}` : "";
+  return (
+    <div ref={ref} className={`${baseClass} ${delayClass} ${isVisible ? "visible" : ""} ${className}`}>
+      {children}
+    </div>
+  );
+}
+
 /* ============== PAGE ============== */
 export default function HomePage() {
   return (
@@ -183,47 +200,28 @@ function HeroSection() {
         />
       </div>
       <HeroBackgroundSVG />
-      {/* Ecosystem convergence — full-width, all streams toward patient center */}
       <ConvergeFlowSVG className="absolute inset-0 w-full h-full opacity-20 pointer-events-none" />
-      {/* Orbital ecosystem — left side */}
       <OrbitalEcosystemSVG className="absolute left-[-120px] top-1/2 -translate-y-1/2 w-[480px] h-[480px] opacity-15 pointer-events-none" />
-      {/* Orbital ecosystem — right side */}
       <OrbitalEcosystemSVG className="absolute right-[-120px] top-1/2 -translate-y-1/2 w-[380px] h-[380px] opacity-12 pointer-events-none" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1200px] h-[900px] gradient-orb gradient-orb-cyan" />
       <div className="absolute top-[20%] right-0 w-[600px] h-[600px] gradient-orb gradient-orb-purple" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] gradient-orb gradient-orb-green opacity-20" />
-      {/* Subtle radial spotlight */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse,rgba(0,217,255,0.06),transparent_70%)]" />
 
       <div className="relative z-10 max-w-5xl mx-auto text-center">
-        {/* Brand identity */}
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center justify-center mb-8"
-        >
+        {/* Brand identity — CSS animation instead of Framer Motion */}
+        <div className="reveal visible flex items-center justify-center mb-8" style={{ animationDelay: "0s" }}>
           <AstriviaWordmark width={340} className="mx-auto scale-95 md:scale-100" />
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-          className="mb-10"
-        >
+        <div className="reveal visible mb-10" style={{ transitionDelay: "0.1s" }}>
           <span className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-[#00D9FF]/[0.10] border border-[#00D9FF]/25 text-base md:text-lg text-white/80 font-medium backdrop-blur-sm shadow-[0_0_22px_rgba(0,217,255,0.16)]">
             <span className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse" />
             Parte do Google for Startups Cloud Program
           </span>
-        </motion.div>
+        </div>
 
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="heading-xl mb-10 text-balance"
-        >
+        <h1 className="heading-xl mb-10 text-balance reveal visible" style={{ transitionDelay: "0.2s" }}>
           <span className="block">O ecossistema de</span>
           <span className="block py-1">
             <span className="rotating-text-container">
@@ -236,42 +234,27 @@ function HeroSection() {
             </span>
           </span>
           <span className="block">a serviço do paciente</span>
-        </motion.h1>
+        </h1>
 
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto mb-12 leading-relaxed text-balance"
-        >
+        <p className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto mb-12 leading-relaxed text-balance reveal visible" style={{ transitionDelay: "0.3s" }}>
           A plataforma de agentes de IA para Life Sciences.
           Segurança regulatória e velocidade de campo — com rastreabilidade em cada etapa.
-        </motion.p>
+        </p>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
-          className="flex flex-col sm:flex-row gap-4 justify-center"
-        >
-          <Link href="/tools/social-vigilante/demo" className="btn-primary text-base px-8 py-4 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center reveal visible" style={{ transitionDelay: "0.5s" }}>
+          <Link href="/tools/social-vigilante/demo" className="btn-primary btn-shimmer text-base px-8 py-4 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none">
             Testar Demo Grátis <ArrowRight size={18} />
           </Link>
           <Link href="/contact" className="btn-outline text-base px-8 py-4 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none">
             Agendar Demonstração
           </Link>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.2 }}
-          className="mt-20 scroll-indicator"
-        >
+        <div className="mt-20 scroll-indicator reveal visible" style={{ transitionDelay: "1.2s" }}>
           <div className="w-6 h-10 rounded-full border border-white/10 flex justify-center pt-2 mx-auto">
             <div className="w-1 h-2.5 bg-white/20 rounded-full" />
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
@@ -281,22 +264,15 @@ function HeroSection() {
 function TrustedBySection() {
   return (
     <section className="relative py-20 px-6 overflow-hidden">
-      {/* Glow divider at top */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00D9FF]/20 to-transparent" />
       <div className="absolute inset-0 bg-section-elevated" />
-      {/* Infrastructure grid — Google Cloud / Vertex AI backbone */}
       <InfraGridSVG className="absolute inset-0 w-full h-full pointer-events-none opacity-60" />
       <div className="relative z-10 max-w-5xl mx-auto">
         <p className="text-center text-white/25 text-xs mb-10 tracking-[0.2em] uppercase">
           Tecnologias que utilizamos
         </p>
         <div className="flex flex-wrap justify-center items-center gap-4 mb-12">
-          {[
-            "Gemini",
-            "Vertex AI",
-            "Cloud Run",
-            "USP",
-          ].map((partner) => (
+          {["Gemini", "Vertex AI", "Cloud Run", "USP"].map((partner) => (
             <span
               key={partner}
               className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-white/[0.06] border border-white/[0.10] text-white/70 text-base font-medium backdrop-blur-sm hover:bg-white/[0.09] hover:text-white/90 transition-colors cursor-default"
@@ -305,7 +281,6 @@ function TrustedBySection() {
             </span>
           ))}
         </div>
-        {/* Google Cloud full-color wordmark (preferred): on white background */}
         <div className="flex justify-center mt-8">
           <div className="rounded-xl bg-white px-5 py-3">
             <Image
@@ -314,7 +289,6 @@ function TrustedBySection() {
               width={148}
               height={32}
               className="h-8 w-auto object-contain"
-              priority={false}
             />
           </div>
         </div>
@@ -327,22 +301,14 @@ function TrustedBySection() {
 function ProductShowcase() {
   return (
     <section className="relative pt-20 pb-10 overflow-hidden">
-      {/* Background mesh gradient for depth */}
       <div className="absolute inset-0 bg-mesh-gradient" />
-      {/* Tools ecosystem — orbital on right, converge on left */}
       <OrbitalEcosystemSVG className="absolute right-[-80px] top-[10%] w-[420px] h-[420px] opacity-18 pointer-events-none" />
       <ConvergeFlowSVG className="absolute left-[-60px] bottom-[10%] w-[460px] h-[400px] opacity-22 pointer-events-none" />
-      {/* Mid-section orbital */}
       <OrbitalEcosystemSVG className="absolute left-[5%] top-[45%] w-[280px] h-[280px] opacity-12 pointer-events-none" />
       <div className="absolute top-0 right-0 w-[500px] h-[500px] gradient-orb gradient-orb-cyan opacity-20" />
       <div className="absolute bottom-[30%] left-0 w-[400px] h-[400px] gradient-orb gradient-orb-purple opacity-15" />
       <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-24"
-        >
+        <Reveal className="text-center mb-24">
           <p className="label mb-4 text-[#00D9FF]">Produtos</p>
           <h2 className="heading-lg mb-6 text-balance">
             Três agentes. Um ecossistema.<br className="hidden md:block" /> O desfecho que importa: o paciente.
@@ -350,13 +316,12 @@ function ProductShowcase() {
           <p className="text-lg text-white/45 max-w-xl mx-auto text-balance">
             3 demos disponíveis agora. Teste direto no navegador.
           </p>
-        </motion.div>
+        </Reveal>
       </div>
 
       {/* Full-width alternating product sections */}
       {mainProducts.map((product, index) => (
         <div key={product.id} className="relative py-16 md:py-24">
-          {/* Per-section colored glow */}
           <div
             className="absolute top-1/2 -translate-y-1/2 w-[600px] h-[400px] rounded-full blur-[120px] pointer-events-none opacity-[0.06]"
             style={{
@@ -365,25 +330,18 @@ function ProductShowcase() {
             }}
           />
           <div className="relative z-10 max-w-7xl mx-auto px-6">
-            <div className={`grid lg:grid-cols-2 gap-12 lg:gap-20 items-center ${index % 2 === 1 ? "" : ""
-              }`}>
+            <div className={`grid lg:grid-cols-2 gap-12 lg:gap-20 items-center`}>
               {/* Visual */}
-              <motion.div
-                initial={{ opacity: 0, x: index % 2 === 0 ? -40 : 40 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7 }}
+              <Reveal
+                direction={index % 2 === 0 ? "left" : "right"}
                 className={index % 2 === 1 ? "lg:order-2" : ""}
               >
                 {product.visual}
-              </motion.div>
+              </Reveal>
 
               {/* Text */}
-              <motion.div
-                initial={{ opacity: 0, x: index % 2 === 0 ? 40 : -40 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7 }}
+              <Reveal
+                direction={index % 2 === 0 ? "right" : "left"}
                 className={index % 2 === 1 ? "lg:order-1" : ""}
               >
                 <div className="flex items-center gap-3 mb-6">
@@ -417,7 +375,7 @@ function ProductShowcase() {
                   Testar Demo
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </Link>
-              </motion.div>
+              </Reveal>
             </div>
           </div>
         </div>
@@ -432,40 +390,29 @@ function ComingSoonSection() {
     <section className="relative py-24 px-6 overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent" />
       <div className="absolute inset-0 bg-dot-pattern opacity-30" />
-      {/* Expanding ecosystem — more tools joining the orbit */}
       <OrbitalEcosystemSVG className="absolute right-[-60px] top-1/2 -translate-y-1/2 w-[400px] h-[400px] opacity-25 pointer-events-none" />
       <InfraGridSVG className="absolute inset-0 w-full h-full pointer-events-none opacity-40" />
       <div className="absolute bottom-0 right-0 w-[400px] h-[400px] gradient-orb gradient-orb-amber opacity-20" />
       <div className="relative z-10 max-w-5xl mx-auto">
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="label mb-8 text-center"
-        >
-          Em breve
-        </motion.p>
+        <Reveal>
+          <p className="label mb-8 text-center">Em breve</p>
+        </Reveal>
         <div className="grid md:grid-cols-2 gap-6">
           {comingSoonProducts.map((product, i) => (
-            <motion.div
-              key={product.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="rounded-2xl p-8 bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-all backdrop-blur-sm"
-            >
-              <div className="flex items-center gap-3 mb-4">
-                <div className="flex-shrink-0">
-                  {product.icon}
+            <Reveal key={product.id} delay={i === 0 ? 1 : 2}>
+              <div className="rounded-2xl p-8 bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12] transition-all backdrop-blur-sm">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex-shrink-0">
+                    {product.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold">{product.title}</h3>
+                    <p className="text-xs text-white/30">{product.category}</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-semibold">{product.title}</h3>
-                  <p className="text-xs text-white/30">{product.category}</p>
-                </div>
+                <p className="text-white/45 text-sm leading-relaxed">{product.description}</p>
               </div>
-              <p className="text-white/45 text-sm leading-relaxed">{product.description}</p>
-            </motion.div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -479,14 +426,12 @@ function StatsSection() {
     <section className="relative py-32 px-6 overflow-hidden">
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#00D9FF]/15 to-transparent" />
       <div className="absolute inset-0 bg-gradient-to-b from-[#0e1117] via-[#0d0f14] to-[#0a0a0a]" />
-      {/* Infrastructure grid — Google backbone visual */}
       <InfraGridSVG className="absolute inset-0 w-full h-full pointer-events-none opacity-100" />
-      {/* Center glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-[radial-gradient(ellipse,rgba(0,217,255,0.05),transparent_70%)]" />
       <div className="relative z-10 max-w-6xl mx-auto">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-12">
           {impactStats.map((stat, i) => (
-            <AnimatedStat key={i} stat={stat} delay={i * 0.1} />
+            <AnimatedStat key={i} stat={stat} delay={i} />
           ))}
         </div>
       </div>
@@ -495,8 +440,7 @@ function StatsSection() {
 }
 
 function AnimatedStat({ stat, delay }: { stat: typeof impactStats[number]; delay: number }) {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, margin: "-100px" });
+  const [ref, isInView] = useScrollReveal<HTMLDivElement>({ margin: "-100px" });
   const [count, setCount] = useState(0);
 
   useEffect(() => {
@@ -516,19 +460,16 @@ function AnimatedStat({ stat, delay }: { stat: typeof impactStats[number]; delay
   }, [isInView, stat.value]);
 
   return (
-    <motion.div
+    <div
       ref={ref}
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay }}
-      className="text-center"
+      className={`text-center reveal ${isInView ? "visible" : ""}`}
+      style={{ transitionDelay: `${delay * 0.1}s` }}
     >
       <p className="stat-number text-5xl md:text-6xl">
         {count}<span className="text-white/20">{stat.suffix}</span>
       </p>
       <p className="text-white/35 text-sm mt-3">{stat.label}</p>
-    </motion.div>
+    </div>
   );
 }
 
@@ -544,50 +485,33 @@ function StepsSection() {
     <section className="relative py-32 px-6 overflow-hidden">
       <div className="absolute inset-0 bg-mesh-gradient" />
       <div className="absolute bottom-0 left-[10%] w-[500px] h-[500px] gradient-orb gradient-orb-green opacity-15" />
-      {/* Ecosystem convergence — streams flowing toward patient */}
       <ConvergeFlowSVG className="absolute right-[-60px] top-1/2 -translate-y-1/2 w-[520px] h-[440px] opacity-35 pointer-events-none" />
-      {/* Orbital ecosystem — left side, smaller */}
       <OrbitalEcosystemSVG className="absolute left-[-80px] top-1/2 -translate-y-1/2 w-[320px] h-[320px] opacity-20 pointer-events-none" />
       <div className="relative z-10 max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-24"
-        >
+        <Reveal className="text-center mb-24">
           <p className="label mb-4 text-[#10B981]">Como funciona</p>
           <h2 className="heading-lg">É simples começar</h2>
-        </motion.div>
+        </Reveal>
 
         <div className="space-y-20">
           {steps.map((step, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="flex gap-8 md:gap-12 items-start"
-            >
-              <span className="step-number flex-shrink-0 w-20">{step.num}</span>
-              <div className="pt-2">
-                <h3 className="text-2xl md:text-3xl font-semibold mb-4" style={{ fontFamily: "var(--font-heading)" }}>{step.title}</h3>
-                <p className="text-white/45 text-lg max-w-lg leading-relaxed">{step.desc}</p>
+            <Reveal key={i} delay={i === 0 ? 1 : i === 1 ? 2 : 3}>
+              <div className="flex gap-8 md:gap-12 items-start">
+                <span className="step-number flex-shrink-0 w-20">{step.num}</span>
+                <div className="pt-2">
+                  <h3 className="text-2xl md:text-3xl font-semibold mb-4" style={{ fontFamily: "var(--font-heading)" }}>{step.title}</h3>
+                  <p className="text-white/45 text-lg max-w-lg leading-relaxed">{step.desc}</p>
+                </div>
               </div>
-            </motion.div>
+            </Reveal>
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-20 text-center"
-        >
-          <Link href="/tools/social-vigilante/demo" className="btn-primary text-base px-8 py-4">
+        <Reveal className="mt-20 text-center">
+          <Link href="/tools/social-vigilante/demo" className="btn-primary btn-shimmer text-base px-8 py-4">
             Comece agora <ArrowRight size={18} />
           </Link>
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   );
@@ -624,52 +548,41 @@ function TeamSection() {
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.06] to-transparent" />
       <div className="absolute inset-0 bg-dot-pattern opacity-20" />
       <div className="absolute top-[20%] right-0 w-[400px] h-[400px] gradient-orb gradient-orb-cyan opacity-10" />
-      {/* Orbital ecosystem — founders surrounded by the ecosystem they built */}
       <OrbitalEcosystemSVG className="absolute left-[-100px] top-1/2 -translate-y-1/2 w-[380px] h-[380px] opacity-30 pointer-events-none" />
       <OrbitalEcosystemSVG className="absolute right-[-100px] top-1/2 -translate-y-1/2 w-[300px] h-[300px] opacity-18 pointer-events-none" />
       <div className="relative z-10 max-w-5xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-20"
-        >
+        <Reveal className="text-center mb-20">
           <p className="label mb-4">Liderança</p>
           <h2 className="heading-lg">
             Da operação ao regulatório —<br className="hidden md:block" /> founders que conhecem cada ponto do ecossistema
           </h2>
-        </motion.div>
+        </Reveal>
 
         <div className="grid md:grid-cols-3 gap-12">
           {team.map((member, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="text-center group"
-            >
-              <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border border-white/[0.08] group-hover:border-[#00D9FF]/30 transition-colors">
-                <Image
-                  src={member.image}
-                  alt={member.name}
-                  fill
-                  className="object-cover"
-                />
+            <Reveal key={i} delay={i === 0 ? 1 : i === 1 ? 2 : 3}>
+              <div className="text-center group">
+                <div className="relative w-32 h-32 mx-auto mb-6 rounded-full overflow-hidden border border-white/[0.08] group-hover:border-[#00D9FF]/30 transition-colors">
+                  <Image
+                    src={member.image}
+                    alt={member.name}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <h3 className="font-semibold text-lg">{member.name}</h3>
+                <p className="text-[#00D9FF] text-sm font-medium mb-1">{member.role}</p>
+                <p className="text-white/40 text-sm mb-3">{member.desc}</p>
+                <Link
+                  href={member.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-white/25 hover:text-white/60 transition-colors"
+                >
+                  LinkedIn ↗
+                </Link>
               </div>
-              <h3 className="font-semibold text-lg">{member.name}</h3>
-              <p className="text-[#00D9FF] text-sm font-medium mb-1">{member.role}</p>
-              <p className="text-white/40 text-sm mb-3">{member.desc}</p>
-              <Link
-                href={member.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-xs text-white/25 hover:text-white/60 transition-colors"
-              >
-                LinkedIn ↗
-              </Link>
-            </motion.div>
+            </Reveal>
           ))}
         </div>
       </div>
@@ -683,44 +596,33 @@ function CTASection() {
     <section className="relative py-40 px-6 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0a] via-[#0a0e18] to-[#0a0a0a]" />
       <div className="absolute inset-0 bg-grid-pattern opacity-20" />
-      {/* The full ecosystem convergence — everything flowing toward the patient */}
       <ConvergeFlowSVG className="absolute inset-0 w-full h-full opacity-25 pointer-events-none" />
-      {/* Central glow intensified */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[500px] bg-[radial-gradient(ellipse,rgba(0,217,255,0.08),transparent_60%)]" />
       <div className="absolute top-0 left-0 w-[500px] h-[500px] gradient-orb gradient-orb-purple opacity-20" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] gradient-orb gradient-orb-cyan opacity-20" />
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-purple-500/20 to-transparent" />
       <div className="relative z-10 max-w-3xl mx-auto text-center">
-        <motion.h2
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="heading-lg mb-8"
-        >
-          A infraestrutura invisível que garante<br className="hidden md:block" /> o desfecho certo — do campo ao paciente
-        </motion.h2>
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="text-xl text-white/45 mb-12 leading-relaxed"
-        >
-          Time bem treinado. Linguagem segura. Vigilância ativa.
-          Com rastreabilidade em cada etapa — porque quando a estrutura falha, quem paga é o paciente.
-        </motion.p>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="flex flex-col sm:flex-row gap-4 justify-center"
-        >
-          <Link href="/contact" className="btn-primary text-base px-8 py-4">
-            Agendar Demonstração <ArrowRight size={18} />
-          </Link>
-          <Link href="/tools/social-vigilante/demo" className="btn-outline text-base px-8 py-4">
-            <Play size={16} /> Testar Demo Grátis
-          </Link>
-        </motion.div>
+        <Reveal>
+          <h2 className="heading-lg mb-8">
+            A infraestrutura invisível que garante<br className="hidden md:block" /> o desfecho certo — do campo ao paciente
+          </h2>
+        </Reveal>
+        <Reveal delay={1}>
+          <p className="text-xl text-white/45 mb-12 leading-relaxed">
+            Time bem treinado. Linguagem segura. Vigilância ativa.
+            Com rastreabilidade em cada etapa — porque quando a estrutura falha, quem paga é o paciente.
+          </p>
+        </Reveal>
+        <Reveal delay={2}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/contact" className="btn-primary btn-shimmer text-base px-8 py-4">
+              Agendar Demonstração <ArrowRight size={18} />
+            </Link>
+            <Link href="/tools/social-vigilante/demo" className="btn-outline text-base px-8 py-4">
+              <Play size={16} /> Testar Demo Grátis
+            </Link>
+          </div>
+        </Reveal>
       </div>
     </section>
   );
@@ -731,61 +633,47 @@ function ManifestoSection() {
   return (
     <section className="py-24 px-6 relative overflow-hidden bg-[#0A1628]">
       <div className="absolute inset-0 bg-gradient-to-b from-[#0A1628] via-[#0D1B2A] to-[#0A1628]" />
-      {/* Ecosystem convergence — everything flowing toward the patient */}
       <ConvergeFlowSVG className="absolute right-0 top-0 w-[360px] h-[320px] opacity-12 pointer-events-none" />
       <div className="max-w-4xl mx-auto relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-10"
-        >
+        <Reveal className="text-center mb-10">
           <p className="text-[#00D9FF] text-sm font-semibold uppercase tracking-widest mb-4">
             Por que existimos
           </p>
           <h2 className="text-3xl md:text-4xl font-bold mb-2 text-white">
             Cada paciente tem uma história
           </h2>
-        </motion.div>
+        </Reveal>
 
-        <motion.blockquote
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.15 }}
-          className="relative bg-white/[0.03] backdrop-blur-sm rounded-2xl p-8 md:p-12 border-l-4 border-[#00D9FF]"
-        >
-          <p className="text-white/80 text-lg md:text-2xl leading-relaxed italic font-light">
-            &ldquo;Alguém precisa explicar bem. Alguém precisa comunicar sem exageros.
-            Alguém precisa treinar o time para lidar com dúvidas. E alguém precisa
-            escutar sinais de risco no mundo real.&rdquo;
-          </p>
-          <p className="text-white/50 text-base md:text-lg mt-8 not-italic">
-            A Astrivia constrói essa infraestrutura para ser rápida, segura e auditável — porque
-            eficiência em Life Sciences não é economia: <span className="text-white font-medium">é cuidado.</span>
-          </p>
-        </motion.blockquote>
+        <Reveal delay={1}>
+          <blockquote className="relative bg-white/[0.03] backdrop-blur-sm rounded-2xl p-8 md:p-12 border-l-4 border-[#00D9FF]">
+            <p className="text-white/80 text-lg md:text-2xl leading-relaxed italic font-light">
+              &ldquo;Alguém precisa explicar bem. Alguém precisa comunicar sem exageros.
+              Alguém precisa treinar o time para lidar com dúvidas. E alguém precisa
+              escutar sinais de risco no mundo real.&rdquo;
+            </p>
+            <p className="text-white/50 text-base md:text-lg mt-8 not-italic">
+              A Astrivia constrói essa infraestrutura para ser rápida, segura e auditável — porque
+              eficiência em Life Sciences não é economia: <span className="text-white font-medium">é cuidado.</span>
+            </p>
+          </blockquote>
+        </Reveal>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3 }}
-          className="grid md:grid-cols-3 gap-4 mt-10"
-        >
-          <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5 text-center hover:bg-white/[0.05] transition-colors">
-            <Mic size={24} className="text-[#00D9FF] mx-auto mb-3" />
-            <p className="text-white/70 text-sm">Campo treinado para conversas difíceis</p>
+        <Reveal delay={2}>
+          <div className="grid md:grid-cols-3 gap-4 mt-10">
+            <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5 text-center hover:bg-white/[0.05] transition-colors">
+              <Mic size={24} className="text-[#00D9FF] mx-auto mb-3" />
+              <p className="text-white/70 text-sm">Campo treinado para conversas difíceis</p>
+            </div>
+            <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5 text-center hover:bg-white/[0.05] transition-colors">
+              <Shield size={24} className="text-[#10B981] mx-auto mb-3" />
+              <p className="text-white/70 text-sm">Marketing que comunica com segurança</p>
+            </div>
+            <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5 text-center hover:bg-white/[0.05] transition-colors">
+              <Globe size={24} className="text-[#A855F7] mx-auto mb-3" />
+              <p className="text-white/70 text-sm">Pós-mercado que detecta sinais antes do reporte</p>
+            </div>
           </div>
-          <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5 text-center hover:bg-white/[0.05] transition-colors">
-            <Shield size={24} className="text-[#10B981] mx-auto mb-3" />
-            <p className="text-white/70 text-sm">Marketing que comunica com segurança</p>
-          </div>
-          <div className="bg-white/[0.03] border border-white/[0.05] rounded-xl p-5 text-center hover:bg-white/[0.05] transition-colors">
-            <Globe size={24} className="text-[#A855F7] mx-auto mb-3" />
-            <p className="text-white/70 text-sm">Pós-mercado que detecta sinais antes do reporte</p>
-          </div>
-        </motion.div>
+        </Reveal>
       </div>
     </section>
   );

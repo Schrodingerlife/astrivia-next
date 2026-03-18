@@ -120,7 +120,7 @@ export function Footer() {
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
                     <p className="text-white/25 text-xs">© 2026 Astrivia AI. Todos os direitos reservados.</p>
                     <span className="text-white/25 text-xs flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
+                        <span className="status-dot" />
                         Todos os sistemas online
                     </span>
                 </div>

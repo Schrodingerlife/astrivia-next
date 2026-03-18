@@ -1,9 +1,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
+import { GEMINI_TEXT_MODEL } from "@/lib/ai-models";
 import { writeFirestoreDocument } from "@/lib/firestore-admin";
-
-// Use a stable, widely available model for this tool
-const VIGILANTE_MODEL = "gemini-2.0-flash";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 
@@ -36,115 +34,8 @@ function normalizeRisk(value: unknown): RiskLevel {
     return "medium";
 }
 
-function detectPlatformFromUrl(url: string): Platform {
-    const u = url.toLowerCase();
-    if (u.includes("reclameaqui")) return "reclameaqui";
-    if (u.includes("reddit")) return "reddit";
-    if (u.includes("instagram")) return "instagram";
-    if (u.includes("facebook") || u.includes("fb.com")) return "facebook";
-    if (u.includes("twitter") || u.includes("x.com")) return "twitter";
-    return "twitter";
-}
-
 // ---------------------------------------------------------------------------
-// Step 1: Google Custom Search API — fetch REAL mentions
-// ---------------------------------------------------------------------------
-
-interface SearchResult {
-    title: string;
-    link: string;
-    snippet: string;
-    displayLink: string;
-}
-
-async function fetchSearchMentions(term: string): Promise<SearchResult[]> {
-    const apiKey = process.env.GOOGLE_CUSTOM_SEARCH_KEY;
-    const cx = process.env.GOOGLE_SEARCH_ENGINE_ID;
-
-    if (!apiKey || !cx) {
-        console.warn("[SocialVigilante] Missing GOOGLE_CUSTOM_SEARCH_KEY or GOOGLE_SEARCH_ENGINE_ID");
-        return [];
-    }
-
-    const queries = [
-        `${term} efeitos colaterais site:reclameaqui.com.br`,
-        `${term} reação adversa reddit`,
-        `${term} problema paciente`,
-    ];
-
-    try {
-        const results = await Promise.all(
-            queries.map(q =>
-                fetch(
-                    `https://www.googleapis.com/customsearch/v1?key=${apiKey}&cx=${cx}&q=${encodeURIComponent(q)}&num=5`
-                )
-                    .then(r => r.json())
-                    .then(data => (data.items ?? []) as SearchResult[])
-                    .catch(() => [] as SearchResult[])
-            )
-        );
-
-        return results.flat();
-    } catch (err) {
-        console.error("[SocialVigilante] Custom Search error:", err);
-        return [];
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Step 2: Gemini classification layer — analyze the search results
-// ---------------------------------------------------------------------------
-
-interface ClassifiedPost {
-    sentiment: string;
-    riskLevel: string;
-    event: string;
-}
-
-async function classifySearchResults(
-    results: SearchResult[],
-    term: string
-): Promise<ClassifiedPost[]> {
-    if (results.length === 0) return [];
-
-    const snippets = results.map((r, i) => `[${i}] ${r.title}: ${r.snippet}`).join("\n");
-
-    const prompt = `Você é um sistema de farmacovigilância. Analise os seguintes resultados de busca sobre "${term}" e classifique cada um.
-
-Resultados:
-${snippets}
-
-Para CADA resultado (na mesma ordem), retorne um JSON array com:
-- sentiment: "negative", "neutral" ou "positive"
-- riskLevel: "critical", "high", "medium" ou "low"
-- event: descrição curta em português do evento de farmacovigilância detectado (ex: "Relato de náusea", "Queixa de eficácia")
-
-Retorne APENAS o JSON array, sem texto adicional.`;
-
-    try {
-        const model = genAI.getGenerativeModel({
-            model: VIGILANTE_MODEL,
-            generationConfig: {
-                responseMimeType: "application/json",
-            },
-        });
-
-        const result = await model.generateContent(prompt);
-        const text = result.response.text();
-        return JSON.parse(text);
-    } catch (err) {
-        console.error("[SocialVigilante] Classification error:", err);
-        // Return neutral defaults
-        return results.map(() => ({
-            sentiment: "neutral",
-            riskLevel: "medium",
-            event: "Menção detectada",
-        }));
-    }
-}
-
-// ---------------------------------------------------------------------------
-// Step 3: Synthetic posts fallback (when Custom Search is unavailable)
+// Synthetic posts — Gemini 3.1 Flash
 // ---------------------------------------------------------------------------
 
 interface GeminiPost {
@@ -170,7 +61,7 @@ REGRAS:
 6. Responda APENAS com o JSON array com campos: platform, author, content, sentiment, riskLevel, event.`;
 
     const model = genAI.getGenerativeModel({
-        model: VIGILANTE_MODEL,
+        model: GEMINI_TEXT_MODEL, // gemini-3.1-flash
         generationConfig: {
             responseMimeType: "application/json",
         },
@@ -196,102 +87,49 @@ export async function POST(req: Request) {
         }
 
         let posts: any[] = [];
-        let source = "gemini-generated";
+        const source = "gemini-generated";
 
-        // ── Step 1: Try Google Custom Search for REAL mentions ──
         try {
-            const searchResults = await fetchSearchMentions(term);
+            const syntheticPosts = await generateSyntheticPosts(term);
+            const now = Date.now();
 
-            if (searchResults.length > 0) {
-                // Classify real results with Gemini
-                const classifications = await classifySearchResults(searchResults, term);
-                const now = Date.now();
+            posts = syntheticPosts.map((post, index) => {
+                const platform = normalizePlatform(post.platform);
+                const sentiment = normalizeSentiment(post.sentiment);
+                const riskLevel = normalizeRisk(post.riskLevel);
+                const hoursAgo = Math.floor(Math.random() * 48) + 1;
 
-                posts = searchResults.map((result, index) => {
-                    const classification = classifications[index] || {
-                        sentiment: "neutral",
-                        riskLevel: "medium",
-                        event: "Menção detectada",
-                    };
-                    const platform = detectPlatformFromUrl(result.link);
-                    const sentiment = normalizeSentiment(classification.sentiment);
-                    const riskLevel = normalizeRisk(classification.riskLevel);
-
-                    return {
-                        id: `search-${now}-${index}`,
-                        platform,
-                        author: result.displayLink || "Fonte web",
-                        handle: `@${result.displayLink?.replace(/\./g, "_") || "web"}`,
-                        avatar: `https://i.pravatar.cc/150?u=search-${now}-${index}`,
-                        content: String(result.snippet || result.title || "").slice(0, 190),
-                        timestamp: new Date(now - (index + 1) * 3600000).toISOString(),
-                        likes: Math.floor(Math.random() * 80) + 5,
-                        shares: Math.floor(Math.random() * 25),
-                        sentiment,
-                        riskLevel,
-                        sourceUrl: result.link,
-                        aiAnalysis: {
-                            detectedEvent: classification.event || "Sinal detectado",
-                            drugMentioned: term,
-                            complianceFlag: riskLevel === "critical" || riskLevel === "high",
-                            confidence: 0.88,
-                        },
-                        isSimulated: false,
-                        dataSource: "google-search",
-                        status: "new",
-                    };
-                });
-                source = "live";
-            }
-        } catch (searchError: any) {
-            console.error("[SocialVigilante] Search failed:", searchError?.message);
-        }
-
-        // ── Step 2: Fallback — synthetic posts via Gemini ──
-        if (posts.length === 0) {
-            source = "gemini-generated";
-            try {
-                const syntheticPosts = await generateSyntheticPosts(term);
-                const now = Date.now();
-
-                posts = syntheticPosts.map((post, index) => {
-                    const platform = normalizePlatform(post.platform);
-                    const sentiment = normalizeSentiment(post.sentiment);
-                    const riskLevel = normalizeRisk(post.riskLevel);
-                    const hoursAgo = Math.floor(Math.random() * 48) + 1;
-
-                    return {
-                        id: `gen-${now}-${index}`,
-                        platform,
-                        author: post.author || "Usuário anônimo",
-                        handle: "@monitoring",
-                        avatar: `https://i.pravatar.cc/150?u=gen-${index}`,
-                        content: String(post.content || "").slice(0, 190),
-                        timestamp: new Date(now - hoursAgo * 3600000).toISOString(),
-                        likes: Math.floor(Math.random() * 50),
-                        shares: Math.floor(Math.random() * 15),
-                        sentiment,
-                        riskLevel,
-                        aiAnalysis: {
-                            detectedEvent: post.event || "Sinal detectado",
-                            drugMentioned: term,
-                            complianceFlag: riskLevel === "critical" || riskLevel === "high",
-                            confidence: 0.72,
-                        },
-                        isSimulated: true,
-                        dataSource: "gemini",
-                        status: "new",
-                    };
-                });
-            } catch (genError: any) {
-                console.error("[SocialVigilante] Gemini generation failed:", genError?.message);
-                return NextResponse.json({
-                    posts: [],
-                    source: "error",
-                    retrievalCount: 0,
-                    error: genError?.message || "Unknown generation error",
-                });
-            }
+                return {
+                    id: `gen-${now}-${index}`,
+                    platform,
+                    author: post.author || "Usuário anônimo",
+                    handle: "@monitoring",
+                    avatar: `https://i.pravatar.cc/150?u=gen-${index}`,
+                    content: String(post.content || "").slice(0, 190),
+                    timestamp: new Date(now - hoursAgo * 3600000).toISOString(),
+                    likes: Math.floor(Math.random() * 50),
+                    shares: Math.floor(Math.random() * 15),
+                    sentiment,
+                    riskLevel,
+                    aiAnalysis: {
+                        detectedEvent: post.event || "Sinal detectado",
+                        drugMentioned: term,
+                        complianceFlag: riskLevel === "critical" || riskLevel === "high",
+                        confidence: 0.72,
+                    },
+                    isSimulated: true,
+                    dataSource: "gemini",
+                    status: "new",
+                };
+            });
+        } catch (genError: any) {
+            console.error("[SocialVigilante] Gemini generation failed:", genError?.message);
+            return NextResponse.json({
+                posts: [],
+                source: "error",
+                retrievalCount: 0,
+                error: genError?.message || "Unknown generation error",
+            });
         }
 
         const highRiskCount = posts.filter(
@@ -304,7 +142,7 @@ export async function POST(req: Request) {
             postCount: posts.length,
             highRiskCount,
             source,
-            model: VIGILANTE_MODEL,
+            model: GEMINI_TEXT_MODEL,
             createdAt: new Date().toISOString(),
         }).catch(() => null);
 
