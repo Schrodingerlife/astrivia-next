@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { GEMINI_TEXT_FALLBACK_MODEL } from "@/lib/ai-models";
 
@@ -84,11 +84,25 @@ export async function POST(req: Request) {
             );
         }
 
-        // Use Flash for speed — JSON Mode forced
+        const expectedSchema = {
+            type: SchemaType.OBJECT,
+            properties: {
+                score_final: { type: SchemaType.INTEGER },
+                aprovado: { type: SchemaType.BOOLEAN },
+                xp_ganho: { type: SchemaType.INTEGER },
+                motivo_reprovacao: { type: SchemaType.STRING, nullable: true },
+                pontos_fortes: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                pontos_melhoria: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } },
+                usou_tecnicas_fechamento: { type: SchemaType.BOOLEAN }
+            },
+            required: ["score_final", "aprovado", "xp_ganho", "pontos_fortes", "pontos_melhoria", "usou_tecnicas_fechamento"]
+        };
+
         const model = genAI.getGenerativeModel({
             model: GEMINI_TEXT_FALLBACK_MODEL,
             generationConfig: {
                 responseMimeType: "application/json",
+                responseSchema: expectedSchema as any,
                 temperature: 0.3,
             },
         });

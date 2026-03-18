@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL } from "@/lib/ai-models";
 import { queryVertexSearch } from "@/lib/vertex-search";
@@ -6,12 +6,17 @@ import { writeFirestoreDocument } from "@/lib/firestore-admin";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 
-async function generateWithFallback(prompt: string): Promise<{ text: string; model: string }> {
+async function generateWithFallback(prompt: string, schema?: any): Promise<{ text: string; model: string }> {
     const models = [GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL].filter(Boolean);
     let lastError: unknown;
     for (const modelName of models) {
         try {
-            const m = genAI.getGenerativeModel({ model: modelName });
+            const configData: any = {};
+            if (schema) {
+                configData.responseMimeType = "application/json";
+                configData.responseSchema = schema;
+            }
+            const m = genAI.getGenerativeModel({ model: modelName, generationConfig: Object.keys(configData).length > 0 ? configData : undefined });
             const result = await m.generateContent(prompt);
             return { text: result.response.text(), model: modelName };
         } catch (err) {
@@ -176,7 +181,49 @@ Analise o texto e retorne APENAS um objeto JSON válido com esta estrutura EXATA
   ]
 }`;
 
-        const generation = await generateWithFallback(prompt);
+        // Extracting just the prompt execution into schema
+            const expectedSchema = {
+                type: SchemaType.OBJECT,
+                properties: {
+                    score: { type: SchemaType.INTEGER },
+                    resumo: { type: SchemaType.STRING },
+                    total_graves: { type: SchemaType.INTEGER },
+                    total_moderadas: { type: SchemaType.INTEGER },
+                    total_leves: { type: SchemaType.INTEGER },
+                    violacoes: {
+                        type: SchemaType.ARRAY,
+                        items: {
+                            type: SchemaType.OBJECT,
+                            properties: {
+                                tipo: { type: SchemaType.STRING, format: "enum", enum: ["grave", "moderada", "leve"] },
+                                texto: { type: SchemaType.STRING },
+                                trecho: { type: SchemaType.STRING },
+                                artigo: { type: SchemaType.STRING },
+                                sugestao: { type: SchemaType.STRING },
+                                sugestao_reescrita: { type: SchemaType.STRING },
+                                refs: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
+                            },
+                            required: ["tipo", "texto", "trecho", "artigo", "sugestao", "sugestao_reescrita", "refs"]
+                        }
+                    },
+                    referencias: {
+                        type: SchemaType.ARRAY,
+                        items: {
+                            type: SchemaType.OBJECT,
+                            properties: {
+                                docId: { type: SchemaType.STRING },
+                                title: { type: SchemaType.STRING },
+                                trecho: { type: SchemaType.STRING },
+                                uri: { type: SchemaType.STRING, nullable: true }
+                            },
+                            required: ["docId", "title", "trecho"]
+                        }
+                    }
+                },
+                required: ["score", "resumo", "total_graves", "total_moderadas", "total_leves", "violacoes", "referencias"]
+            };
+
+        const generation = await generateWithFallback(prompt, expectedSchema);
         const responseText = generation.text;
         const usedModel = generation.model;
         const parsed = JSON.parse(extractJsonObject(responseText));
