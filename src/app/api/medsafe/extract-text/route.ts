@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleAIFileManager } from "@google/generative-ai/server";
 import { GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL } from "@/lib/ai-models";
+import fs from "fs";
+import os from "os";
+import path from "path";
 
 const SUPPORTED_MIME_TYPES = new Set([
     "application/pdf",
@@ -24,6 +28,10 @@ Retorne APENAS o texto extraído — sem comentários, sem explicações, sem ma
  * Body: { fileBase64: string, mimeType: string }
  */
 export async function POST(req: Request) {
+    let tempFilePath = "";
+    let uploadedFileName = "";
+    let fileManager: GoogleAIFileManager | null = null;
+
     try {
         if (!process.env.GOOGLE_API_KEY) {
             return NextResponse.json({ error: "GOOGLE_API_KEY não configurado" }, { status: 503 });
@@ -49,12 +57,52 @@ export async function POST(req: Request) {
 
         let extracted = "";
         let lastError: unknown;
+        let fileUri = "";
+
+        // Para application/pdf, subir via File API (obrigatório/recomendado para Gemini em PDFs)
+        if (normalizedMime === "application/pdf") {
+            fileManager = new GoogleAIFileManager(process.env.GOOGLE_API_KEY);
+            const buffer = Buffer.from(fileBase64, "base64");
+            tempFilePath = path.join(os.tmpdir(), `medsafe-upload-${Date.now()}.pdf`);
+            fs.writeFileSync(tempFilePath, buffer);
+
+            const uploadResponse = await fileManager.uploadFile(tempFilePath, {
+                mimeType: "application/pdf",
+                displayName: "MedSafe PDF Analysis",
+            });
+            
+            uploadedFileName = uploadResponse.file.name;
+            let fileState = uploadResponse.file.state;
+
+            // Esperar o processamento do documento no backend do Google (até 15s)
+            if (fileState === 'PROCESSING') {
+                for (let i = 0; i < 5; i++) {
+                    await new Promise(resolve => setTimeout(resolve, 3000));
+                    const getFile = await fileManager.getFile(uploadedFileName);
+                    if (getFile.state === 'ACTIVE' || getFile.state === 'FAILED') {
+                        fileState = getFile.state;
+                        break;
+                    }
+                }
+            }
+
+            if (fileState === 'FAILED') {
+                throw new Error("O processamento do PDF falhou na API do Google.");
+            }
+
+            fileUri = uploadResponse.file.uri;
+        }
 
         for (const modelName of modelNames) {
             try {
                 const m = genAI.getGenerativeModel({ model: modelName });
+                
+                const part = normalizedMime === "application/pdf" && fileUri
+                    ? { fileData: { mimeType: "application/pdf", fileUri: fileUri } }
+                    : { inlineData: { data: fileBase64, mimeType: normalizedMime } };
+
                 const result = await m.generateContent([
-                    { inlineData: { data: fileBase64, mimeType: normalizedMime } },
+                    part,
                     EXTRACTION_PROMPT,
                 ]);
                 extracted = result.response.text().trim();
@@ -65,6 +113,14 @@ export async function POST(req: Request) {
             }
         }
 
+        // Cleanup da File API local e remoto
+        if (uploadedFileName && fileManager) {
+            await fileManager.deleteFile(uploadedFileName).catch(console.error);
+        }
+        if (tempFilePath && fs.existsSync(tempFilePath)) {
+            fs.unlinkSync(tempFilePath);
+        }
+
         if (!extracted) {
             const details = lastError instanceof Error ? lastError.message : "Nenhum texto encontrado";
             return NextResponse.json({ error: "Nenhum texto encontrado no documento", details }, { status: 422 });
@@ -72,6 +128,14 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ text: extracted, charCount: extracted.length });
     } catch (error: unknown) {
+        // Emergency cleanup
+        if (uploadedFileName && fileManager) {
+            fileManager.deleteFile(uploadedFileName).catch(console.error);
+        }
+        if (tempFilePath && fs.existsSync(tempFilePath)) {
+            fs.unlinkSync(tempFilePath);
+        }
+
         const message = error instanceof Error ? error.message : "Unknown error";
         console.error("Extract-text error:", message);
         return NextResponse.json(
