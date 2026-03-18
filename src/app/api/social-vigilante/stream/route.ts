@@ -21,7 +21,7 @@ async function generateWithFallback(prompt: string): Promise<string> {
     throw lastError;
 }
 
-type Platform = "twitter" | "facebook" | "instagram" | "reddit" | "reclameaqui" | "hackernews";
+type Platform = "twitter" | "facebook" | "instagram" | "reddit" | "reclameaqui";
 type Sentiment = "negative" | "neutral" | "positive";
 type RiskLevel = "critical" | "high" | "medium" | "low";
 
@@ -38,7 +38,7 @@ function normalizePlatform(value: unknown): Platform {
     if (raw.includes("face")) return "facebook";
     if (raw.includes("reddit")) return "reddit";
     if (raw.includes("reclame")) return "reclameaqui";
-    if (raw.includes("hacker") || raw.includes("hn")) return "hackernews";
+
     return "twitter";
 }
 
@@ -91,39 +91,6 @@ interface RedditPost {
     num_comments: number;
     created_utc: number;
     url: string;
-}
-
-interface HNHit {
-    objectID: string;
-    title: string;
-    author: string;
-    points: number;
-    num_comments: number;
-    created_at: string;
-    story_url: string | null;
-}
-
-async function fetchHackerNewsPosts(term: string): Promise<HNHit[]> {
-    const encoded = encodeURIComponent(term);
-    const url = `https://hn.algolia.com/api/v1/search?query=${encoded}&tags=story&hitsPerPage=10`;
-
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 7000);
-
-    try {
-        const response = await fetch(url, {
-            signal: controller.signal,
-            headers: { "Accept": "application/json" },
-        });
-
-        clearTimeout(timeout);
-        if (!response.ok) return [];
-        const data = await response.json();
-        return Array.isArray(data?.hits) ? data.hits.filter((h: HNHit) => h.title) : [];
-    } catch {
-        clearTimeout(timeout);
-        return [];
-    }
 }
 
 async function fetchRedditPosts(term: string): Promise<RedditPost[]> {
@@ -276,11 +243,8 @@ export async function POST(req: Request) {
         let posts: unknown[] = [];
         let source = "gemini-generated";
 
-        // Fetch Reddit + Hacker News in parallel
-        const [redditRaw, hnRaw] = await Promise.all([
-            fetchRedditPosts(term),
-            fetchHackerNewsPosts(term),
-        ]);
+        // Fetch Reddit posts
+        const redditRaw = await fetchRedditPosts(term);
 
         const livePosts: unknown[] = [];
 
@@ -327,37 +291,7 @@ export async function POST(req: Request) {
             livePosts.push(...(relevant.length > 0 ? relevant : mappedPosts.slice(0, 8)));
         }
 
-        if (hnRaw.length > 0) {
-            const hnPosts = hnRaw.slice(0, 8).map((hit) => {
-                const text = hit.title;
-                const sentiment = heuristicSentiment(text);
-                const riskLevel = heuristicRisk(text);
-                return {
-                    id: `hn-${hit.objectID}`,
-                    platform: "hackernews" as Platform,
-                    author: hit.author || "hn_user",
-                    handle: hit.author || "hn_user",
-                    avatar: `https://i.pravatar.cc/150?u=hn-${hit.objectID}`,
-                    content: hit.title.slice(0, 190),
-                    timestamp: parseTimestamp(hit.created_at),
-                    likes: hit.points || 0,
-                    shares: hit.num_comments || 0,
-                    sentiment,
-                    riskLevel,
-                    sourceUrl: hit.story_url || `https://news.ycombinator.com/item?id=${hit.objectID}`,
-                    aiAnalysis: {
-                        detectedEvent: "Discussão técnica detectada",
-                        drugMentioned: term,
-                        complianceFlag: riskLevel === "critical" || riskLevel === "high",
-                        confidence: 0.70,
-                    },
-                    isSimulated: false,
-                    dataSource: "hackernews",
-                    status: "new",
-                };
-            });
-            livePosts.push(...hnPosts);
-        }
+
 
         if (livePosts.length > 0) {
             source = "live";
