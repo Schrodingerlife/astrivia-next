@@ -1,6 +1,4 @@
-"use client";
 
-import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -24,8 +22,8 @@ import {
   OrbitalEcosystemSVG,
   InfraGridSVG,
 } from "@/components/home/SectionBackgrounds";
-import { useScrollReveal } from "@/hooks/useScrollReveal";
-
+import { Reveal } from "@/components/home/Reveal";
+import { AnimatedStat } from "@/components/home/AnimatedStat";
 /* ============== PRODUCT ILLUSTRATIONS (Image-based) ============== */
 function PharmaRoleplayVisual() {
   return (
@@ -143,27 +141,6 @@ const impactStats = [
   { value: "5", suffix: "", label: "Produtos no ecossistema" },
 ];
 
-/* ============== REUSABLE REVEAL WRAPPER ============== */
-function Reveal({
-  children,
-  className = "",
-  direction,
-  delay,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  direction?: "left" | "right";
-  delay?: 1 | 2 | 3 | 4;
-}) {
-  const [ref, isVisible] = useScrollReveal();
-  const baseClass = direction === "left" ? "reveal-left" : direction === "right" ? "reveal-right" : "reveal";
-  const delayClass = delay ? `reveal-delay-${delay}` : "";
-  return (
-    <div ref={ref} className={`${baseClass} ${delayClass} ${isVisible ? "visible" : ""} ${className}`}>
-      {children}
-    </div>
-  );
-}
 
 /* ============== PAGE ============== */
 export default function HomePage() {
@@ -439,39 +416,6 @@ function StatsSection() {
   );
 }
 
-function AnimatedStat({ stat, delay }: { stat: typeof impactStats[number]; delay: number }) {
-  const [ref, isInView] = useScrollReveal<HTMLDivElement>({ margin: "-100px" });
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    if (!isInView) return;
-    const end = parseInt(stat.value);
-    const duration = 1500;
-    const startTime = performance.now();
-
-    const animate = (now: number) => {
-      const elapsed = now - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(end * eased));
-      if (progress < 1) requestAnimationFrame(animate);
-    };
-    requestAnimationFrame(animate);
-  }, [isInView, stat.value]);
-
-  return (
-    <div
-      ref={ref}
-      className={`text-center reveal ${isInView ? "visible" : ""}`}
-      style={{ transitionDelay: `${delay * 0.1}s` }}
-    >
-      <p className="stat-number text-5xl md:text-6xl">
-        {count}<span className="text-white/20">{stat.suffix}</span>
-      </p>
-      <p className="text-white/35 text-sm mt-3">{stat.label}</p>
-    </div>
-  );
-}
 
 /* ============== STEPS ============== */
 function StepsSection() {
