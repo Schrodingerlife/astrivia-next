@@ -223,9 +223,9 @@ export default function DashboardPage() {
                         </div>
                     </div>
                     <Link href="/tools/pharmaroleplay/training">
-                        <button className="btn-primary px-6 py-2.5 rounded-xl inline-flex items-center gap-2">
+                        <button className="btn-primary px-6 py-2.5 rounded-xl inline-flex items-center gap-2 font-semibold shadow-[0_0_15px_rgba(0,217,255,0.2)]">
                             <Play className="w-4 h-4" />
-                            Novo Treino
+                            Iniciar Treinamento
                         </button>
                     </Link>
                 </motion.div>
@@ -364,8 +364,8 @@ export default function DashboardPage() {
                                                     Você ainda não possui sessões gravadas. Simule seu primeiro atendimento e ganhe insights com IA!
                                                 </p>
                                                 <Link href="/tools/pharmaroleplay/training">
-                                                    <button className="btn-primary px-6 py-2.5 rounded-xl shadow-[0_0_20px_rgba(0,217,255,0.2)]">
-                                                        Iniciar Meu 1º Treino
+                                                    <button className="btn-primary px-6 py-2.5 rounded-xl font-semibold shadow-[0_0_20px_rgba(0,217,255,0.3)]">
+                                                        Iniciar Treinamento
                                                     </button>
                                                 </Link>
                                             </div>
