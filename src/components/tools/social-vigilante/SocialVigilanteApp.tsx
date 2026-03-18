@@ -210,7 +210,7 @@ export default function SocialVigilanteApp({ embedded = false }: SocialVigilante
     };
 
     const sourceLabel = dataSource === "live"
-        ? "Reddit"
+        ? "Google Search"
         : dataSource === "gemini-generated"
         ? "Simulado por IA"
         : dataSource === "error"
