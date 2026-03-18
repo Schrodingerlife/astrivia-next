@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL } from "@/lib/ai-models";
 import { queryVertexSearch } from "@/lib/vertex-search";
@@ -6,12 +6,17 @@ import { writeFirestoreDocument } from "@/lib/firestore-admin";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 
-async function generateWithFallback(prompt: string): Promise<{ text: string; model: string }> {
+async function generateWithFallback(prompt: string, schema?: any): Promise<{ text: string; model: string }> {
     const models = [GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL].filter(Boolean);
     let lastError: unknown;
     for (const modelName of models) {
         try {
-            const m = genAI.getGenerativeModel({ model: modelName });
+            const configData: any = {};
+            if (schema) {
+                configData.responseMimeType = "application/json";
+                configData.responseSchema = schema;
+            }
+            const m = genAI.getGenerativeModel({ model: modelName, generationConfig: Object.keys(configData).length > 0 ? configData : undefined });
             const result = await m.generateContent(prompt);
             return { text: result.response.text(), model: modelName };
         } catch (err) {
@@ -140,37 +145,34 @@ export async function POST(req: Request) {
             retrievalCount = 8; // 8 inline docs
         }
 
-        const prompt = `Você é um auditor regulatório especializado na RDC 96/2008 (ANVISA).
+        const prompt = `Você é um Auditor Sênior de Compliance Farmacêutico da ANVISA. Sua função é analisar materiais promocionais e encontrar QUALQUER violação à RDC 96/2008.
+Você receberá o texto do material promocional e os trechos recuperados da RDC 96.
 
-Você DEVE usar apenas o contexto abaixo (RAG) para fundamentar referências/citações.
-Se faltar evidência no contexto, diga explicitamente que não há suporte documental.
+Regra de Ouro: Medicamentos NUNCA são "100% eficazes", NUNCA têm "garantia de resultados" e NUNCA são "isentos de efeitos colaterais". Promessas absolutistas são violações GRAVES.
 
-CONTEXTO RAG:
+CONTEXTO RAG (Trechos da RDC 96/2008):
 ${ragContext}
 
-MATERIAL PARA ANÁLISE:
+MATERIAL PROMOCIONAL PARA ANÁLISE:
 """
 ${texto}
 """
 
-TAREFA:
-1) Analise claims e linguagem promocional do material.
-2) Identifique violações e classifique: grave, moderada, leve.
-3) Pontue score de conformidade de 0 a 100.
-4) Traga sugestões específicas e acionáveis.
-5) Inclua referências do contexto RAG para cada decisão relevante.
-
-Responda APENAS com JSON válido:
+Analise o texto e retorne APENAS um objeto JSON válido com esta estrutura EXATA:
 {
-  "score": 0-100,
-  "resumo": "texto",
+  "score": [Inteiro de 0 a 100. Comece com 100 e deduza 30 para cada erro grave, 15 para moderado e 5 para leve. Se houver erro grave, a nota máxima é 70],
+  "resumo": "Resumo executivo da análise em 2-3 frases",
+  "total_graves": [Int],
+  "total_moderadas": [Int],
+  "total_leves": [Int],
   "violacoes": [
     {
       "tipo": "grave|moderada|leve",
-      "texto": "descrição",
-      "trecho": "trecho do material",
-      "artigo": "artigo/regra",
-      "sugestao": "sugestão prática",
+      "texto": "Descrição técnica da violação",
+      "trecho": "Copie EXATAMENTE a frase ou trecho problemático do material original",
+      "artigo": "Ex: Artigo 4º, Inciso III da RDC 96/2008",
+      "sugestao": "Sugestão prática de correção",
+      "sugestao_reescrita": "Reescreva a frase problemática de forma compliance. Ex: Em vez de '100% eficaz', escrever 'Demonstrou alta eficácia nos ensaios clínicos'",
       "refs": ["DOC_1","DOC_3"]
     }
   ],
@@ -179,18 +181,60 @@ Responda APENAS com JSON válido:
   ]
 }`;
 
-        const generation = await generateWithFallback(prompt);
+        // Extracting just the prompt execution into schema
+            const expectedSchema = {
+                type: SchemaType.OBJECT,
+                properties: {
+                    score: { type: SchemaType.INTEGER },
+                    resumo: { type: SchemaType.STRING },
+                    total_graves: { type: SchemaType.INTEGER },
+                    total_moderadas: { type: SchemaType.INTEGER },
+                    total_leves: { type: SchemaType.INTEGER },
+                    violacoes: {
+                        type: SchemaType.ARRAY,
+                        items: {
+                            type: SchemaType.OBJECT,
+                            properties: {
+                                tipo: { type: SchemaType.STRING, format: "enum", enum: ["grave", "moderada", "leve"] },
+                                texto: { type: SchemaType.STRING },
+                                trecho: { type: SchemaType.STRING },
+                                artigo: { type: SchemaType.STRING },
+                                sugestao: { type: SchemaType.STRING },
+                                sugestao_reescrita: { type: SchemaType.STRING },
+                                refs: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } }
+                            },
+                            required: ["tipo", "texto", "trecho", "artigo", "sugestao", "sugestao_reescrita", "refs"]
+                        }
+                    },
+                    referencias: {
+                        type: SchemaType.ARRAY,
+                        items: {
+                            type: SchemaType.OBJECT,
+                            properties: {
+                                docId: { type: SchemaType.STRING },
+                                title: { type: SchemaType.STRING },
+                                trecho: { type: SchemaType.STRING },
+                                uri: { type: SchemaType.STRING, nullable: true }
+                            },
+                            required: ["docId", "title", "trecho"]
+                        }
+                    }
+                },
+                required: ["score", "resumo", "total_graves", "total_moderadas", "total_leves", "violacoes", "referencias"]
+            };
+
+        const generation = await generateWithFallback(prompt, expectedSchema);
         const responseText = generation.text;
         const usedModel = generation.model;
         const parsed = JSON.parse(extractJsonObject(responseText));
 
         const validatedReferences: MedsafeReference[] = Array.isArray(parsed.referencias)
             ? parsed.referencias.map((item: any) => ({
-                  docId: String(item?.docId || ""),
-                  title: String(item?.title || "Referência"),
-                  trecho: String(item?.trecho || "").slice(0, 420),
-                  uri: item?.uri ? String(item.uri) : undefined,
-              }))
+                docId: String(item?.docId || ""),
+                title: String(item?.title || "Referência"),
+                trecho: String(item?.trecho || "").slice(0, 420),
+                uri: item?.uri ? String(item.uri) : undefined,
+            }))
             : [];
 
         const validated = {
@@ -201,14 +245,15 @@ Responda APENAS com JSON válido:
             resumo: typeof parsed.resumo === "string" ? parsed.resumo : "Análise concluída.",
             violacoes: Array.isArray(parsed.violacoes)
                 ? parsed.violacoes.map((item: any, index: number) => ({
-                      id: index + 1,
-                      tipo: ["grave", "moderada", "leve"].includes(item?.tipo) ? item.tipo : "leve",
-                      texto: String(item?.texto || "Violação identificada."),
-                      trecho: String(item?.trecho || "").slice(0, 300),
-                      artigo: String(item?.artigo || "RDC 96/2008"),
-                      sugestao: String(item?.sugestao || "Revisar o trecho com a equipe regulatória."),
-                      refs: Array.isArray(item?.refs) ? item.refs.map((ref: unknown) => String(ref)) : [],
-                  }))
+                    id: index + 1,
+                    tipo: ["grave", "moderada", "leve"].includes(item?.tipo) ? item.tipo : "leve",
+                    texto: String(item?.texto || "Violação identificada."),
+                    trecho: String(item?.trecho || "").slice(0, 300),
+                    artigo: String(item?.artigo || "RDC 96/2008"),
+                    sugestao: String(item?.sugestao || "Revisar o trecho com a equipe regulatória."),
+                    sugestao_reescrita: String(item?.sugestao_reescrita || ""),
+                    refs: Array.isArray(item?.refs) ? item.refs.map((ref: unknown) => String(ref)) : [],
+                }))
                 : [],
             referencias: validatedReferences,
             grounded: true,

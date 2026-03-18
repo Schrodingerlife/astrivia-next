@@ -39,32 +39,56 @@ interface SiteContent {
     home: HomeContent;
 }
 
+const teamOverrides: Record<string, Partial<TeamMember>> = {
+    "Nícollas Braga": {
+        role: "CEO & Founder",
+        bio: "Profissional de Farmacia com experiencia em marketing de healthcare, marketing na industria farmaceutica, acesso ao mercado e projetos de novos negocios. Lidera a frente estrategica, tecnologica e de produto da Astrivia AI.",
+        experience: ["Marketing Healthcare", "Marketing Farmaceutico", "Acesso ao Mercado", "Projetos e Novos Negocios"],
+    },
+    "André Guilherme": {
+        role: "CSO & Co-Founder",
+        bio: "Profissional de Farmacia com atuacao em financeiro, estrategia comercial e captacao de novos clientes. Responsavel pelo crescimento comercial da Astrivia AI.",
+        experience: ["Financeiro", "Estrategia Comercial", "Captacao de Clientes", "Farmacia-USP"],
+    },
+    "Gabriel Katakura": {
+        role: "COO & Co-Founder",
+        bio: "Qualidade MedTech e validacao regulatoria. Responsavel por operacoes, compliance e execucao.",
+        experience: ["Qualidade", "Regulatorio", "Compliance", "Farmacia-USP"],
+    },
+};
+
+function normalizeTeamMember(member: TeamMember): TeamMember {
+    const override = teamOverrides[member.name];
+    if (!override) return member;
+    return { ...member, ...override };
+}
+
 const defaultContent: SiteContent = {
     team: [
         {
             name: "Nícollas Braga",
             role: "CEO & Founder",
             image: "/images/team-nicollas.jpg",
-            bio: "Liderança em Marketing de Doenças Raras em Big Pharma. Farmácia-USP.",
-            experience: ["Big Pharma", "Doenças Raras", "Marketing", "Farmácia-USP"],
+            bio: "Profissional de Farmacia com experiencia em marketing de healthcare, marketing na industria farmaceutica, acesso ao mercado e projetos de novos negocios. Lidera a frente estrategica, tecnologica e de produto da Astrivia AI.",
+            experience: ["Marketing Healthcare", "Marketing Farmaceutico", "Acesso ao Mercado", "Projetos e Novos Negocios"],
             quote: "A inovação em saúde precisa de velocidade sem comprometer segurança.",
             linkedin: "https://www.linkedin.com/in/nicollas-souza-788987256/",
         },
         {
             name: "André Guilherme",
-            role: "CSO",
+            role: "CSO & Co-Founder",
             image: "/images/team-andre.jpg",
-            bio: "Ex-Marketing Sanofi. Estratégia B2B e Finanças. Farmácia-USP.",
-            experience: ["Sanofi", "B2B Strategy", "Finanças", "Farmácia-USP"],
+            bio: "Profissional de Farmacia com atuacao em financeiro, estrategia comercial e captacao de novos clientes. Responsavel pelo crescimento comercial da Astrivia AI.",
+            experience: ["Financeiro", "Estrategia Comercial", "Captacao de Clientes", "Farmacia-USP"],
             quote: "Dados e estratégia caminham juntos na indústria farmacêutica.",
             linkedin: "https://www.linkedin.com/in/andretobiasmendes/",
         },
         {
             name: "Gabriel Katakura",
-            role: "CCO",
+            role: "COO & Co-Founder",
             image: "/images/team-gabriel.jpg",
-            bio: "Qualidade na Boston Scientific. Validação Regulatória. Farmácia-USP.",
-            experience: ["Boston Scientific", "Qualidade", "Regulatório", "Farmácia-USP"],
+            bio: "Qualidade MedTech e validacao regulatoria. Responsavel por operacoes, compliance e execucao.",
+            experience: ["Qualidade", "Regulatorio", "Compliance", "Farmacia-USP"],
             quote: "Compliance não é obstáculo, é vantagem competitiva.",
             linkedin: "https://www.linkedin.com/in/gkatakura/",
         },
@@ -119,7 +143,7 @@ export default function AdminPage() {
             const teamSnapshot = await getDocs(collection(db, "team"));
             if (!teamSnapshot.empty) {
                 const teamData: TeamMember[] = [];
-                teamSnapshot.forEach((doc) => teamData.push(doc.data() as TeamMember));
+                teamSnapshot.forEach((doc) => teamData.push(normalizeTeamMember(doc.data() as TeamMember)));
                 setContent(prev => ({ ...prev, team: teamData }));
             }
 

@@ -1,9 +1,10 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import { GEMINI_TEXT_MODEL } from "@/lib/ai-models";
+import { GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL } from "@/lib/ai-models";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 const model = genAI.getGenerativeModel({ model: GEMINI_TEXT_MODEL });
+const flashModel = genAI.getGenerativeModel({ model: GEMINI_TEXT_FALLBACK_MODEL });
 
 const MEDICOS: Record<string, { nome: string; especialidade: string; personalidade: string; perfil: string }> = {
     objecao_preco: {
@@ -99,19 +100,17 @@ INSTRUÇÕES CRÍTICAS:
 2. Se ele mencionou dados, estudo, preço, benefício específico → responda sobre AQUILO exatamente
 3. Se ele falou algo vago ou incorreto → pressione pedindo precisão ou corrija implicitamente
 4. Se ele foi convincente → mostre interesse genuíno mas levante a próxima objeção natural
-5. Tom coloquial de médico brasileiro, direto, sem floreios
-6. MÁXIMO 2 frases curtas
-${numTurnos >= 7 ? "7. Esta é uma das últimas falas — comece a encerrar naturalmente (ex: 'ok, deixa o material que eu analiso')" : ""}
+5. Tom coloquial de médico brasileiro em CONSULTÓRIO REAL: direto, humano, com pequenas marcas de fala natural ("olha", "entendo", "certo", "perfeito"), sem exagero
+6. Não soe roteirizado; pareça uma conversa viva de treinamento prático
+7. Traga uma objeção ou pergunta clínica plausível para o dia a dia do representante
+8. MÁXIMO 2 frases curtas (objetivas e realistas)
+${numTurnos >= 7 ? "9. Esta é uma das últimas falas — comece a encerrar naturalmente (ex: 'ok, deixa o material que eu analiso')" : ""}
 
 Sua resposta (apenas o texto do médico, sem aspas, sem prefixo):`;
 
-        const result = await model.generateContent(prompt);
-        const resposta = result.response.text().trim();
-
-        // Feedback on the rep's last message
-        let feedback = null;
-        if (ultimaFalaTexto) {
-            const feedbackPrompt = `Analise esta fala de um representante farmacêutico no cenário "${cenarioNome}":
+        // Build feedback prompt in parallel with doctor response
+        const feedbackPrompt = ultimaFalaTexto
+            ? `Analise esta fala de um representante farmacêutico no cenário "${cenarioNome}":
 
 "${ultimaFalaTexto}"
 
@@ -123,10 +122,41 @@ Retorne JSON (sem markdown):
   "categoria": "Técnica de Vendas"|"Conhecimento do Produto"|"Comunicação"|"Compliance",
   "mensagem": "<feedback específico sobre o que foi dito, 1 frase concreta, em pt-BR>",
   "pontos": <0-100>
-}`;
+}`
+            : null;
 
+        // Fire both calls at the same time — doctor response (Pro) + feedback (Flash)
+        const [result, feedbackResult] = await Promise.all([
+            model.generateContent(prompt),
+            feedbackPrompt ? flashModel.generateContent(feedbackPrompt).catch(() => null) : Promise.resolve(null),
+        ]);
+
+        const respostaRaw = result.response.text().trim();
+
+        // Guard: Gemini sometimes wraps its answer in JSON { texto_tts, texto_ui }
+        let respostaUI = respostaRaw;
+        let respostaTTS = respostaRaw;
+        try {
+            const cleaned = respostaRaw.replace(/```json\s*/gi, "").replace(/```\s*/g, "").trim();
+            const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (parsed.texto_ui || parsed.texto_tts) {
+                    respostaUI = String(parsed.texto_ui || parsed.texto_tts || respostaRaw);
+                    respostaTTS = String(parsed.texto_tts || parsed.texto_ui || respostaRaw);
+                }
+            }
+        } catch {
+            // Not JSON — use raw text as-is (expected path)
+        }
+
+        // Strip any remaining quotes wrapping the response
+        respostaUI = respostaUI.replace(/^["']|["']$/g, "").trim();
+        respostaTTS = respostaTTS.replace(/^["']|["']$/g, "").trim();
+
+        let feedback = null;
+        if (feedbackResult) {
             try {
-                const feedbackResult = await model.generateContent(feedbackPrompt);
                 const feedbackText = feedbackResult.response.text()
                     .replace(/```json\s*/gi, "")
                     .replace(/```\s*/g, "")
@@ -140,7 +170,7 @@ Retorne JSON (sem markdown):
             }
         }
 
-        return NextResponse.json({ resposta, feedback });
+        return NextResponse.json({ resposta: respostaUI, resposta_tts: respostaTTS, feedback });
     } catch (error: unknown) {
         const message = error instanceof Error ? error.message : "Unknown error";
         console.error("PharmaRoleplay API error:", message);

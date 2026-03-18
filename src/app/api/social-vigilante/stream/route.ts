@@ -1,6 +1,6 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI, Schema, SchemaType } from "@google/generative-ai";
 import { NextResponse } from "next/server";
-import { GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL } from "@/lib/ai-models";
+import { GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL, GEMINI_LITE_MODEL } from "@/lib/ai-models";
 import { writeFirestoreDocument } from "@/lib/firestore-admin";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
@@ -176,24 +176,36 @@ async function generateSyntheticPosts(term: string): Promise<GeminiPost[]> {
 Gere ${4 + Math.floor(Math.random() * 3)} posts REALISTAS que poderiam ser encontrados em redes sociais brasileiras sobre "${term}".
 
 Os posts devem simular o que REALMENTE seria publicado por pacientes, profissionais de saúde ou cuidadores em plataformas brasileiras.
-Varie as plataformas, sentimentos e níveis de risco. Inclua pelo menos 1 post com risco alto ou crítico (evento adverso real).
+Varie as plataformas, sentimentos e níveis de risco. Inclua pelo menos 1 post com risco alto ou crítico (evento adverso real).`;
 
-Retorne APENAS JSON array:
-[
-  {
-    "platform": "twitter|facebook|instagram|reddit|reclameaqui",
-    "author": "nome realista brasileiro",
-    "content": "texto do post em português, máximo 180 caracteres",
-    "sentiment": "negative|neutral|positive",
-    "riskLevel": "critical|high|medium|low",
-    "event": "tipo de evento detectado (ex: reação adversa, queixa de eficácia, efeito colateral)"
-  }
-]`;
+    const model = genAI.getGenerativeModel({
+        model: GEMINI_LITE_MODEL,
+        generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+                type: SchemaType.ARRAY,
+                items: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                        platform: { type: SchemaType.STRING, format: "enum", enum: ["twitter", "facebook", "instagram", "reddit", "reclameaqui"] },
+                        author: { type: SchemaType.STRING },
+                        content: { type: SchemaType.STRING },
+                        sentiment: { type: SchemaType.STRING, format: "enum", enum: ["negative", "neutral", "positive"] },
+                        riskLevel: { type: SchemaType.STRING, format: "enum", enum: ["critical", "high", "medium", "low"] },
+                        event: { type: SchemaType.STRING }
+                    },
+                    required: ["platform", "author", "content", "sentiment", "riskLevel", "event"]
+                }
+            },
+            thinkingConfig: {
+                thinkingBudgetTargetCount: 1024
+            }
+        } as any // Bypass TS error for thinkingConfig in current SDK model type
+    });
 
-    const responseText = await generateWithFallback(prompt);
-    const parsed = JSON.parse(extractJsonArray(responseText));
-    if (!Array.isArray(parsed)) return [];
-    return parsed;
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    return JSON.parse(text);
 }
 
 interface ClassifiedPost {
@@ -217,26 +229,35 @@ ${items}
 
 Para cada post, determine:
 - Se é RELEVANTE para farmacovigilância (eventos adversos, efeitos colaterais, queixas de eficácia, uso clínico)
-- Sentimento: negative|neutral|positive
-- Nível de risco: critical|high|medium|low
-- Evento detectado (descrição curta em português)
-
-Retorne APENAS JSON array:
-[
-  {
-    "index": 0,
-    "relevant": true,
-    "sentiment": "negative|neutral|positive",
-    "riskLevel": "critical|high|medium|low",
-    "event": "descrição do evento"
-  }
-]`;
+- Sentimento
+- Nível de risco
+- Evento detectado (descrição curta em português)`;
 
     try {
-        const responseText = await generateWithFallback(prompt);
-        const classified = JSON.parse(extractJsonArray(responseText));
-        if (!Array.isArray(classified)) return [];
-        return classified;
+        const model = genAI.getGenerativeModel({
+            model: GEMINI_TEXT_MODEL,
+            generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                    type: SchemaType.ARRAY,
+                    items: {
+                        type: SchemaType.OBJECT,
+                        properties: {
+                            index: { type: SchemaType.INTEGER },
+                            relevant: { type: SchemaType.BOOLEAN },
+                            sentiment: { type: SchemaType.STRING, format: "enum", enum: ["negative", "neutral", "positive"] },
+                            riskLevel: { type: SchemaType.STRING, format: "enum", enum: ["critical", "high", "medium", "low"] },
+                            event: { type: SchemaType.STRING }
+                        },
+                        required: ["index", "relevant", "sentiment", "riskLevel", "event"]
+                    }
+                }
+            }
+        });
+
+        const result = await model.generateContent(prompt);
+        const classified = JSON.parse(result.response.text());
+        return Array.isArray(classified) ? classified : [];
     } catch {
         return [];
     }

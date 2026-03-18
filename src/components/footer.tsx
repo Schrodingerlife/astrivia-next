@@ -1,6 +1,7 @@
+import Image from "next/image";
 import Link from "next/link";
 import { toolsConfig, upcomingToolsConfig } from "@/lib/tools-config";
-import { AstriviaSymbol } from "@/components/product-logos";
+import { AstriviaWordmark } from "@/components/product-logos";
 
 const companyLinks = [
     { name: "Tecnologia", href: "/technology" },
@@ -26,15 +27,28 @@ export function Footer() {
             <div className="site-container">
                 <div className="grid lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr] gap-10 mb-12">
                     <div>
-                        <div className="flex items-center gap-2 mb-4">
-                            <AstriviaSymbol size={28} />
-                            <span className="text-[18px] font-bold tracking-tight text-white/80 leading-none">
-                                Astrivia <span className="text-[#00D9FF]">AI</span>
-                            </span>
-                        </div>
+                        <AstriviaWordmark
+                            width={120}
+                            variant="compact"
+                            className="mb-4"
+                        />
                         <p className="text-white/35 text-sm leading-relaxed max-w-xs">
                             Agentes de IA para Life Sciences — segurança regulatória, rastreabilidade e velocidade de campo.
                         </p>
+                        <span className="mt-5 inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#00D9FF]/[0.08] border border-[#00D9FF]/20 text-xs text-white/70">
+                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
+                            Parte do Google for Startups Cloud Program
+                        </span>
+                        <div className="mt-4 inline-flex items-center rounded-lg bg-white px-3 py-2">
+                            <Image
+                                src="/images/partners/google-cloud-full-color.png"
+                                alt="Google Cloud"
+                                width={132}
+                                height={28}
+                                className="h-6 w-auto object-contain"
+                                priority={false}
+                            />
+                        </div>
                     </div>
 
                     <div>

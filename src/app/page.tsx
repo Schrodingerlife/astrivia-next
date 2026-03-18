@@ -17,7 +17,7 @@ import {
   Award,
 } from "lucide-react";
 import {
-  AstriviaSymbol,
+  AstriviaWordmark,
   PharmaRoleplayLogo,
   SocialVigilanteLogo,
   MedSafeLogo,
@@ -201,25 +201,20 @@ function HeroSection() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="flex items-center justify-center gap-3 mb-8"
+          className="flex items-center justify-center mb-8"
         >
-          <div className="brand-symbol-glow">
-            <AstriviaSymbol size={42} />
-          </div>
-          <span className="text-[28px] font-bold tracking-tight leading-none brand-name-shimmer">
-            Astrivia AI
-          </span>
+          <AstriviaWordmark width={340} className="mx-auto scale-95 md:scale-100" />
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="mb-8"
+          className="mb-10"
         >
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/[0.04] border border-white/[0.06] text-sm text-white/40 backdrop-blur-sm">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-            Powered by Google Cloud &amp; Gemini
+          <span className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full bg-[#00D9FF]/[0.10] border border-[#00D9FF]/25 text-base md:text-lg text-white/80 font-medium backdrop-blur-sm shadow-[0_0_22px_rgba(0,217,255,0.16)]">
+            <span className="w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse" />
+            Parte do Google for Startups Cloud Program
           </span>
         </motion.div>
 
@@ -227,7 +222,7 @@ function HeroSection() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="heading-xl mb-10"
+          className="heading-xl mb-10 text-balance"
         >
           <span className="block">O ecossistema de</span>
           <span className="block py-1">
@@ -247,7 +242,7 @@ function HeroSection() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto mb-12 leading-relaxed"
+          className="text-xl md:text-2xl text-white/50 max-w-2xl mx-auto mb-12 leading-relaxed text-balance"
         >
           A plataforma de agentes de IA para Life Sciences.
           Segurança regulatória e velocidade de campo — com rastreabilidade em cada etapa.
@@ -259,10 +254,10 @@ function HeroSection() {
           transition={{ duration: 0.6, delay: 0.5 }}
           className="flex flex-col sm:flex-row gap-4 justify-center"
         >
-          <Link href="/tools/social-vigilante/demo" className="btn-primary text-base px-8 py-4">
+          <Link href="/tools/social-vigilante/demo" className="btn-primary text-base px-8 py-4 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none">
             Testar Demo Grátis <ArrowRight size={18} />
           </Link>
-          <Link href="/contact" className="btn-outline text-base px-8 py-4">
+          <Link href="/contact" className="btn-outline text-base px-8 py-4 focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:outline-none">
             Agendar Demonstração
           </Link>
         </motion.div>
@@ -293,19 +288,35 @@ function TrustedBySection() {
       <InfraGridSVG className="absolute inset-0 w-full h-full pointer-events-none opacity-60" />
       <div className="relative z-10 max-w-5xl mx-auto">
         <p className="text-center text-white/25 text-xs mb-10 tracking-[0.2em] uppercase">
-          Construído sobre
+          Tecnologias que utilizamos
         </p>
-        <div className="flex flex-wrap justify-center items-center gap-x-16 gap-y-8">
+        <div className="flex flex-wrap justify-center items-center gap-4 mb-12">
           {[
-            "Google Cloud",
+            "Gemini",
             "Vertex AI",
-            "Google for Startups",
+            "Cloud Run",
             "USP",
           ].map((partner) => (
-            <span key={partner} className="text-white/25 text-lg font-medium hover:text-white/50 transition-colors cursor-default">
+            <span
+              key={partner}
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-white/[0.06] border border-white/[0.10] text-white/70 text-base font-medium backdrop-blur-sm hover:bg-white/[0.09] hover:text-white/90 transition-colors cursor-default"
+            >
               {partner}
             </span>
           ))}
+        </div>
+        {/* Google Cloud full-color wordmark (preferred): on white background */}
+        <div className="flex justify-center mt-8">
+          <div className="rounded-xl bg-white px-5 py-3">
+            <Image
+              src="/images/partners/google-cloud-full-color.png"
+              alt="Google Cloud"
+              width={148}
+              height={32}
+              className="h-8 w-auto object-contain"
+              priority={false}
+            />
+          </div>
         </div>
       </div>
     </section>
@@ -333,10 +344,10 @@ function ProductShowcase() {
           className="text-center mb-24"
         >
           <p className="label mb-4 text-[#00D9FF]">Produtos</p>
-          <h2 className="heading-lg mb-6">
+          <h2 className="heading-lg mb-6 text-balance">
             Três agentes. Um ecossistema.<br className="hidden md:block" /> O desfecho que importa: o paciente.
           </h2>
-          <p className="text-lg text-white/45 max-w-xl mx-auto">
+          <p className="text-lg text-white/45 max-w-xl mx-auto text-balance">
             3 demos disponíveis agora. Teste direto no navegador.
           </p>
         </motion.div>
@@ -588,21 +599,21 @@ function TeamSection() {
     {
       name: "Nícollas Braga",
       role: "CEO & Founder",
-      desc: "PMO · Novos Negócios · Pós-Registro",
+      desc: "Projetos · Estratégia · IA Aplicada à Saúde",
       image: "/images/team-nicollas.jpg",
       linkedin: "https://www.linkedin.com/in/nicollas-healthtech/",
     },
     {
       name: "André Guilherme",
-      role: "CTO & Co-Founder",
-      desc: "Estratégia B2B · Desenvolvimento de Produto",
+      role: "CSO & Co-Founder",
+      desc: "Financeiro · Estrategia Comercial · Captacao de Clientes",
       image: "/images/team-andre.jpg",
       linkedin: "https://www.linkedin.com/in/andretobiasmendes/",
     },
     {
       name: "Gabriel Katakura",
       role: "COO & Co-Founder",
-      desc: "Qualidade · Validação Regulatória",
+      desc: "Operacoes · Qualidade · Validacao Regulatoria",
       image: "/images/team/gabriel.jpg?v=2",
       linkedin: "https://www.linkedin.com/in/gkatakura/",
     },
@@ -653,6 +664,7 @@ function TeamSection() {
               <Link
                 href={member.linkedin}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-xs text-white/25 hover:text-white/60 transition-colors"
               >
                 LinkedIn ↗

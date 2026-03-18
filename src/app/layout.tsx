@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "pt_BR",
-    url: "https://astrivia.ai",
+    url: "https://astriviaai.tech",
     siteName: "Astrivia AI",
     title: "Astrivia AI | Sistema Operacional de Agentes para Life Sciences",
     description:

@@ -13,6 +13,16 @@ import ScoreRing from '@/components/tools/pharmaroleplay/ScoreRing';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+interface AvaliacaoData {
+    score_final: number;
+    aprovado: boolean;
+    xp_ganho: number;
+    motivo_reprovacao: string | null;
+    pontos_fortes: string[];
+    pontos_melhoria: string[];
+    usou_tecnicas_fechamento: boolean;
+}
+
 interface Sessao {
     id: string;
     cenario: string;
@@ -21,6 +31,7 @@ interface Sessao {
     aprovado: boolean;
     createdAt: string;
     resumo?: { tempoSessao?: number; mensagensUsuario?: number };
+    avaliacao?: AvaliacaoData | null;
 }
 
 // ── Level / XP system ────────────────────────────────────────────────────────
@@ -35,6 +46,8 @@ const NIVEIS = [
 
 function calcXp(sessoes: Sessao[]): number {
     return sessoes.reduce((acc, s) => {
+        // Use LLM-as-a-Judge xp_ganho when available
+        if (s.avaliacao?.xp_ganho) return acc + s.avaliacao.xp_ganho;
         let xp = s.scoreGeral;
         if (s.aprovado) xp += 30;
         if (s.scoreGeral >= 90) xp += 20;
@@ -247,7 +260,7 @@ export default function DashboardPage() {
                                     <span className="text-3xl">{nivel.icone}</span>
                                     <div>
                                         <p className="text-white font-bold text-lg">{nivel.nome}</p>
-                                        <p className="text-white/40 text-xs">{xp} XP total</p>
+                                        <p className="text-white/50 text-xs">{xp} XP total</p>
                                     </div>
                                 </div>
 
@@ -341,10 +354,19 @@ export default function DashboardPage() {
                                                 <span className="text-sm">Carregando...</span>
                                             </div>
                                         ) : sessoes.length === 0 ? (
-                                            <div className="py-10 text-center">
-                                                <p className="text-white/30">Nenhuma sessão ainda</p>
+                                            <div className="py-14 text-center border-t border-white/5 mt-4">
+                                                <div className="w-16 h-16 rounded-full bg-[#00D9FF]/10 border border-[#00D9FF]/20 flex items-center justify-center mx-auto mb-5 relative">
+                                                    <div className="absolute inset-0 bg-[#00D9FF]/20 blur-xl rounded-full" />
+                                                    <Target className="w-8 h-8 text-[#00D9FF] relative z-10" />
+                                                </div>
+                                                <h3 className="text-white font-semibold text-lg mb-2">Sua jornada começa aqui</h3>
+                                                <p className="text-white/50 text-sm max-w-[280px] mx-auto mb-6">
+                                                    Você ainda não possui sessões gravadas. Simule seu primeiro atendimento e ganhe insights com IA!
+                                                </p>
                                                 <Link href="/tools/pharmaroleplay/training">
-                                                    <button className="mt-3 text-sm text-[#00D9FF] hover:underline">Iniciar primeiro treino →</button>
+                                                    <button className="btn-primary px-6 py-2.5 rounded-xl shadow-[0_0_20px_rgba(0,217,255,0.2)]">
+                                                        Iniciar Meu 1º Treino
+                                                    </button>
                                                 </Link>
                                             </div>
                                         ) : (
@@ -438,7 +460,7 @@ export default function DashboardPage() {
                                         <div className="flex justify-center">
                                             <ScoreRing score={scoreMedio} size={160} strokeWidth={10} />
                                         </div>
-                                        <p className="text-white/40 mt-4 text-xs">
+                                        <p className="text-white/50 mt-4 text-xs">
                                             {sessoes.length > 0 ? `Baseado em ${sessoes.length} sessão${sessoes.length > 1 ? 'ões' : ''}` : 'Sem sessões ainda'}
                                         </p>
                                     </motion.div>
@@ -505,6 +527,37 @@ export default function DashboardPage() {
                                             {underperformers.map(u => u.nome).join(', ')} precisam de suporte adicional.
                                             Considere sessões de coaching ou cenários mais simples para recuperação.
                                         </p>
+                                    </div>
+                                </motion.div>
+                            )}
+
+                            {/* Aggregated pontos_melhoria from real sessions */}
+                            {sessoes.some(s => s.avaliacao?.pontos_melhoria?.length) && (
+                                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+                                    className="rounded-xl p-5 mb-6 border border-[#00D9FF]/20 bg-[#00D9FF]/5">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <Target className="w-5 h-5 text-[#00D9FF]" />
+                                        <h3 className="text-white font-semibold text-sm">Pontos de Melhoria — Análise LLM Agregada</h3>
+                                    </div>
+                                    <div className="space-y-2">
+                                        {(() => {
+                                            const melhorias: Record<string, number> = {};
+                                            sessoes.forEach(s => {
+                                                (s.avaliacao?.pontos_melhoria || []).forEach(pm => {
+                                                    const key = pm.toLowerCase().trim();
+                                                    melhorias[key] = (melhorias[key] || 0) + 1;
+                                                });
+                                            });
+                                            return Object.entries(melhorias)
+                                                .sort((a, b) => b[1] - a[1])
+                                                .slice(0, 5)
+                                                .map(([melhoria, count], i) => (
+                                                    <div key={i} className="flex items-center justify-between p-2.5 rounded-lg bg-white/[0.03]">
+                                                        <span className="text-white/70 text-sm capitalize">{melhoria}</span>
+                                                        <span className="text-[#00D9FF] text-xs font-medium">{count}x mencionado</span>
+                                                    </div>
+                                                ));
+                                        })()}
                                     </div>
                                 </motion.div>
                             )}
@@ -617,7 +670,7 @@ export default function DashboardPage() {
                                                     </div>
                                                 );
                                             })}
-                                            <p className="text-white/20 text-xs mt-2">Passe o mouse sobre cada bloco para ver o score individual</p>
+                                            <p className="text-white/45 text-xs mt-2">Passe o mouse sobre cada bloco para ver o score individual</p>
                                         </div>
                                     </motion.div>
                                 </div>

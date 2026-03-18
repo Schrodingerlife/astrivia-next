@@ -75,7 +75,7 @@ const tabs = [
         content: (
             <div>
                 <h3 className="heading-md mb-6 text-center text-gradient-cyan">
-                    Powered by Google Cloud
+                    Infraestrutura Google Cloud
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
                     {techStack.map((tech) => (
@@ -105,9 +105,21 @@ export default function TechnologyPage() {
                     <h1 className="heading-lg mb-4">
                         Arquitetura <span className="text-gradient-cyan">Técnica</span>
                     </h1>
-                    <p className="body-lg max-w-2xl mx-auto">
-                        Powered by Google Cloud & Vertex AI Agent Engine
+                    <p className="body-lg max-w-2xl mx-auto mb-8">
+                        Construído com Vertex AI Agent Engine na Google Cloud
                     </p>
+                    <div className="flex justify-center">
+                        <div className="rounded-xl bg-white px-5 py-3">
+                            <Image
+                                src="/images/partners/google-cloud-full-color.png"
+                                alt="Google Cloud"
+                                width={148}
+                                height={32}
+                                className="h-8 w-auto object-contain"
+                                priority={false}
+                            />
+                        </div>
+                    </div>
                 </motion.div>
             </section>
 

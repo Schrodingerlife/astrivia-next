@@ -1,33 +1,115 @@
 "use client";
+import Image from "next/image";
 
 /* ============== BRAND LOGO ============== */
+const ASTRIVIA_LOGO_SRC = "/images/astrivia_ai_logo_3d.svg";
 
 export function AstriviaSymbol({ size = 36 }: { size?: number }) {
     return (
-        <svg width={size} height={size} viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg
+            width={size}
+            height={size}
+            viewBox="0 0 230 230"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-label="Astrivia AI"
+        >
             <defs>
-                <linearGradient id="as-main" x1="8" y1="6" x2="40" y2="44" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#00F0FF" />
-                    <stop offset="0.5" stopColor="#00D9FF" />
-                    <stop offset="1" stopColor="#00B8D4" />
-                </linearGradient>
-                <linearGradient id="as-glow" x1="24" y1="4" x2="24" y2="44" gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#00F0FF" stopOpacity="0.6" />
-                    <stop offset="1" stopColor="#00D9FF" stopOpacity="0" />
-                </linearGradient>
-                <filter id="as-blur">
-                    <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" />
+                <filter id="neoGlow" x="-40%" y="-40%" width="180%" height="180%">
+                    <feGaussianBlur stdDeviation="2.4" result="blur1" />
+                    <feGaussianBlur stdDeviation="6.2" result="blur2" />
+                    <feMerge>
+                        <feMergeNode in="blur2" />
+                        <feMergeNode in="blur1" />
+                        <feMergeNode in="SourceGraphic" />
+                    </feMerge>
                 </filter>
+                <linearGradient id="tubeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#8ef0e8" stopOpacity="0.55" />
+                    <stop offset="35%" stopColor="#00d4c0" stopOpacity="0.3" />
+                    <stop offset="65%" stopColor="#007a8a" stopOpacity="0.2" />
+                    <stop offset="100%" stopColor="#003a50" stopOpacity="0.45" />
+                </linearGradient>
+                <linearGradient id="neonLine" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#00ffe8" />
+                    <stop offset="50%" stopColor="#00d4b0" />
+                    <stop offset="100%" stopColor="#00ff99" />
+                </linearGradient>
             </defs>
-            {/* Glow layer */}
-            <path d="M24 6L8 38H18L24 26L30 38H40L24 6Z" fill="url(#as-glow)" filter="url(#as-blur)" />
-            {/* Main triangle "A" shape */}
-            <path d="M24 8L10 37H17.5L24 23.5L30.5 37H38L24 8Z" fill="url(#as-main)" />
-            {/* Inner crossbar */}
-            <rect x="16" y="30" width="16" height="2.5" rx="1.25" fill="url(#as-main)" opacity="0.7" />
-            {/* Shine highlight */}
-            <path d="M24 8L18 20L24 14L30 20L24 8Z" fill="white" opacity="0.25" />
+
+            <g transform="translate(0, 0)">
+                <path d="M 80,200 L 58,200 L 100,72 L 118,72 Z" fill="url(#tubeGrad)" stroke="#00c8b8" strokeWidth="1.4" opacity="0.9" />
+                <path d="M 90,195 L 73,195 L 109,78 L 112,78 Z" fill="url(#neonLine)" opacity="0.58" filter="url(#neoGlow)" />
+                <line x1="118" y1="72" x2="80" y2="200" stroke="#a0f0e8" strokeWidth="1.2" opacity="0.66" />
+
+                <path d="M 150,200 L 172,200 L 130,72 L 112,72 Z" fill="url(#tubeGrad)" stroke="#00c8b8" strokeWidth="1.4" opacity="0.9" />
+                <path d="M 140,195 L 157,195 L 121,78 L 118,78 Z" fill="url(#neonLine)" opacity="0.58" filter="url(#neoGlow)" />
+                <line x1="112" y1="72" x2="150" y2="200" stroke="#a0f0e8" strokeWidth="1.2" opacity="0.66" />
+
+                <path d="M 100,72 L 110,52 L 120,52 L 130,72 Z" fill="url(#tubeGrad)" stroke="#00c8b8" strokeWidth="1.3" opacity="0.92" />
+                <path d="M 108,68 L 115,56 L 122,68 Z" fill="url(#neonLine)" opacity="0.72" filter="url(#neoGlow)" />
+                <rect x="84" y="148" width="62" height="16" rx="8" fill="url(#tubeGrad)" stroke="#00c8b8" strokeWidth="1.2" opacity="0.9" />
+                <rect x="88" y="151" width="54" height="10" rx="5" fill="url(#neonLine)" opacity="0.52" filter="url(#neoGlow)" />
+            </g>
         </svg>
+    );
+}
+
+export function AstriviaWordmark({
+    width = 210,
+    className = "",
+    variant = "full",
+}: {
+    width?: number;
+    className?: string;
+    variant?: "full" | "compact";
+}) {
+    if (variant === "compact") {
+        const markSize = Math.max(32, Math.round(width * 0.35));
+        return (
+            <span className={`inline-flex items-center gap-3 ${className}`.trim()}>
+                <AstriviaMark size={markSize} />
+                <span className="text-lg font-semibold leading-none tracking-[-0.02em] text-white">
+                    Astrivia <span className="text-[#00D9FF]">AI</span>
+                </span>
+            </span>
+        );
+    }
+
+    return (
+        <span className={`relative inline-block isolate ${className}`.trim()} style={{ width: `${width}px` }}>
+            <Image
+                src={ASTRIVIA_LOGO_SRC}
+                alt="Astrivia AI"
+                width={width}
+                height={width}
+                priority
+                className="relative z-10 h-auto w-full object-contain mix-blend-screen [filter:saturate(1.1)_contrast(1.05)]"
+            />
+            <span aria-hidden className="pointer-events-none absolute inset-x-[8%] bottom-[5%] h-[28%] rounded-full bg-[#00D9FF]/22 blur-2xl" />
+        </span>
+    );
+}
+
+export function AstriviaMark({
+    size = 42,
+    className = "",
+}: {
+    size?: number;
+    className?: string;
+}) {
+    return (
+        <span className={`relative inline-flex overflow-hidden rounded-md ${className}`.trim()} style={{ width: `${size}px`, height: `${size}px` }}>
+            <Image
+                src={ASTRIVIA_LOGO_SRC}
+                alt="Astrivia AI"
+                fill
+                sizes={`${size}px`}
+                priority
+                className="object-cover object-[50%_17%] scale-[1.14] mix-blend-screen [filter:saturate(1.08)_contrast(1.06)]"
+            />
+            <span aria-hidden className="pointer-events-none absolute inset-0 rounded-md ring-1 ring-cyan-300/30 shadow-[0_0_22px_rgba(0,217,255,0.25)]" />
+        </span>
     );
 }
 
