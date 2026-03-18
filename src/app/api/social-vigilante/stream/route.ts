@@ -184,8 +184,12 @@ export async function POST(req: Request) {
                 });
                 source = "live";
             }
-        } catch (groundError) {
+        } catch (groundError: any) {
             console.error("[SocialVigilante] Grounding process failed:", groundError);
+            // Optionally store the error but don't return yet, fallback to synthetic
+            source = "error"; 
+            const groundErrorMessage = groundError?.message || "Unknown grounding error";
+            console.warn("[SocialVigilante] Fallback triggered due to:", groundErrorMessage);
         }
 
         // Step 2: Fallback — generate synthetic posts with Gemini
@@ -224,12 +228,13 @@ export async function POST(req: Request) {
                         status: "new",
                     };
                 });
-            } catch (genError) {
+            } catch (genError: any) {
                 console.error("Gemini generation failed:", genError);
                 return NextResponse.json({
                     posts: [],
                     source: "error",
                     retrievalCount: 0,
+                    error: genError?.message || "Unknown generation error"
                 });
             }
         }
