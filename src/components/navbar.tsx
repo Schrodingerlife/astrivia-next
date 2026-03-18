@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ChevronDown, ChevronRight, Menu, X } from "lucide-react";
+import FocusTrap from "focus-trap-react";
 import { toolsConfig, upcomingToolsConfig } from "@/lib/tools-config";
 import { AstriviaMark } from "@/components/product-logos";
 
@@ -87,7 +88,7 @@ export function Navbar() {
 
     const closeDesktopProducts = () => {
         clearHoverTimers();
-        closeTimerRef.current = setTimeout(() => setDesktopProductsOpen(false), 180);
+        closeTimerRef.current = setTimeout(() => setDesktopProductsOpen(false), 350);
     };
 
     const closeMobileMenu = () => {
@@ -225,63 +226,65 @@ export function Navbar() {
                 {mobileMenuOpen && (
                     <>
                         <motion.button aria-label="Fechar menu" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="mobile-overlay open" onClick={closeMobileMenu} />
-                        <motion.aside initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "tween", duration: 0.3 }} className="fixed top-0 right-0 h-screen w-[92vw] max-w-[430px] bg-[#070D17] border-l border-white/10 z-[101] flex flex-col" aria-label="Menu mobile">
-                            <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
-                                <span className="text-sm font-semibold text-white/90">Menu</span>
-                                <button type="button" aria-label="Fechar menu" className="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-white/10 text-white/80 hover:text-white hover:bg-white/5 transition-colors" onClick={closeMobileMenu}>
-                                    <X size={18} />
-                                </button>
-                            </div>
-
-                            <div className="flex-1 overflow-y-auto px-5 py-5">
-                                <button type="button" className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-white/10 bg-white/[0.02] text-left" aria-expanded={mobileToolsOpen} aria-controls={mobileToolsId} onClick={() => setMobileToolsOpen((prev) => !prev)}>
-                                    <span className="text-sm font-medium text-white">Demos disponíveis</span>
-                                    <ChevronDown size={16} className={`text-white/60 transition-transform ${mobileToolsOpen ? "rotate-180" : ""}`} />
-                                </button>
-
-                                <AnimatePresence initial={false}>
-                                    {mobileToolsOpen && (
-                                        <motion.div id={mobileToolsId} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} className="mt-3 space-y-3 overflow-hidden">
-                                            {toolsConfig.map((tool) => (
-                                                <article key={tool.slug} className="rounded-2xl border border-white/10 bg-white/[0.02] p-3">
-                                                    <Link href={tool.landingHref} className="block" onClick={closeMobileMenu}>
-                                                        <div className="relative aspect-[16/9] overflow-hidden rounded-xl border border-white/10">
-                                                            <Image src={tool.heroImage} alt={tool.name} fill sizes="360px" className="object-cover" />
-                                                        </div>
-                                                        <p className="mt-3 text-sm font-semibold text-white">{tool.name}</p>
-                                                        <p className="mt-1 text-xs text-white/45 truncate">{tool.description}</p>
-                                                    </Link>
-                                                    <Link href={tool.demoHref} className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/75 hover:text-white transition-colors" onClick={closeMobileMenu}>Iniciar Demo <ChevronRight size={14} /></Link>
-                                                </article>
-                                            ))}
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-
-                                <div className="h-px bg-white/[0.08] my-5" />
-                                <div className="space-y-1">
-                                    {navLinks.map((link) => (
-                                        <Link key={link.name} href={link.href} className={`block px-3 py-2 rounded-lg text-base transition-colors ${isActive(link.href) ? "text-white bg-white/[0.06]" : "text-white/70 hover:text-white hover:bg-white/[0.04]"}`} onClick={closeMobileMenu}>
-                                            {link.name}
-                                        </Link>
-                                    ))}
+                        <FocusTrap active={mobileMenuOpen}>
+                            <motion.aside initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "tween", duration: 0.3 }} className="fixed top-0 right-0 h-screen w-[92vw] max-w-[430px] bg-[#070D17] border-l border-white/10 z-[101] flex flex-col" aria-label="Menu mobile">
+                                <div className="px-5 py-4 border-b border-white/10 flex items-center justify-between">
+                                    <span className="text-sm font-semibold text-white/90">Menu</span>
+                                    <button type="button" aria-label="Fechar menu" className="inline-flex items-center justify-center h-9 w-9 rounded-lg border border-white/10 text-white/80 hover:text-white hover:bg-white/5 transition-colors" onClick={closeMobileMenu}>
+                                        <X size={18} />
+                                    </button>
                                 </div>
-                                <div className="h-px bg-white/[0.08] my-5" />
-                                <div className="space-y-1">
-                                    {quickLinks.map((link) => (
-                                        <Link key={link.href} href={link.href} className="block px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/[0.04] transition-colors" onClick={closeMobileMenu}>
-                                            {link.name}
-                                        </Link>
-                                    ))}
-                                </div>
-                            </div>
 
-                            <div className="border-t border-white/10 p-5 bg-[#070D17]">
-                                <Link href="/tools/social-vigilante/demo" className="btn-primary w-full justify-center" onClick={closeMobileMenu}>
-                                    Testar Grátis
-                                </Link>
-                            </div>
-                        </motion.aside>
+                                <div className="flex-1 overflow-y-auto px-5 py-5">
+                                    <button type="button" className="w-full flex items-center justify-between px-3 py-2 rounded-xl border border-white/10 bg-white/[0.02] text-left" aria-expanded={mobileToolsOpen} aria-controls={mobileToolsId} onClick={() => setMobileToolsOpen((prev) => !prev)}>
+                                        <span className="text-sm font-medium text-white">Demos disponíveis</span>
+                                        <ChevronDown size={16} className={`text-white/60 transition-transform ${mobileToolsOpen ? "rotate-180" : ""}`} />
+                                    </button>
+
+                                    <AnimatePresence initial={false}>
+                                        {mobileToolsOpen && (
+                                            <motion.div id={mobileToolsId} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} transition={{ duration: 0.2 }} className="mt-3 space-y-3 overflow-hidden">
+                                                {toolsConfig.map((tool) => (
+                                                    <article key={tool.slug} className="rounded-2xl border border-white/10 bg-white/[0.02] p-3">
+                                                        <Link href={tool.landingHref} className="block" onClick={closeMobileMenu}>
+                                                            <div className="relative aspect-[16/9] overflow-hidden rounded-xl border border-white/10">
+                                                                <Image src={tool.heroImage} alt={tool.name} fill sizes="360px" className="object-cover" />
+                                                            </div>
+                                                            <p className="mt-3 text-sm font-semibold text-white">{tool.name}</p>
+                                                            <p className="mt-1 text-xs text-white/45 truncate">{tool.description}</p>
+                                                        </Link>
+                                                        <Link href={tool.demoHref} className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/75 hover:text-white transition-colors" onClick={closeMobileMenu}>Iniciar Demo <ChevronRight size={14} /></Link>
+                                                    </article>
+                                                ))}
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+
+                                    <div className="h-px bg-white/[0.08] my-5" />
+                                    <div className="space-y-1">
+                                        {navLinks.map((link) => (
+                                            <Link key={link.name} href={link.href} className={`block px-3 py-2 rounded-lg text-base transition-colors ${isActive(link.href) ? "text-white bg-white/[0.06]" : "text-white/70 hover:text-white hover:bg-white/[0.04]"}`} onClick={closeMobileMenu}>
+                                                {link.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                    <div className="h-px bg-white/[0.08] my-5" />
+                                    <div className="space-y-1">
+                                        {quickLinks.map((link) => (
+                                            <Link key={link.href} href={link.href} className="block px-3 py-2 rounded-lg text-sm text-white/60 hover:text-white hover:bg-white/[0.04] transition-colors" onClick={closeMobileMenu}>
+                                                {link.name}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="border-t border-white/10 p-5 bg-[#070D17]">
+                                    <Link href="/tools/social-vigilante/demo" className="btn-primary w-full justify-center" onClick={closeMobileMenu}>
+                                        Testar Grátis
+                                    </Link>
+                                </div>
+                            </motion.aside>
+                        </FocusTrap>
                     </>
                 )}
             </AnimatePresence>

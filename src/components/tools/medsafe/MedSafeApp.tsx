@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { CheckCircle2, FileText, Loader2, ScanText, ShieldCheck, Sparkles, Upload, Wand2 } from "lucide-react";
 
 import { useMedsafe } from "./useMedsafe";
@@ -15,7 +16,17 @@ function riskClass(level: RiskLevel) {
 }
 
 export default function MedSafeApp() {
-    const [tab, setTab] = useState<WorkspaceTab>("overview");
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const tab = (searchParams.get("tab") as WorkspaceTab) || "overview";
+
+    const setTab = (newTab: WorkspaceTab) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set("tab", newTab);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    };
+
     const [expandedSuggestion, setExpandedSuggestion] = useState<number | null>(null);
     const [hoveredViolation, setHoveredViolation] = useState<number | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -128,7 +139,7 @@ export default function MedSafeApp() {
                     ) : null}
 
                     {/* Supported formats hint */}
-                    <p className="mb-2 text-[11px] text-white/25">
+                    <p className="mb-2 text-xs text-white/45">
                         Formatos: PDF, JPG, PNG, WEBP (OCR automático) · TXT, MD, CSV
                     </p>
 
@@ -139,7 +150,7 @@ export default function MedSafeApp() {
                             ? "Extraindo texto do documento via IA..."
                             : "Cole aqui o texto do material promocional ou faça upload de um PDF/imagem para análise com a RDC 96/2008..."}
                         disabled={isExtracting}
-                        className={`w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/25 focus:outline-none disabled:opacity-50 ${tab === "documents" ? "h-[360px]" : "h-[200px]"
+                        className={`w-full resize-none rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-sm text-white placeholder:text-white/45 focus:outline-none disabled:opacity-50 ${tab === "documents" ? "h-[360px]" : "h-[200px]"
                             }`}
                     />
 

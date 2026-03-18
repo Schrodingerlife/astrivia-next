@@ -260,7 +260,7 @@ export default function DashboardPage() {
                                     <span className="text-3xl">{nivel.icone}</span>
                                     <div>
                                         <p className="text-white font-bold text-lg">{nivel.nome}</p>
-                                        <p className="text-white/40 text-xs">{xp} XP total</p>
+                                        <p className="text-white/50 text-xs">{xp} XP total</p>
                                     </div>
                                 </div>
 
@@ -354,10 +354,19 @@ export default function DashboardPage() {
                                                 <span className="text-sm">Carregando...</span>
                                             </div>
                                         ) : sessoes.length === 0 ? (
-                                            <div className="py-10 text-center">
-                                                <p className="text-white/30">Nenhuma sessão ainda</p>
+                                            <div className="py-14 text-center border-t border-white/5 mt-4">
+                                                <div className="w-16 h-16 rounded-full bg-[#00D9FF]/10 border border-[#00D9FF]/20 flex items-center justify-center mx-auto mb-5 relative">
+                                                    <div className="absolute inset-0 bg-[#00D9FF]/20 blur-xl rounded-full" />
+                                                    <Target className="w-8 h-8 text-[#00D9FF] relative z-10" />
+                                                </div>
+                                                <h3 className="text-white font-semibold text-lg mb-2">Sua jornada começa aqui</h3>
+                                                <p className="text-white/50 text-sm max-w-[280px] mx-auto mb-6">
+                                                    Você ainda não possui sessões gravadas. Simule seu primeiro atendimento e ganhe insights com IA!
+                                                </p>
                                                 <Link href="/tools/pharmaroleplay/training">
-                                                    <button className="mt-3 text-sm text-[#00D9FF] hover:underline">Iniciar primeiro treino →</button>
+                                                    <button className="btn-primary px-6 py-2.5 rounded-xl shadow-[0_0_20px_rgba(0,217,255,0.2)]">
+                                                        Iniciar Meu 1º Treino
+                                                    </button>
                                                 </Link>
                                             </div>
                                         ) : (
@@ -451,7 +460,7 @@ export default function DashboardPage() {
                                         <div className="flex justify-center">
                                             <ScoreRing score={scoreMedio} size={160} strokeWidth={10} />
                                         </div>
-                                        <p className="text-white/40 mt-4 text-xs">
+                                        <p className="text-white/50 mt-4 text-xs">
                                             {sessoes.length > 0 ? `Baseado em ${sessoes.length} sessão${sessoes.length > 1 ? 'ões' : ''}` : 'Sem sessões ainda'}
                                         </p>
                                     </motion.div>
@@ -661,7 +670,7 @@ export default function DashboardPage() {
                                                     </div>
                                                 );
                                             })}
-                                            <p className="text-white/20 text-xs mt-2">Passe o mouse sobre cada bloco para ver o score individual</p>
+                                            <p className="text-white/45 text-xs mt-2">Passe o mouse sobre cada bloco para ver o score individual</p>
                                         </div>
                                     </motion.div>
                                 </div>
