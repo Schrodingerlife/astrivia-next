@@ -6,7 +6,7 @@ import { writeFirestoreDocument } from "@/lib/firestore-admin";
 
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || "");
 
-async function generateWithFallback(prompt: string, schema?: any): Promise<{ text: string; model: string }> {
+async function generateWithFallback(prompt: string, schema?: any, systemInstruction?: string, tools?: any[]): Promise<{ text: string; model: string }> {
     const models = [GEMINI_TEXT_MODEL, GEMINI_TEXT_FALLBACK_MODEL].filter(Boolean);
     let lastError: unknown;
     for (const modelName of models) {
@@ -16,7 +16,12 @@ async function generateWithFallback(prompt: string, schema?: any): Promise<{ tex
                 configData.responseMimeType = "application/json";
                 configData.responseSchema = schema;
             }
-            const m = genAI.getGenerativeModel({ model: modelName, generationConfig: Object.keys(configData).length > 0 ? configData : undefined });
+            const m = genAI.getGenerativeModel({ 
+                model: modelName, 
+                generationConfig: Object.keys(configData).length > 0 ? configData : undefined,
+                systemInstruction: systemInstruction,
+                tools: tools
+            });
             const result = await m.generateContent(prompt);
             return { text: result.response.text(), model: modelName };
         } catch (err) {
@@ -145,46 +150,25 @@ export async function POST(req: Request) {
             retrievalCount = 8; // 8 inline docs
         }
 
-        const prompt = `Você é um Auditor Sênior de Compliance Farmacêutico da ANVISA. Sua função é analisar materiais promocionais e encontrar QUALQUER violação à RDC 96/2008.
-Você receberá o texto do material promocional e os trechos recuperados da RDC 96.
+        const systemInstruction = `Você é um Auditor Sênior de Compliance Farmacêutico da ANVISA. Sua função é analisar materiais promocionais e encontrar QUALQUER violação à RDC 96/2008. Regra de Ouro: Medicamentos NUNCA são "100% eficazes", NUNCA têm "garantia de resultados" e NUNCA são "isentos de efeitos colaterais". Promessas absolutistas são violações GRAVES. Leia e entenda profundamente o conteúdo enviado pelo usuário.`;
 
-Regra de Ouro: Medicamentos NUNCA são "100% eficazes", NUNCA têm "garantia de resultados" e NUNCA são "isentos de efeitos colaterais". Promessas absolutistas são violações GRAVES.
+        const prompt = `Analise o material promocional abaixo e compare rigorosamente com os artigos da RDC 96/2008 recuperados pelo RAG.
+Raciocine passo a passo (preencha a propriedade "raciocinio" no JSON). Use o Google Search para verificar fatos ambíguos do mercado, se necessário.
+Retorne APENAS um objeto JSON válido com a estrutura exata solicitada.
 
-CONTEXTO RAG (Trechos da RDC 96/2008):
+CONTEXTO RAG (Trechos da RDC 96/2008 e documentos base):
 ${ragContext}
 
-MATERIAL PROMOCIONAL PARA ANÁLISE:
+MATERIAL PROMOCIONAL (EXTRAÍDO DO ARQUIVO ENVIADO):
 """
 ${texto}
-"""
-
-Analise o texto e retorne APENAS um objeto JSON válido com esta estrutura EXATA:
-{
-  "score": [Inteiro de 0 a 100. Comece com 100 e deduza 30 para cada erro grave, 15 para moderado e 5 para leve. Se houver erro grave, a nota máxima é 70],
-  "resumo": "Resumo executivo da análise em 2-3 frases",
-  "total_graves": [Int],
-  "total_moderadas": [Int],
-  "total_leves": [Int],
-  "violacoes": [
-    {
-      "tipo": "grave|moderada|leve",
-      "texto": "Descrição técnica da violação",
-      "trecho": "Copie EXATAMENTE a frase ou trecho problemático do material original",
-      "artigo": "Ex: Artigo 4º, Inciso III da RDC 96/2008",
-      "sugestao": "Sugestão prática de correção",
-      "sugestao_reescrita": "Reescreva a frase problemática de forma compliance. Ex: Em vez de '100% eficaz', escrever 'Demonstrou alta eficácia nos ensaios clínicos'",
-      "refs": ["DOC_1","DOC_3"]
-    }
-  ],
-  "referencias": [
-    { "docId": "DOC_1", "title": "título", "trecho": "trecho usado", "uri": "url opcional" }
-  ]
-}`;
+"""`;
 
         // Extracting just the prompt execution into schema
             const expectedSchema = {
                 type: SchemaType.OBJECT,
                 properties: {
+                    raciocinio: { type: SchemaType.STRING, description: "Raciocínio diagnóstico passo a passo, detalhando a interpretação do material e a aplicação das regras RAG (CoT)." },
                     score: { type: SchemaType.INTEGER },
                     resumo: { type: SchemaType.STRING },
                     total_graves: { type: SchemaType.INTEGER },
@@ -220,10 +204,11 @@ Analise o texto e retorne APENAS um objeto JSON válido com esta estrutura EXATA
                         }
                     }
                 },
-                required: ["score", "resumo", "total_graves", "total_moderadas", "total_leves", "violacoes", "referencias"]
+                required: ["raciocinio", "score", "resumo", "total_graves", "total_moderadas", "total_leves", "violacoes", "referencias"]
             };
 
-        const generation = await generateWithFallback(prompt, expectedSchema);
+        const tools = [{ googleSearch: {} }];
+        const generation = await generateWithFallback(prompt, expectedSchema, systemInstruction, tools);
         const responseText = generation.text;
         const usedModel = generation.model;
         const parsed = JSON.parse(extractJsonObject(responseText));
