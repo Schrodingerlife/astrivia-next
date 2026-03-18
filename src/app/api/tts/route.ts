@@ -8,9 +8,9 @@ const GOOGLE_CLOUD_TTS_URL = `https://texttospeech.googleapis.com/v1/text:synthe
 const FAST_TTS_TIMEOUT_MS = 5200;
 const HQ_TTS_TIMEOUT_MS = 8200;
 const CLOUD_TTS_TIMEOUT_MS = 5200;
-const FAST_TTS_DELAY_MS = 550;
-const HQ_TTS_DELAY_MS = 0;
-const CLOUD_TTS_DELAY_MS = 1600;
+const FAST_TTS_DELAY_MS = 2000;
+const HQ_TTS_DELAY_MS = 2000;
+const CLOUD_TTS_DELAY_MS = 0;
 
 // Create a WAV header for raw PCM data (16-bit LE, mono, 24000Hz)
 function createWavHeader(pcmLength: number): Buffer {
@@ -184,7 +184,7 @@ export async function POST(req: Request) {
 
         const cloudTask = async () => {
             await delay(CLOUD_TTS_DELAY_MS);
-            const cloudVoice = isFemale ? 'pt-BR-Wavenet-A' : 'pt-BR-Wavenet-B';
+            const cloudVoice = isFemale ? 'pt-BR-Neural2-A' : 'pt-BR-Neural2-B';
             const cloudGender = isFemale ? 'FEMALE' : 'MALE';
             const mp3Buffer = await generateGoogleCloudFallback(truncated, CLOUD_TTS_TIMEOUT_MS, cloudVoice, cloudGender);
             return {

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { toolsConfig, upcomingToolsConfig } from "@/lib/tools-config";
 import { AstriviaWordmark } from "@/components/product-logos";
@@ -34,6 +35,20 @@ export function Footer() {
                         <p className="text-white/35 text-sm leading-relaxed max-w-xs">
                             Agentes de IA para Life Sciences — segurança regulatória, rastreabilidade e velocidade de campo.
                         </p>
+                        <span className="mt-5 inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-[#00D9FF]/[0.08] border border-[#00D9FF]/20 text-xs text-white/70">
+                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
+                            Parte do Google for Startups Cloud Program
+                        </span>
+                        <div className="mt-4 inline-flex items-center rounded-lg bg-white px-3 py-2">
+                            <Image
+                                src="/images/partners/google-cloud-full-color.png"
+                                alt="Google Cloud"
+                                width={132}
+                                height={28}
+                                className="h-6 w-auto object-contain"
+                                priority={false}
+                            />
+                        </div>
                     </div>
 
                     <div>

@@ -146,31 +146,24 @@ export function Navbar() {
                                         transition={{ duration: 0.2 }}
                                         className="mega-dropdown open"
                                     >
-                                        <div className="grid grid-cols-[minmax(0,2fr)_minmax(250px,1fr)] gap-4">
-                                            <section>
-                                                <p className="label mb-3 text-white/50">Demos disponíveis</p>
-                                                <div className="grid grid-cols-2 gap-3">
+                                        <div className="mega-dropdown-grid">
+                                            {/* Column 1 — Available tools */}
+                                            <section className="mega-dropdown-col">
+                                                <p className="label mb-3 text-white/50">Ferramentas</p>
+                                                <div className="space-y-2">
                                                     {toolsConfig.map((tool, idx) => (
-                                                        <article key={tool.slug} className="mega-product-card">
+                                                        <article key={tool.slug} className="mega-tool-card" style={{ "--tool-accent": tool.accent } as React.CSSProperties}>
                                                             <Link
                                                                 ref={idx === 0 ? firstDesktopItemRef : undefined}
                                                                 href={tool.landingHref}
                                                                 role="menuitem"
-                                                                className="block"
+                                                                className="mega-tool-card-link"
                                                                 onClick={() => setDesktopProductsOpen(false)}
                                                             >
-                                                                <div className="relative aspect-[16/9] overflow-hidden rounded-xl border border-white/[0.08]">
-                                                                    <Image src={tool.heroImage} alt={tool.name} fill sizes="(max-width: 1280px) 280px, 320px" className="object-cover transition-transform duration-500 hover:scale-[1.03]" />
-                                                                </div>
-                                                                <p className="mt-3 text-sm font-semibold text-white">{tool.name}</p>
-                                                                <p className="mt-1 text-xs text-white/45 truncate">{tool.description}</p>
-                                                                <div className="mt-2 flex flex-wrap gap-1.5">
-                                                                    {tool.chips.map((chip) => (
-                                                                        <span key={chip} className="menu-chip">{chip}</span>
-                                                                    ))}
-                                                                </div>
+                                                                <p className="text-sm font-semibold text-white">{tool.name}</p>
+                                                                <p className="mt-0.5 text-xs text-white/50 line-clamp-2">{tool.headline}</p>
                                                             </Link>
-                                                            <Link href={tool.demoHref} className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/75 hover:text-white transition-colors" onClick={() => setDesktopProductsOpen(false)}>
+                                                            <Link href={tool.demoHref} className="mega-tool-demo-link" onClick={() => setDesktopProductsOpen(false)}>
                                                                 Iniciar Demo <ChevronRight size={14} />
                                                             </Link>
                                                         </article>
@@ -178,29 +171,30 @@ export function Navbar() {
                                                 </div>
                                             </section>
 
-                                            <div className="space-y-3">
-                                                <section className="menu-side-panel">
-                                                    <p className="label mb-2 text-white/50">Em breve</p>
-                                                    <div className="space-y-2">
-                                                        {upcomingToolsConfig.map((tool) => (
-                                                            <Link key={tool.slug} href={tool.href} className="menu-soon-item" onClick={() => setDesktopProductsOpen(false)}>
-                                                                <span className="text-sm font-medium text-white/90">{tool.name}</span>
-                                                                <span className="text-xs text-white/45">{tool.description}</span>
-                                                            </Link>
-                                                        ))}
-                                                    </div>
-                                                </section>
-                                                <section className="menu-side-panel">
-                                                    <p className="label mb-2 text-white/50">Links rápidos</p>
-                                                    <div className="space-y-1">
-                                                        {quickLinks.map((link) => (
-                                                            <Link key={link.href} href={link.href} className="menu-quick-link" onClick={() => setDesktopProductsOpen(false)}>
-                                                                {link.name}
-                                                            </Link>
-                                                        ))}
-                                                    </div>
-                                                </section>
-                                            </div>
+                                            {/* Column 2 — Upcoming */}
+                                            <section className="mega-dropdown-col">
+                                                <p className="label mb-3 text-white/50">Em breve</p>
+                                                <div className="space-y-2">
+                                                    {upcomingToolsConfig.map((tool) => (
+                                                        <Link key={tool.slug} href={tool.href} className="menu-soon-item" onClick={() => setDesktopProductsOpen(false)}>
+                                                            <span className="text-sm font-medium text-white/90">{tool.name}</span>
+                                                            <span className="text-xs text-white/45">{tool.description}</span>
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            </section>
+
+                                            {/* Column 3 — Quick links */}
+                                            <section className="mega-dropdown-col">
+                                                <p className="label mb-3 text-white/50">Links rápidos</p>
+                                                <div className="space-y-1">
+                                                    {quickLinks.map((link) => (
+                                                        <Link key={link.href} href={link.href} className="menu-quick-link" onClick={() => setDesktopProductsOpen(false)}>
+                                                            {link.name}
+                                                        </Link>
+                                                    ))}
+                                                </div>
+                                            </section>
                                         </div>
                                     </motion.div>
                                 )}

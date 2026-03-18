@@ -483,13 +483,13 @@ select.form-input option {
 .mega-dropdown {
   position: absolute;
   top: 100%;
-  right: -120px;
-  transform: translateY(8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
   background: rgba(12, 17, 28, 0.97);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: var(--radius-xl);
-  padding: 18px;
-  min-width: 980px;
+  padding: 20px;
+  min-width: 680px;
   opacity: 0;
   visibility: hidden;
   transition: all 0.3s var(--ease-out-expo);
@@ -500,29 +500,54 @@ select.form-input option {
 .mega-dropdown.open {
   opacity: 1;
   visibility: visible;
-  transform: translateY(0);
+  transform: translateX(-50%) translateY(0);
 }
 
-.mega-dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 16px;
+/* 3-column grid layout */
+.mega-dropdown-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 20px;
+}
+
+.mega-dropdown-col {
+  min-width: 0;
+}
+
+/* Compact tool card with accent border */
+.mega-tool-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-left: 3px solid var(--tool-accent, #00D9FF);
   border-radius: 12px;
-  transition: background 0.2s ease;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.01));
+  padding: 14px 14px 10px;
+  transition: all 0.25s ease;
+}
+
+.mega-tool-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.mega-tool-card-link {
+  display: block;
   text-decoration: none;
   color: inherit;
 }
 
-.mega-dropdown-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+.mega-tool-demo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+  transition: color 0.2s ease;
 }
 
-.mega-product-card {
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-lg);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.015));
-  padding: 12px;
+.mega-tool-demo-link:hover {
+  color: #fff;
 }
 
 .menu-chip {
@@ -838,8 +863,7 @@ select.form-input option {
 
 @media (max-width: 1280px) {
   .mega-dropdown {
-    min-width: 860px;
-    right: -70px;
+    min-width: 600px;
   }
 }
 

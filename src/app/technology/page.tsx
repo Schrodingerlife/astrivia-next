@@ -105,9 +105,21 @@ export default function TechnologyPage() {
                     <h1 className="heading-lg mb-4">
                         Arquitetura <span className="text-gradient-cyan">Técnica</span>
                     </h1>
-                    <p className="body-lg max-w-2xl mx-auto">
+                    <p className="body-lg max-w-2xl mx-auto mb-8">
                         Construído com Vertex AI Agent Engine na Google Cloud
                     </p>
+                    <div className="flex justify-center">
+                        <div className="rounded-xl bg-white px-5 py-3">
+                            <Image
+                                src="/images/partners/google-cloud-full-color.png"
+                                alt="Google Cloud"
+                                width={148}
+                                height={32}
+                                className="h-8 w-auto object-contain"
+                                priority={false}
+                            />
+                        </div>
+                    </div>
                 </motion.div>
             </section>
 

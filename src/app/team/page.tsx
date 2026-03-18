@@ -18,22 +18,48 @@ interface TeamMember {
     linkedin: string;
 }
 
+const teamOverrides: Record<string, Partial<TeamMember>> = {
+    "nicollas": {
+        role: "CEO & Founder",
+        bio: "Fundador da Astrivia AI. Especialista em projetos, estratégia e inteligência artificial aplicada à saúde. Atua na indústria farmacêutica.",
+        experience: ["Projetos & Estratégia", "IA Aplicada à Saúde", "Indústria Farmacêutica"],
+    },
+    "andre": {
+        role: "CSO & Co-Founder",
+        bio: "Co-fundador responsável pela frente financeira, estratégia comercial e captação de novos clientes. Impulsiona o crescimento da Astrivia AI através de parcerias estratégicas e desenvolvimento de negócios.",
+        experience: ["Financeiro", "Captação de Clientes", "Estratégia Comercial", "Desenvolvimento de Negócios"],
+    },
+    "gabriel": {
+        role: "COO & Co-Founder",
+        bio: "Co-fundador com experiência em qualidade MedTech e validação regulatória. Responsável por operações, compliance e validação de produtos na Astrivia AI.",
+        experience: ["Qualidade MedTech", "Validação Regulatória", "Compliance", "Operações"],
+    },
+};
+
+function normalizeTeamMember(member: TeamMember): TeamMember {
+    // Match by first name (case-insensitive, accent-insensitive) to handle Firebase name variations
+    const nameLower = member.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    const overrideKey = Object.keys(teamOverrides).find(key => nameLower.includes(key));
+    if (!overrideKey) return member;
+    return { ...member, ...teamOverrides[overrideKey] };
+}
+
 const defaultTeam: TeamMember[] = [
     {
         name: "Nícollas Braga",
         role: "CEO & Founder",
         image: "/images/team-nicollas.jpg",
-        bio: "Fundador da Astrivia AI. Profissional de Farmácia com experiência em PMO, Novos Negócios e Pós-Registro. Lidera a visão estratégica e desenvolvimento de soluções de IA para Life Sciences.",
-        experience: ["Founder", "PMO", "Novos Negócios", "Pós-Registro"],
+        bio: "Fundador da Astrivia AI. Especialista em projetos, estratégia e inteligência artificial aplicada à saúde. Atua na indústria farmacêutica.",
+        experience: ["Projetos & Estratégia", "IA Aplicada à Saúde", "Indústria Farmacêutica"],
         quote: "A inovação em saúde precisa de velocidade sem comprometer segurança.",
         linkedin: "https://www.linkedin.com/in/nicollas-healthtech/",
     },
     {
         name: "André Guilherme",
-        role: "CTO & Co-Founder",
+        role: "CSO & Co-Founder",
         image: "/images/team-andre.jpg",
-        bio: "Profissional de Farmácia com experiência em Estratégia B2B e Desenvolvimento de Produto. Responsável pela arquitetura técnica e desenvolvimento de produtos de IA.",
-        experience: ["Estratégia B2B", "Desenvolvimento de Produto", "Tech Lead", "AI Engineering"],
+        bio: "Co-fundador responsável pela frente financeira, estratégia comercial e captação de novos clientes. Impulsiona o crescimento da Astrivia AI através de parcerias estratégicas e desenvolvimento de negócios.",
+        experience: ["Financeiro", "Captação de Clientes", "Estratégia Comercial", "Desenvolvimento de Negócios"],
         quote: "Dados e estratégia caminham juntos na indústria farmacêutica.",
         linkedin: "https://www.linkedin.com/in/andretobiasmendes/",
     },
@@ -41,8 +67,8 @@ const defaultTeam: TeamMember[] = [
         name: "Gabriel Katakura",
         role: "COO & Co-Founder",
         image: "/images/team/gabriel.jpg?v=2",
-        bio: "Profissional de Farmácia com experiência em Qualidade MedTech e Validação Regulatória. Responsável por operações, compliance e validação de produtos.",
-        experience: ["Qualidade", "Validação Regulatória", "Compliance", "Operações"],
+        bio: "Co-fundador com experiência em qualidade MedTech e validação regulatória. Responsável por operações, compliance e validação de produtos na Astrivia AI.",
+        experience: ["Qualidade MedTech", "Validação Regulatória", "Compliance", "Operações"],
         quote: "Compliance não é obstáculo, é vantagem competitiva.",
         linkedin: "https://www.linkedin.com/in/gkatakura/",
     },
@@ -78,7 +104,7 @@ export default function TeamPage() {
                 if (!querySnapshot.empty) {
                     const teamData: TeamMember[] = [];
                     querySnapshot.forEach((doc) => {
-                        teamData.push({ id: doc.id, ...doc.data() } as TeamMember);
+                        teamData.push(normalizeTeamMember({ id: doc.id, ...doc.data() } as TeamMember));
                     });
                     setTeam(teamData);
                 }
@@ -229,6 +255,19 @@ export default function TeamPage() {
                                 <span className="text-white/40 font-medium text-sm">{partner}</span>
                             </motion.div>
                         ))}
+                    </div>
+                    {/* Google Cloud full-color wordmark (preferred): on white background */}
+                    <div className="flex justify-center mt-10">
+                        <div className="rounded-xl bg-white px-5 py-3">
+                            <Image
+                                src="/images/partners/google-cloud-full-color.png"
+                                alt="Google Cloud"
+                                width={148}
+                                height={32}
+                                className="h-8 w-auto object-contain"
+                                priority={false}
+                            />
+                        </div>
                     </div>
                 </div>
             </section>

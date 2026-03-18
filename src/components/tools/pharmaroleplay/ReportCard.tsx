@@ -23,13 +23,13 @@ import {
 import ScoreRing from './ScoreRing';
 import Link from 'next/link';
 
-interface AnaliseItem {
+export interface AnaliseItem {
     frase_usuario: string;
     problema: string;
     exemplo_melhor: string;
 }
 
-interface AvaliacaoData {
+export interface AvaliacaoData {
     score_final: number;
     aprovado: boolean;
     xp_ganho: number;
@@ -39,7 +39,7 @@ interface AvaliacaoData {
     usou_tecnicas_fechamento: boolean;
 }
 
-interface Relatorio {
+export interface Relatorio {
     scoreGeral: number;
     scores: {
         tom: number;

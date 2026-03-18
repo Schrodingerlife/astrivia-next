@@ -3,45 +3,10 @@
 import { useMemo, useRef, useState } from "react";
 import { CheckCircle2, FileText, Loader2, ScanText, ShieldCheck, Sparkles, Upload, Wand2 } from "lucide-react";
 
-type RiskLevel = "grave" | "moderada" | "leve";
+import { useMedsafe } from "./useMedsafe";
+import type { RiskLevel } from "./useMedsafe";
+
 type WorkspaceTab = "overview" | "documents";
-
-interface Violation {
-    id: number;
-    tipo: RiskLevel;
-    texto: string;
-    trecho: string;
-    artigo: string;
-    sugestao: string;
-    sugestao_reescrita?: string;
-}
-
-interface AnalysisResult {
-    score: number;
-    resumo: string;
-    tempoAnalise: number;
-    violacoes: Violation[];
-    retrievalCount?: number;
-    analysisId?: string | null;
-    referencias?: Array<{
-        docId: string;
-        title: string;
-        trecho: string;
-        uri?: string;
-    }>;
-}
-
-const TEXT_MIME_TYPES = new Set(["text/plain", "text/markdown", "text/csv", "application/csv"]);
-const OCR_MIME_TYPES = new Set([
-    "application/pdf",
-    "image/jpeg",
-    "image/jpg",
-    "image/png",
-    "image/webp",
-    "image/gif",
-    "image/bmp",
-    "image/tiff",
-]);
 
 function riskClass(level: RiskLevel) {
     if (level === "grave") return "text-red-200 border-red-500/35 bg-red-500/10";
@@ -51,15 +16,21 @@ function riskClass(level: RiskLevel) {
 
 export default function MedSafeApp() {
     const [tab, setTab] = useState<WorkspaceTab>("overview");
-    const [text, setText] = useState("");
-    const [fileName, setFileName] = useState<string | null>(null);
-    const [isExtracting, setIsExtracting] = useState(false);
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [result, setResult] = useState<AnalysisResult | null>(null);
     const [expandedSuggestion, setExpandedSuggestion] = useState<number | null>(null);
     const [hoveredViolation, setHoveredViolation] = useState<number | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const {
+        text,
+        setText,
+        fileName,
+        isExtracting,
+        isLoading,
+        error,
+        result,
+        handleUpload,
+        runAnalysis
+    } = useMedsafe();
 
     const summary = useMemo(() => {
         if (!result) return { grave: 0, moderada: 0, leve: 0 };
@@ -83,91 +54,6 @@ export default function MedSafeApp() {
             return { id: index, line, tipo: matched?.tipo ?? null, artigo: matched?.artigo ?? null, violationId: matched?.id ?? null };
         });
     }, [text, result]);
-
-    const handleUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (!file) return;
-        // Reset input value so same file can be re-selected
-        event.target.value = "";
-        setFileName(file.name);
-        setError(null);
-
-        const isText = TEXT_MIME_TYPES.has(file.type) || /\.(txt|md|csv)$/i.test(file.name);
-        const isOcr = OCR_MIME_TYPES.has(file.type) || /\.(pdf|jpe?g|png|webp|gif|bmp|tiff?)$/i.test(file.name);
-
-        if (isText) {
-            const reader = new FileReader();
-            reader.onload = () => setText(String(reader.result || ""));
-            reader.readAsText(file);
-            return;
-        }
-
-        if (isOcr) {
-            setIsExtracting(true);
-            setText("");
-            const reader = new FileReader();
-            reader.onload = async () => {
-                try {
-                    // Strip the "data:mimeType;base64," prefix
-                    const dataUrl = reader.result as string;
-                    const base64 = dataUrl.split(",")[1];
-                    const mimeType = file.type || (file.name.endsWith(".pdf") ? "application/pdf" : "image/jpeg");
-
-                    const response = await fetch("/api/medsafe/extract-text", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ fileBase64: base64, mimeType }),
-                    });
-                    const data = await response.json();
-                    if (!response.ok) {
-                        setError(data.error || "Falha na leitura do documento");
-                    } else {
-                        setText(data.text);
-                    }
-                } catch {
-                    setError("Falha ao processar o arquivo");
-                } finally {
-                    setIsExtracting(false);
-                }
-            };
-            reader.readAsDataURL(file);
-            return;
-        }
-
-        setError("Formato não suportado. Use PDF, imagem (JPG, PNG, WEBP) ou texto.");
-    };
-
-    const runAnalysis = async () => {
-        if (!text.trim()) return;
-        setIsLoading(true);
-        setResult(null);
-        setError(null);
-        try {
-            const started = Date.now();
-            const response = await fetch("/api/medsafe", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ texto: text }),
-            });
-            if (!response.ok) {
-                const payload = await response.json().catch(() => ({}));
-                const msg = payload?.details
-                    ? `${payload.error}: ${payload.details}`
-                    : payload?.error || "Falha na análise RAG";
-                throw new Error(msg);
-            }
-            const data = (await response.json()) as AnalysisResult;
-            setResult({
-                ...data,
-                tempoAnalise: Number(((Date.now() - started) / 1000).toFixed(1)),
-            });
-        } catch (analysisError) {
-            const message = analysisError instanceof Error ? analysisError.message : "Falha na análise RAG";
-            setError(message);
-        } finally {
-            setIsLoading(false);
-        }
-    };
 
     const score = result?.score ?? null;
     const scoreColor = score === null ? '#10B981' : score >= 90 ? '#10B981' : score >= 70 ? '#eab308' : '#ef4444';
