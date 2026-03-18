@@ -212,10 +212,10 @@ export default function SocialVigilanteApp({ embedded = false }: SocialVigilante
     const sourceLabel = dataSource === "live"
         ? "Google Search"
         : dataSource === "gemini-generated"
-        ? "Simulado por IA"
+        ? "IA Gemini"
         : dataSource === "error"
         ? "Erro"
-        : "";
+        : "Sistema";
 
     return (
         <div className={`flex text-white ${embedded ? "min-h-[900px]" : "h-[calc(100vh-82px)] overflow-hidden"} bg-[radial-gradient(circle_at_20%_0%,#22103f_0%,#0b1330_36%,#050913_78%)]`}>
