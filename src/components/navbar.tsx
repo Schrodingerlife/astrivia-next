@@ -203,7 +203,13 @@ export function Navbar() {
                         </div>
 
                         {navLinks.map((link) => (
-                            <Link key={link.name} href={link.href} className={`px-4 py-2 text-sm font-medium transition-colors rounded-full hover:bg-white/[0.04] ${isActive(link.href) ? "text-white" : "text-white/60 hover:text-white"}`}>
+                            <Link 
+                                key={link.name} 
+                                href={link.href} 
+                                className={`px-4 py-2 text-sm font-medium transition-colors rounded-full hover:bg-white/[0.04] ${
+                                    isActive(link.href) ? "text-white nav-link-active" : "text-white/60 hover:text-white"
+                                }`}
+                            >
                                 {link.name}
                             </Link>
                         ))}
@@ -213,7 +219,7 @@ export function Navbar() {
                         <Link href="/platform" className={`text-sm font-medium transition-colors px-4 py-2 ${isActive("/platform") ? "text-white" : "text-white/60 hover:text-white"}`}>
                             Login
                         </Link>
-                        <Link href="/tools/social-vigilante/demo" className="btn-primary text-sm !py-2.5 !px-6">Testar Grátis</Link>
+                        <Link href="/tools/social-vigilante/demo" className="btn-primary btn-shimmer text-sm !py-2.5 !px-6">Testar Grátis</Link>
                     </div>
 
                     <button type="button" aria-label={mobileMenuOpen ? "Fechar menu" : "Abrir menu"} aria-expanded={mobileMenuOpen} className="lg:hidden inline-flex items-center justify-center h-10 w-10 rounded-xl border border-white/10 text-white hover:bg-white/5 transition-colors" onClick={() => setMobileMenuOpen((prev) => !prev)}>

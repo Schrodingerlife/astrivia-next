@@ -8,11 +8,11 @@ import { MouseGlow } from "@/components/home/MouseGlow";
 
 export function ClientLayout({ children }: { children: ReactNode }) {
     return (
-        <AuthProvider>
+        <>
             <MouseGlow />
             <Navbar />
             <main>{children}</main>
             <Footer />
-        </AuthProvider>
+        </>
     );
 }

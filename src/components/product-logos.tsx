@@ -2,7 +2,7 @@
 import Image from "next/image";
 
 /* ============== BRAND LOGO ============== */
-const ASTRIVIA_LOGO_SRC = "/images/astrivia_ai_logo_3d.svg";
+const ASTRIVIA_LOGO_SRC = "/images/astrivia_ai_logo_3d.webp";
 
 export function AstriviaSymbol({ size = 36 }: { size?: number }) {
     return (
